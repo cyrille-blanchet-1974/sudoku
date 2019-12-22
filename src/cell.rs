@@ -101,6 +101,22 @@ impl Cell {
     pub fn get_column(&self) -> u8 {
         self.column
     }
+    pub fn get_val(&self) -> u8 {
+        match &self.state {
+            State::Resolved => self.answer,
+            _ => 0,
+        }
+    }
+    pub fn set_val(&mut self, val: u8) {
+        //self.state = State::Resolved;
+        //self.answer = val;
+        for i in 1..=MAX {
+            if i != val {
+                let pos = i.try_into().unwrap();
+                self.remove_a_possible(pos);
+            }
+        }
+    }
 }
 
 pub fn get_coord(pos: u8) -> (u8, u8) {
