@@ -26,6 +26,22 @@ impl Cardinal {
             Cardinal::SE => 8,
         }
     }
+
+    pub fn from(&self, val:u8) -> Cardinal {
+        match val {
+            0=> Cardinal::NW,
+            1=>Cardinal::N,
+            2=>Cardinal::NE,
+            3=>Cardinal::W,
+            4=>Cardinal::C,
+            5=>Cardinal::E,
+            6=>Cardinal::SW,
+            7=>Cardinal::S,
+            8=>Cardinal::SE,
+            _=>Cardinal::SE,//default
+        }
+    }
+
 }
 
 pub struct Accessor {
@@ -67,8 +83,6 @@ impl Accessor {
         };
         res
     }
-
-    //TODO: revert: found a line, a column or a square where a position is
 }
 
 fn gen_squares() -> HashMap<u8, Vec<u8>> {
