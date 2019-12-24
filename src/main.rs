@@ -1,8 +1,9 @@
+mod accessor;
 mod cell;
 mod constant;
 mod grid;
-mod accessor;
 
+use accessor::*;
 use constant::*;
 use grid::*;
 use std::io;
@@ -37,7 +38,7 @@ fn fill(g: &mut Grid) {
     }
 }
 
-fn test(){
+fn test() {
     let mut g = Grid::new();
     g.display();
     g.set_val(1, 1, 1);
@@ -124,6 +125,7 @@ fn test(){
     g.check_puzzle();
     g.display();
 
+    let a = Accessor::new();
 }
 
 fn main() {
@@ -138,7 +140,4 @@ fn main() {
     test();
 
     fill(&mut g);
-
-
-
 }

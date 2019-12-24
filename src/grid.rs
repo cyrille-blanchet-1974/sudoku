@@ -1,6 +1,6 @@
+use super::accessor::*;
 use super::cell::*;
 use super::constant::*;
-use super::accessor::*;
 use std::convert::TryInto;
 
 pub struct Grid {
@@ -57,8 +57,8 @@ impl Grid {
         }
     }
 
-    pub fn check_puzzle(&self) -> bool{
-        let attendu = 9+8+7+6+5+4+3+2+1;
+    pub fn check_puzzle(&self) -> bool {
+        let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;
         let mut c = 0;
         //ctl by line
         for line in 1..=LINESIZE {
@@ -69,7 +69,7 @@ impl Grid {
                 c += cell.get_val();
             }
             if c != attendu {
-                println!("unckeck line {} => {}",line,c);
+                println!("unckeck line {} => {}", line, c);
                 return false;
             }
         }
@@ -82,42 +82,42 @@ impl Grid {
                 c += cell.get_val();
             }
             if c != attendu {
-                println!("unckeck column {} => {}",column,c);
+                println!("unckeck column {} => {}", column, c);
                 return false;
             }
         }
         //ctl by square
-        if ! self.check_square(1,3,1,3) {
+        if !self.check_square(1, 3, 1, 3) {
             return false;
         }
-        if ! self.check_square(4,6,1,3) {
+        if !self.check_square(4, 6, 1, 3) {
             return false;
         }
-        if ! self.check_square(7,9,1,3) {
+        if !self.check_square(7, 9, 1, 3) {
             return false;
         }
-        if ! self.check_square(1,3,4,6) {
+        if !self.check_square(1, 3, 4, 6) {
             return false;
         }
-        if ! self.check_square(4,6,4,6) {
+        if !self.check_square(4, 6, 4, 6) {
             return false;
         }
-        if ! self.check_square(7,9,4,6) {
+        if !self.check_square(7, 9, 4, 6) {
             return false;
         }
-        if ! self.check_square(1,3,7,9) {
+        if !self.check_square(1, 3, 7, 9) {
             return false;
         }
-        if ! self.check_square(4,6,7,9) {
+        if !self.check_square(4, 6, 7, 9) {
             return false;
         }
-        if ! self.check_square(7,9,7,9) {
+        if !self.check_square(7, 9, 7, 9) {
             return false;
         }
         return true;
     }
-    fn check_square(&self,l1:u8,l2:u8,c1:u8,c2:u8) -> bool{
-        let attendu = 9+8+7+6+5+4+3+2+1;
+    fn check_square(&self, l1: u8, l2: u8, c1: u8, c2: u8) -> bool {
+        let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;
         let mut c = 0;
         for column in c1..=c2 {
             for line in l1..=l2 {
@@ -127,12 +127,11 @@ impl Grid {
             }
         }
         if c != attendu {
-            println!("uncheck square {},{} {},{} => {}",c1,c2,l1,l2,c);
+            println!("uncheck square {},{} {},{} => {}", c1, c2, l1, l2, c);
             return false;
         }
         return true;
     }
-
 }
 
 fn coord_to_pos(line: u8, column: u8) -> usize {
@@ -145,7 +144,6 @@ fn resolution_test() {
     let g = Grid::new();
     assert_eq!(false, g.is_resolved());
 }
-
 
 #[test]
 fn display_test() {
@@ -238,7 +236,7 @@ fn display_test() {
 #[test]
 fn check_test() {
     let mut g = Grid::new();
-    assert_eq!(false,g.check_puzzle());
+    assert_eq!(false, g.check_puzzle());
     g.set_val(1, 1, 1);
     g.set_val(1, 2, 2);
     g.set_val(1, 3, 3);
@@ -320,6 +318,5 @@ fn check_test() {
     g.set_val(9, 7, 6);
     g.set_val(9, 8, 7);
     g.set_val(9, 9, 8);
-    assert_eq!(true,g.check_puzzle());
+    assert_eq!(true, g.check_puzzle());
 }
-
