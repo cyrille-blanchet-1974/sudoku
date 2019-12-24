@@ -1,5 +1,6 @@
 use super::cell::*;
 use super::constant::*;
+use super::accessor::*;
 use std::convert::TryInto;
 
 pub struct Grid {
@@ -19,6 +20,7 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
+        //TODO: remove this value from possibles of the line, the column and the square
     }
 
     /**
@@ -50,9 +52,12 @@ impl Grid {
             println!();
         }
         println!("------------------------------------");
+        if self.is_resolved() {
+            println!("Puzzle soled!");
+        }
     }
 
-    pub fn check(&self) -> bool{
+    pub fn check_puzzle(&self) -> bool{
         let attendu = 9+8+7+6+5+4+3+2+1;
         let mut c = 0;
         //ctl by line
@@ -233,7 +238,7 @@ fn display_test() {
 #[test]
 fn check_test() {
     let mut g = Grid::new();
-    assert_eq!(false,g.check());
+    assert_eq!(false,g.check_puzzle());
     g.set_val(1, 1, 1);
     g.set_val(1, 2, 2);
     g.set_val(1, 3, 3);
@@ -315,6 +320,6 @@ fn check_test() {
     g.set_val(9, 7, 6);
     g.set_val(9, 8, 7);
     g.set_val(9, 9, 8);
-    assert_eq!(true,g.check());
+    assert_eq!(true,g.check_puzzle());
 }
 

@@ -1,6 +1,7 @@
 mod cell;
 mod constant;
 mod grid;
+mod accessor;
 
 use constant::*;
 use grid::*;
@@ -120,7 +121,7 @@ fn test(){
     g.set_val(9, 7, 6);
     g.set_val(9, 8, 7);
     g.set_val(9, 9, 8);
-    g.check();
+    g.check_puzzle();
     g.display();
 
 }
