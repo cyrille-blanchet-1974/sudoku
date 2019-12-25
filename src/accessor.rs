@@ -11,34 +11,36 @@ pub enum Cardinal {
     NW,
     SE,
     SW,
+    UNKNOWN,
 }
 impl Cardinal {
     pub fn get_value(&self) -> u8 {
         match self {
-            Cardinal::NW => 0,
-            Cardinal::N => 1,
-            Cardinal::NE => 2,
-            Cardinal::W => 3,
-            Cardinal::C => 4,
-            Cardinal::E => 5,
-            Cardinal::SW => 6,
-            Cardinal::S => 7,
-            Cardinal::SE => 8,
+            Cardinal::NW => 1,
+            Cardinal::N => 2,
+            Cardinal::NE => 3,
+            Cardinal::W => 4,
+            Cardinal::C => 5,
+            Cardinal::E => 6,
+            Cardinal::SW => 7,
+            Cardinal::S => 8,
+            Cardinal::SE => 9,
+            Cardinal::UNKNOWN => 0,
         }
     }
 
     pub fn from(&self, val:u8) -> Cardinal {
         match val {
-            0=> Cardinal::NW,
-            1=>Cardinal::N,
-            2=>Cardinal::NE,
-            3=>Cardinal::W,
-            4=>Cardinal::C,
-            5=>Cardinal::E,
-            6=>Cardinal::SW,
-            7=>Cardinal::S,
-            8=>Cardinal::SE,
-            _=>Cardinal::SE,//default
+            1=>Cardinal::NW,
+            2=>Cardinal::N,
+            3=>Cardinal::NE,
+            4=>Cardinal::W,
+            5=>Cardinal::C,
+            6=>Cardinal::E,
+            7=>Cardinal::SW,
+            8=>Cardinal::S,
+            9=>Cardinal::SE,
+            _=>Cardinal::UNKNOWN,//default
         }
     }
 
@@ -87,7 +89,7 @@ impl Accessor {
 
 fn gen_squares() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
-    let mut i = 0;
+    let mut i = 1;
     for l in 0..3 {
         for c in 0..3 {
             res.insert(i, gen_square(l * 3, (l + 1) * 3, c * 3, (c + 1) * 3));
@@ -110,7 +112,7 @@ fn gen_square(l1: u8, l2: u8, c1: u8, c2: u8) -> Vec<u8> {
 fn gen_lines() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
     for i in 0..LINESIZE {
-        res.insert(i, gen_line(i));
+        res.insert(i+1, gen_line(i));
     }
     res
 }
@@ -128,7 +130,7 @@ fn gen_line(l: u8) -> Vec<u8> {
 fn gen_columns() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
     for i in 0..COLUMNSIZE {
-        res.insert(i, gen_column(i));
+        res.insert(i+1, gen_column(i));
     }
     res
 }
@@ -148,9 +150,9 @@ fn lines_test() {
     assert_eq!(gen_line(0), vec!(0, 1, 2, 3, 4, 5, 6, 7, 8));
     assert_eq!(gen_line(8), vec!(72, 73, 74, 75, 76, 77, 78, 79, 80));
     let l = gen_lines();
-    assert_eq!(l.get(&0).unwrap(), &vec!(0, 1, 2, 3, 4, 5, 6, 7, 8));
+    assert_eq!(l.get(&1).unwrap(), &vec!(0, 1, 2, 3, 4, 5, 6, 7, 8));
     assert_eq!(
-        l.get(&8).unwrap(),
+        l.get(&9).unwrap(),
         &vec!(72, 73, 74, 75, 76, 77, 78, 79, 80)
     );
 }
@@ -160,8 +162,8 @@ fn columns_test() {
     assert_eq!(gen_column(0), vec!(0, 9, 18, 27, 36, 45, 54, 63, 72));
     assert_eq!(gen_column(8), vec!(8, 17, 26, 35, 44, 53, 62, 71, 80));
     let l = gen_columns();
-    assert_eq!(l.get(&0).unwrap(), &vec!(0, 9, 18, 27, 36, 45, 54, 63, 72));
-    assert_eq!(l.get(&8).unwrap(), &vec!(8, 17, 26, 35, 44, 53, 62, 71, 80));
+    assert_eq!(l.get(&1).unwrap(), &vec!(0, 9, 18, 27, 36, 45, 54, 63, 72));
+    assert_eq!(l.get(&9).unwrap(), &vec!(8, 17, 26, 35, 44, 53, 62, 71, 80));
 }
 
 #[test]
@@ -176,9 +178,9 @@ fn squares_test() {
         vec!(27, 28, 29, 36, 37, 38, 45, 46, 47)
     );
     let l = gen_squares();
-    assert_eq!(l.get(&0).unwrap(), &vec!(0, 1, 2, 9, 10, 11, 18, 19, 20));
+    assert_eq!(l.get(&1).unwrap(), &vec!(0, 1, 2, 9, 10, 11, 18, 19, 20));
     assert_eq!(
-        l.get(&3).unwrap(),
+        l.get(&4).unwrap(),
         &vec!(27, 28, 29, 36, 37, 38, 45, 46, 47)
     );
 }
