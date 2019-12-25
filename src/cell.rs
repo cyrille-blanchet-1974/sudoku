@@ -83,10 +83,12 @@ impl Cell {
      */
     pub fn remove_a_possible(&mut self, val: usize) {
         match &self.state {
-            State::Resolved => panic!("cell {} is already solved", self.position),
-            _ => self.possibles[val - 1] = false,
+            State::Resolved => return,//println!("cell {} is already solved", self.position),
+            State::Unknown => {
+                self.possibles[val - 1] = false;
+                self.verify_resolve();
+            },
         };
-        self.verify_resolve();
     }
 
     /**
@@ -104,6 +106,9 @@ impl Cell {
     }
     pub fn get_column(&self) -> u8 {
         self.column
+    }
+    pub fn get_square(&self)-> Cardinal {
+        self.square
     }
     pub fn get_val(&self) -> u8 {
         match &self.state {

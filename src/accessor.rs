@@ -2,6 +2,7 @@ use super::constant::*;
 use std::collections::HashMap;
 use std::cmp::PartialEq;
 
+#[derive(Debug, Copy, Clone)]
 pub enum Cardinal {
     N,
     S,

@@ -24,7 +24,42 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
+        println!("setting value {} on cell[{}]",val,pos);
         //TODO: remove this value from possibles of the line, the column and the square
+        let lin = self.acc.get_line(cell.get_line());
+        let col = self.acc.get_column(cell.get_column());
+        let squ = self.acc.get_square(cell.get_square());
+        /*
+        for c in lin{
+            let cc:usize = c.try_into().unwrap();
+            if cc != pos {
+                let cell: &mut Cell = &mut (self.cells[cc]);
+                if cell.is_a_possible(val.try_into().unwrap()) {
+                    println!("(line] removing value value {} from the possible of on cell[{}]",val,cc);
+                    cell.remove_a_possible(val.try_into().unwrap());
+                }
+            }
+        }
+        for c in col{
+            let cc:usize = c.try_into().unwrap();
+            if cc != pos {
+                let cell: &mut Cell = &mut (self.cells[cc]);
+                if cell.is_a_possible(val.try_into().unwrap()) {
+                    println!("[column] removing value value {} from the possible of on cell[{}]",val,cc);
+                    cell.remove_a_possible(val.try_into().unwrap());
+                }
+            }
+        }*/
+        for c in squ{
+            let cc:usize = c.try_into().unwrap();
+            if cc != pos {
+               let cell: &mut Cell = &mut (self.cells[cc]);
+                if cell.is_a_possible(val.try_into().unwrap()) {
+                    println!("[square] removing value value {} from the possible of on cell[{}]",val,cc);
+                    cell.remove_a_possible(val.try_into().unwrap());
+                }
+            }
+        }
     }
 
     /**
