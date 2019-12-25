@@ -5,6 +5,7 @@ use std::convert::TryInto;
 
 pub struct Grid {
     cells: Vec<Cell>,
+    acc: Accessor,
 }
 
 impl Grid {
@@ -13,7 +14,10 @@ impl Grid {
         for i in 0..GRIDSIZE {
             data.push(Cell::new(i + 1));
         }
-        Grid { cells: data }
+        Grid { 
+            cells: data,
+            acc: Accessor::new(),
+         }
     }
 
     pub fn set_val(&mut self, line: u8, column: u8, val: u8) {

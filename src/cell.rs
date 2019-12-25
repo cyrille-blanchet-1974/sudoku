@@ -1,4 +1,5 @@
 use super::constant::*;
+use super::accessor::Cardinal;
 use std::convert::TryInto;
 
 enum State {
@@ -12,6 +13,7 @@ pub struct Cell {
     position: u8, //position in the grid
     column: u8,
     line: u8,
+    square: Cardinal,
     possibles: Vec<bool>,
     //TODO   hypothesis : u8,
     answer: u8,
@@ -24,11 +26,13 @@ impl Cell {
             possibles.push(true);
         }
         let coord = get_coord(pos);
+        let square = get_square(coord);
         Cell {
             state: State::Unknown,
             position: pos,
             column: coord.1,
             line: coord.0,
+            square,
             possibles,
             //TODO           hypothesis : 0,
             answer: 0,
@@ -129,6 +133,12 @@ pub fn get_coord(pos: u8) -> (u8, u8) {
         }
     }
     panic!("Position {} not supported", pos);
+}
+
+pub fn get_square(coord : (u8, u8))-> Cardinal{
+    let n = (coord.0 /3) *3 + (coord.1 / 3);
+    let tmp = Cardinal::C;
+    tmp.from(n)
 }
 
 #[test]
