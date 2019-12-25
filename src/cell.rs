@@ -141,9 +141,35 @@ pub fn get_coord(pos: u8) -> (u8, u8) {
 }
 
 pub fn get_square(coord : (u8, u8))-> Cardinal{
-    let n = (coord.0 /3) *3 + (coord.1 / 3) + 1;
+    let res = match coord.0{
+        1..=3 => {
+            match coord.1{
+                1..=3 => 1,
+                4..=6 => 2,
+                7..=9 => 3,
+                _=>0,
+            }        
+        },
+        4..=6 => {
+            match coord.1{
+                1..=3 => 4,
+                4..=6 => 5,
+                7..=9 => 6,
+                _=>0,
+            }        
+        },
+        7..=9 => {
+            match coord.1{
+                1..=3 => 7,
+                4..=6 => 8,
+                7..=9 => 9,
+                _=>0,
+            }        
+        },
+        _=>0,
+    };
     let tmp = Cardinal::C;
-    tmp.from(n)
+    tmp.from(res)
 }
 
 #[test]
@@ -158,6 +184,8 @@ fn get_line_test() {
     assert_eq!(2, c.get_line());
     let c = Cell::new(81);
     assert_eq!(9, c.get_line());
+    let c = Cell::new(13);
+    assert_eq!(2, c.get_line());
 }
 
 #[test]
@@ -172,6 +200,8 @@ fn get_column_test() {
     assert_eq!(7, c.get_column());
     let c = Cell::new(81);
     assert_eq!(9, c.get_column());
+    let c = Cell::new(13);
+    assert_eq!(4, c.get_column());
 }
 
 #[test]
@@ -200,7 +230,44 @@ fn resolution_test() {
 
 #[test]
 fn get_square_test() {
-    assert_eq!(1, get_square((0,0)).get_value());
-    assert_eq!(5, get_square((4,4)).get_value());
-    assert_eq!(9, get_square((8,8)).get_value());
+    assert_eq!(1, get_square(get_coord(1)).get_value());
+    assert_eq!(1, get_square(get_coord(2)).get_value());
+    assert_eq!(1, get_square(get_coord(3)).get_value());
+    assert_eq!(2, get_square(get_coord(4)).get_value());
+    assert_eq!(2, get_square(get_coord(5)).get_value());
+    assert_eq!(2, get_square(get_coord(6)).get_value());
+    assert_eq!(3, get_square(get_coord(7)).get_value());
+    assert_eq!(3, get_square(get_coord(8)).get_value());
+    assert_eq!(3, get_square(get_coord(9)).get_value());
+    assert_eq!(1, get_square(get_coord(10)).get_value());
+    assert_eq!(1, get_square(get_coord(11)).get_value());
+    assert_eq!(1, get_square(get_coord(12)).get_value());
+    assert_eq!(2, get_square(get_coord(13)).get_value());
+    assert_eq!(2, get_square(get_coord(14)).get_value());
+    assert_eq!(2, get_square(get_coord(15)).get_value());
+    assert_eq!(3, get_square(get_coord(16)).get_value());
+    assert_eq!(3, get_square(get_coord(17)).get_value());
+    assert_eq!(3, get_square(get_coord(18)).get_value());
+    assert_eq!(1, get_square(get_coord(19)).get_value());
+    assert_eq!(1, get_square(get_coord(20)).get_value());
+    assert_eq!(1, get_square(get_coord(21)).get_value());
+    assert_eq!(2, get_square(get_coord(22)).get_value());
+    assert_eq!(2, get_square(get_coord(23)).get_value());
+    assert_eq!(2, get_square(get_coord(24)).get_value());
+    assert_eq!(3, get_square(get_coord(25)).get_value());
+    assert_eq!(3, get_square(get_coord(26)).get_value());
+    assert_eq!(3, get_square(get_coord(27)).get_value());
+
+    
+    assert_eq!(1, get_square((1,1)).get_value());
+    assert_eq!(1, get_square((2,1)).get_value());
+    assert_eq!(1, get_square((3,1)).get_value());
+    assert_eq!(1, get_square((1,2)).get_value());
+    assert_eq!(1, get_square((2,2)).get_value());
+    assert_eq!(1, get_square((3,2)).get_value());
+    assert_eq!(1, get_square((1,3)).get_value());
+    assert_eq!(1, get_square((2,3)).get_value());
+    assert_eq!(1, get_square((3,3)).get_value());
+    assert_eq!(5, get_square((5,5)).get_value());
+    assert_eq!(9, get_square((9,9)).get_value());
 }

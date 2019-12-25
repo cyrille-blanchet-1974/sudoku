@@ -12,7 +12,7 @@ impl Grid {
     pub fn new() -> Grid {
         let mut data = Vec::new();
         for i in 0..GRIDSIZE {
-            data.push(Cell::new(i + 1));
+            data.push(Cell::new(i+1));
         }
         Grid { 
             cells: data,
@@ -25,11 +25,13 @@ impl Grid {
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
         println!("setting value {} on cell[{}]",val,pos);
-        //TODO: remove this value from possibles of the line, the column and the square
+        //TODO: remove this value from possibles of the line, the column and the square        
         let lin = self.acc.get_line(cell.get_line());
+        println!("cleaning line {} -> {:?}",cell.get_line(),lin);
         let col = self.acc.get_column(cell.get_column());
+        println!("cleaning column {} -> {:?}",cell.get_column(),col);
         let squ = self.acc.get_square(cell.get_square());
-        /*
+        println!("cleaning square {} -> {:?}",cell.get_square().get_value(),squ);
         for c in lin{
             let cc:usize = c.try_into().unwrap();
             if cc != pos {
@@ -49,7 +51,7 @@ impl Grid {
                     cell.remove_a_possible(val.try_into().unwrap());
                 }
             }
-        }*/
+        }
         for c in squ{
             let cc:usize = c.try_into().unwrap();
             if cc != pos {
@@ -285,6 +287,7 @@ fn check_test() {
     g.set_val(1, 7, 7);
     g.set_val(1, 8, 8);
     g.set_val(1, 9, 9);
+
     g.set_val(2, 1, 4);
     g.set_val(2, 2, 5);
     g.set_val(2, 3, 6);
@@ -294,6 +297,7 @@ fn check_test() {
     g.set_val(2, 7, 1);
     g.set_val(2, 8, 2);
     g.set_val(2, 9, 3);
+
     g.set_val(3, 1, 7);
     g.set_val(3, 2, 8);
     g.set_val(3, 3, 9);
@@ -303,6 +307,7 @@ fn check_test() {
     g.set_val(3, 7, 4);
     g.set_val(3, 8, 5);
     g.set_val(3, 9, 6);
+
     g.set_val(4, 1, 2);
     g.set_val(4, 2, 3);
     g.set_val(4, 3, 4);
@@ -312,6 +317,7 @@ fn check_test() {
     g.set_val(4, 7, 8);
     g.set_val(4, 8, 9);
     g.set_val(4, 9, 1);
+
     g.set_val(5, 1, 5);
     g.set_val(5, 2, 6);
     g.set_val(5, 3, 7);
@@ -321,6 +327,7 @@ fn check_test() {
     g.set_val(5, 7, 2);
     g.set_val(5, 8, 3);
     g.set_val(5, 9, 4);
+
     g.set_val(6, 1, 8);
     g.set_val(6, 2, 9);
     g.set_val(6, 3, 1);
@@ -330,6 +337,7 @@ fn check_test() {
     g.set_val(6, 7, 5);
     g.set_val(6, 8, 6);
     g.set_val(6, 9, 7);
+
     g.set_val(7, 1, 3);
     g.set_val(7, 2, 4);
     g.set_val(7, 3, 5);
@@ -339,6 +347,7 @@ fn check_test() {
     g.set_val(7, 7, 9);
     g.set_val(7, 8, 1);
     g.set_val(7, 9, 2);
+
     g.set_val(8, 1, 6);
     g.set_val(8, 2, 7);
     g.set_val(8, 3, 8);
@@ -348,6 +357,7 @@ fn check_test() {
     g.set_val(8, 7, 3);
     g.set_val(8, 8, 4);
     g.set_val(8, 9, 5);
+
     g.set_val(9, 1, 9);
     g.set_val(9, 2, 1);
     g.set_val(9, 3, 2);
@@ -357,5 +367,7 @@ fn check_test() {
     g.set_val(9, 7, 6);
     g.set_val(9, 8, 7);
     g.set_val(9, 9, 8);
+
+    g.display();
     assert_eq!(true, g.check_puzzle());
 }
