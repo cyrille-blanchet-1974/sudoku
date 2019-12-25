@@ -136,7 +136,7 @@ pub fn get_coord(pos: u8) -> (u8, u8) {
 }
 
 pub fn get_square(coord : (u8, u8))-> Cardinal{
-    let n = (coord.0 /3) *3 + (coord.1 / 3);
+    let n = (coord.0 /3) *3 + (coord.1 / 3) + 1;
     let tmp = Cardinal::C;
     tmp.from(n)
 }
@@ -191,4 +191,11 @@ fn resolution_test() {
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());
+}
+
+#[test]
+fn get_square_test() {
+    assert_eq!(1, get_square((0,0)).get_value());
+    assert_eq!(5, get_square((4,4)).get_value());
+    assert_eq!(9, get_square((8,8)).get_value());
 }

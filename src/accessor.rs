@@ -1,5 +1,6 @@
 use super::constant::*;
 use std::collections::HashMap;
+use std::cmp::PartialEq;
 
 pub enum Cardinal {
     N,
@@ -43,7 +44,12 @@ impl Cardinal {
             _=>Cardinal::UNKNOWN,//default
         }
     }
+}
 
+impl PartialEq for Cardinal{
+    fn eq(&self, other: &Self) -> bool {
+        self.get_value() == other.get_value()
+    }
 }
 
 pub struct Accessor {
