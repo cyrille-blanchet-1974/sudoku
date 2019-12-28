@@ -91,7 +91,7 @@ impl Cell {
      */
     pub fn remove_a_possible(&mut self, val: usize) {
         match &self.state {
-            State::Resolved => return,//println!("cell {} is already solved", self.position),
+            State::Resolved => {},//println!("cell {} is already solved", self.position),
             State::Unknown => {
                 self.possibles[val - 1] = false;
                 self.verify_resolvution();

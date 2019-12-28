@@ -16,7 +16,7 @@ pub enum Cardinal {
     UNKNOWN,
 }
 impl Cardinal {
-    pub fn get_value(&self) -> u8 {
+    pub fn get_value(self) -> u8 {
         match self {
             Cardinal::NW => 1,
             Cardinal::N => 2,
@@ -31,7 +31,7 @@ impl Cardinal {
         }
     }
 
-    pub fn from(&self, val:u8) -> Cardinal {
+    pub fn from(self, val:u8) -> Cardinal {
         match val {
             1=>Cardinal::NW,
             2=>Cardinal::N,
@@ -48,7 +48,7 @@ impl Cardinal {
     /*
      get coord of square ((line,column) ,(line,column))
     */
-    pub fn get_coord(&self) -> ((u8,u8),(u8,u8)){
+    pub fn get_coord(self) -> ((u8,u8),(u8,u8)){
         match self {
             Cardinal::NW => ((1, 1), (3, 3)),
             Cardinal::N  => ((4, 1), (6, 3)),
@@ -65,7 +65,7 @@ impl Cardinal {
     /*
      get other square of the same line/row
     */
-    pub fn get_other(&self) -> Vec<Cardinal>{
+    pub fn get_other(self) -> Vec<Cardinal>{
         match self {
             Cardinal::NW => vec!(Cardinal::N,Cardinal::NE,Cardinal::W,Cardinal::SW),
             Cardinal::N  => vec!(Cardinal::NW,Cardinal::NE,Cardinal::C,Cardinal::S),
@@ -82,10 +82,47 @@ impl Cardinal {
     /*
     get all squares
     */
-    pub fn get_all(&self) -> Vec<Cardinal>{
+    pub fn get_all(self) -> Vec<Cardinal>{
         vec!(Cardinal::NW,Cardinal::N,Cardinal::NE,
              Cardinal::W ,Cardinal::C,Cardinal::S,
              Cardinal::SW,Cardinal::S,Cardinal::SE)
+    }
+    /*
+     get lines of a square
+    */
+        /*
+     get coord of square ((line,column) ,(line,column))
+    */
+    pub fn get_lines(self) -> Vec<u8>{
+        match self {
+            Cardinal::NW => vec!(1,2,3),
+            Cardinal::N  => vec!(1,2,3),
+            Cardinal::NE => vec!(1,2,3),
+            Cardinal::W  => vec!(4,5,6),
+            Cardinal::C  => vec!(4,5,6),
+            Cardinal::E  => vec!(4,5,6),
+            Cardinal::SW => vec!(7,8,9),
+            Cardinal::S  => vec!(7,8,9),
+            Cardinal::SE => vec!(7,8,9),
+            Cardinal::UNKNOWN => Vec::new(),
+        }
+    }
+    /*
+    get columns of a square
+    */
+    pub fn get_columns(self) -> Vec<u8>{
+        match self {
+            Cardinal::NW => vec!(1,2,3),
+            Cardinal::W  => vec!(1,2,3),
+            Cardinal::SW => vec!(1,2,3),
+            Cardinal::N  => vec!(4,5,6),
+            Cardinal::C  => vec!(4,5,6),
+            Cardinal::S  => vec!(4,5,6),
+            Cardinal::E  => vec!(7,8,9),
+            Cardinal::NE => vec!(7,8,9),
+            Cardinal::SE => vec!(7,8,9),
+            Cardinal::UNKNOWN => Vec::new(),
+        }
     }
 }
 
@@ -111,28 +148,22 @@ impl Accessor {
     }
 
     pub fn get_line(&self,l:u8)->Vec<u8>{
-        let res = 
         match self.lines.get(&l){
             None =>Vec::new(),
             Some(x)=>x.clone()
-        };
-        res
+        }
     }
     pub fn get_column(&self,c:u8)->Vec<u8>{
-        let res = 
         match self.columns.get(&c){
             None =>Vec::new(),
             Some(x)=>x.clone()
-        };
-        res
+        }
     }
     pub fn get_square(&self,s:Cardinal)->Vec<u8>{
-        let res = 
         match self.squares.get(&(s.get_value())){
             None =>Vec::new(),
             Some(x)=>x.clone()
-        };
-        res
+        }
     }
 }
 

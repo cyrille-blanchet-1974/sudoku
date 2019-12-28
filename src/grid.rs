@@ -223,7 +223,7 @@ impl Grid {
                 return false;
             }    
         }
-        return true;
+        true
     }
     fn check_square(&self, card:Cardinal) -> bool {
         let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;
@@ -247,7 +247,7 @@ impl Grid {
             println!("uncheck square {},{} {},{} => {}", c1, c2, l1, l2, c);
             return false;
         }
-        return true;
+        true
     }
 
 }
