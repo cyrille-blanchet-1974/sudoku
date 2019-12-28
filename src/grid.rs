@@ -3,14 +3,19 @@ use super::cell::*;
 use super::constant::*;
 use std::convert::TryInto;
 
+//Gris => 81 cells
 pub struct Grid {
-    cells: Vec<Cell>,
-    acc: Accessor,
+    cells: Vec<Cell>, //the cells are stored in a Vec
+    acc: Accessor, //methods to retreive cells by coordinates
 }
 
 impl Grid {
+    /*
+    Construct the grid
+    */
     pub fn new() -> Grid {
         let mut data = Vec::new();
+        //construct all cells
         for i in 0..GRIDSIZE {
             data.push(Cell::new(i+1));
         }
@@ -91,16 +96,23 @@ impl Grid {
         res
     }
 
+    /*
+    If a cell is resolved then his value is in no other cells of the same Row, 
+    in no other cells of the same column and in no other cells of the same square
+    */
     pub fn resolve_lvl1(&mut self,p:u8){
+       //get other cells
        let clean = self.get_to_clean(p);       
+       //get value of the received one
        let pos:usize = p.try_into().unwrap();
        let cell: &mut Cell = &mut (self.cells[pos]);
-       let val = cell.get_val();
-       if val == 0 {
-           return;
-       }
+       let val = match cell.get_answer(){
+           None => return,
+           Some(x) => x,
+       };
        println!("to clean = {:?}/val = {}",clean,val);
        let val:usize = val.try_into().unwrap();
+       //remove the value to all the others
        for c in clean{
         let cc:usize = c.try_into().unwrap();
            let cell: &mut Cell = &mut (self.cells[cc]);
@@ -108,6 +120,10 @@ impl Grid {
         }
     }
 
+    /*
+     from a cell retrieve the cells of the same line, same column and same square
+     but not the original one
+    */
     fn get_to_clean(&self,p:u8)->Vec<u8>{
         let mut res = Vec::new();
         let pos:usize = p.try_into().unwrap();
@@ -143,7 +159,10 @@ impl Grid {
             for column in 1..=COLUMNSIZE {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
-                print!(" {} |", cell.get_val());
+                match cell.get_answer(){
+                    None => print!(" ? |"),
+                    Some(x) => print!(" {} |", x),
+                };         
             }
             println!();
         }
@@ -161,17 +180,19 @@ impl Grid {
         }        
     }
 
-
     pub fn check_puzzle(&self) -> bool {
         let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;
-        let mut c = 0;
+        let mut c;
         //ctl by line
         for line in 1..=LINESIZE {
             c = 0;
             for column in 1..=COLUMNSIZE {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
-                c += cell.get_val();
+                match cell.get_answer(){
+                    None => c += 0,
+                    Some(x) => c += x,
+                };
             }
             if c != attendu {
                 println!("unckeck line {} => {}", line, c);
@@ -184,7 +205,10 @@ impl Grid {
             for line in 1..=LINESIZE {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
-                c += cell.get_val();
+                match cell.get_answer(){
+                    None => c += 0,
+                    Some(x) => c += x,
+                };
             }
             if c != attendu {
                 println!("unckeck column {} => {}", column, c);
@@ -192,43 +216,31 @@ impl Grid {
             }
         }
         //ctl by square
-        if !self.check_square(1, 3, 1, 3) {
-            return false;
-        }
-        if !self.check_square(4, 6, 1, 3) {
-            return false;
-        }
-        if !self.check_square(7, 9, 1, 3) {
-            return false;
-        }
-        if !self.check_square(1, 3, 4, 6) {
-            return false;
-        }
-        if !self.check_square(4, 6, 4, 6) {
-            return false;
-        }
-        if !self.check_square(7, 9, 4, 6) {
-            return false;
-        }
-        if !self.check_square(1, 3, 7, 9) {
-            return false;
-        }
-        if !self.check_square(4, 6, 7, 9) {
-            return false;
-        }
-        if !self.check_square(7, 9, 7, 9) {
-            return false;
+        let card = Cardinal::C;
+        for c in card.get_all()
+        {
+            if !self.check_square(c) {
+                return false;
+            }    
         }
         return true;
     }
-    fn check_square(&self, l1: u8, l2: u8, c1: u8, c2: u8) -> bool {
+    fn check_square(&self, card:Cardinal) -> bool {
         let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;
+        let c= card.get_coord();
+        let l1=(c.0).0;
+        let l2=(c.1).0;
+        let c1=(c.0).1;
+        let c2=(c.1).1;
         let mut c = 0;
         for column in c1..=c2 {
             for line in l1..=l2 {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
-                c += cell.get_val();
+                match cell.get_answer(){
+                    None => c += 0,
+                    Some(x) => c += x,
+                };
             }
         }
         if c != attendu {
@@ -237,6 +249,7 @@ impl Grid {
         }
         return true;
     }
+
 }
 
 fn coord_to_pos(line: u8, column: u8) -> usize {

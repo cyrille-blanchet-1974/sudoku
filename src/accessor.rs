@@ -45,6 +45,48 @@ impl Cardinal {
             _=>Cardinal::UNKNOWN,//default
         }
     }
+    /*
+     get coord of square ((line,column) ,(line,column))
+    */
+    pub fn get_coord(&self) -> ((u8,u8),(u8,u8)){
+        match self {
+            Cardinal::NW => ((1, 1), (3, 3)),
+            Cardinal::N  => ((4, 1), (6, 3)),
+            Cardinal::NE => ((7, 1), (9, 3)),
+            Cardinal::W  => ((1, 4), (3, 6)),
+            Cardinal::C  => ((4, 4), (6, 6)),
+            Cardinal::E  => ((7, 4), (9, 6)),
+            Cardinal::SW => ((1, 7), (3, 9)),
+            Cardinal::S  => ((4, 7), (6, 9)),
+            Cardinal::SE => ((7, 7), (9, 9)),
+            Cardinal::UNKNOWN => ((0,0),(0,0)),
+        }
+    }
+    /*
+     get other square of the same line/row
+    */
+    pub fn get_other(&self) -> Vec<Cardinal>{
+        match self {
+            Cardinal::NW => vec!(Cardinal::N,Cardinal::NE,Cardinal::W,Cardinal::SW),
+            Cardinal::N  => vec!(Cardinal::NW,Cardinal::NE,Cardinal::C,Cardinal::S),
+            Cardinal::NE => vec!(Cardinal::NW,Cardinal::N,Cardinal::E,Cardinal::SE),
+            Cardinal::W  => vec!(Cardinal::NW,Cardinal::SW,Cardinal::C,Cardinal::E),
+            Cardinal::C  => vec!(Cardinal::N,Cardinal::S,Cardinal::W,Cardinal::E),
+            Cardinal::E  => vec!(Cardinal::NE,Cardinal::SE,Cardinal::C,Cardinal::W),
+            Cardinal::SW => vec!(Cardinal::NW,Cardinal::W,Cardinal::S,Cardinal::SE),
+            Cardinal::S  => vec!(Cardinal::SW,Cardinal::SE,Cardinal::C,Cardinal::N),
+            Cardinal::SE => vec!(Cardinal::SW,Cardinal::S,Cardinal::E,Cardinal::NE),
+            Cardinal::UNKNOWN => Vec::new(),
+        }
+    }
+    /*
+    get all squares
+    */
+    pub fn get_all(&self) -> Vec<Cardinal>{
+        vec!(Cardinal::NW,Cardinal::N,Cardinal::NE,
+             Cardinal::W ,Cardinal::C,Cardinal::S,
+             Cardinal::SW,Cardinal::S,Cardinal::SE)
+    }
 }
 
 impl PartialEq for Cardinal{

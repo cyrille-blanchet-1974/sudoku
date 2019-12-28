@@ -36,6 +36,10 @@ fn fill(g: &mut Grid) {
         g.set_val(l, c, v);
         println!();
         g.display();
+        if g.check_puzzle() {
+            println!("Sudoku resolved!");        
+            return;
+        }
     }
 }
 

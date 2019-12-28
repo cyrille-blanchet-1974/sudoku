@@ -97,10 +97,10 @@ Cells of the squares:
 
 
 Resolution lvl 0:
-  a cell is resolved when there only one possible left (At start ther is 9 possible values for each cell)
+  a cell is resolved when there only one possible left (At start there is 9 possible values for each cell)
 
 Resolution lvl 1:
-  If a cell is resolved then his number is in no other cells of the same Row, in no other cells of the same column and in no other cells of the same square
+  If a cell is resolved then his value is in no other cells of the same Row, in no other cells of the same column and in no other cells of the same square
 
 Resolution lvl 2:
   if the same value is resolve in left, right, up and down square of ours we can identify where it should be

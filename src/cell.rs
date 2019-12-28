@@ -2,30 +2,37 @@ use super::constant::*;
 use super::accessor::Cardinal;
 use std::convert::TryInto;
 
+//State of the cell Resolved or unknown
+//we probably will add some hypothesis state when we will have to try some values
 enum State {
     Resolved,
     //TODO:   Hypothesis,
     Unknown,
 }
 
+//the cell
 pub struct Cell {
-    state: State,
-    position: u8, //position in the grid
-    column: u8,
-    line: u8,
-    square: Cardinal,
-    possibles: Vec<bool>,
-    //TODO   hypothesis : u8,
-    answer: u8,
+    state: State,    //its state 
+    position: u8,    //position in the grid (in the Vec in fact) -> see Map.txt
+    column: u8,      //column in the grid 1..9
+    line: u8,        //line in the grid 1..9
+    square: Cardinal,  //square in the grid
+    possibles: Vec<bool>,   //possibles values of the cell
+    //TODO   hypothesis : u8, // for the future
+    answer: u8,         //value of the cell when solved
 }
 
 impl Cell {
+    //construct a cell giving is position in the grid
     pub fn new(pos: u8) -> Cell {
+        //add all possibles
         let mut possibles = Vec::new();
         for _i in 0..MAX {
             possibles.push(true);
         }
+        //calculate line/column
         let coord = get_coord(pos);
+        //then square
         let square = get_square(coord);
         Cell {
             state: State::Unknown,
@@ -50,7 +57,7 @@ impl Cell {
     }
 
     /**
-     * get answer
+     * get final answer  is resolved
      */
     pub fn get_answer(&self) -> Option<u8> {
         match &self.state {
@@ -62,19 +69,20 @@ impl Cell {
     /**
      * check if resolved
      */
-    fn verify_resolve(&mut self) {
-        let mut count = 0;
-        let mut val = 1;
+    fn verify_resolvution(&mut self) {
+        let mut count = 0;//count of possible left
+        let mut val = 1; //val
+        //check all possible
         for i in 1..=MAX {
             let pos = i.try_into().unwrap();
             if self.is_a_possible(pos) {
-                count += 1;
-                val = i;
+                count += 1; //one more
+                val = i; 
             }
         }
-        if count == 1 {
-            self.state = State::Resolved;
-            self.answer = val;
+        if count == 1 { //if only one possible left
+            self.state = State::Resolved; //then cell is resolved
+            self.answer = val; //and we got our answer
         }
     }
 
@@ -86,13 +94,13 @@ impl Cell {
             State::Resolved => return,//println!("cell {} is already solved", self.position),
             State::Unknown => {
                 self.possibles[val - 1] = false;
-                self.verify_resolve();
+                self.verify_resolvution();
             },
         };
     }
 
     /**
-     * is the value val a possible
+     * is the value a possible
      */
     pub fn is_a_possible(&mut self, val: usize) -> bool {
         self.possibles[val - 1]
@@ -104,28 +112,37 @@ impl Cell {
     pub fn get_line(&self) -> u8 {
         self.line
     }
+    /**
+     * return the column of the cell
+     */
     pub fn get_column(&self) -> u8 {
         self.column
     }
+    /**
+     * return the square of the cell
+     */
     pub fn get_square(&self)-> Cardinal {
         self.square
     }
-    pub fn get_val(&self) -> u8 {
-        match &self.state {
-            State::Resolved => self.answer,
-            _ => 0,
-        }
-    }
+    /*
+     se the value of the cell
+    */
     pub fn set_val(&mut self, val: u8) {
+        //remove other possibles
         for i in 1..=MAX {
             if i != val {
                 let pos = i.try_into().unwrap();
                 self.remove_a_possible(pos);
             }
         }
+        //set the answer and change the state
         self.state = State::Resolved;
         self.answer = val;
     }
+
+    /*
+      display data of the cell
+    */
     pub fn debug(&self) {
         let mut poss = Vec::new();
         let mut i =1;
@@ -137,6 +154,36 @@ impl Cell {
     }
 }
 
+ 
+
+
+#[test]
+fn possible_test() {
+    let mut c = Cell::new(1);
+    for i in 1..MAX + 1 {
+        let pos = i.try_into().unwrap();
+        assert_eq!(true, c.is_a_possible(pos));
+    }
+    c.remove_a_possible(5);
+    assert_eq!(false, c.is_a_possible(5));
+}
+
+#[test]
+fn resolution_test() {
+    let mut c = Cell::new(1);
+    assert_eq!(false, c.is_resolved());
+    assert_eq!(None, c.get_answer());
+    for i in 1..MAX {
+        let pos = i.try_into().unwrap();
+        c.remove_a_possible(pos);
+    }
+    assert_eq!(true, c.is_resolved());
+    assert_eq!(Some(9), c.get_answer());
+}
+
+/*
+  from a position calculate line and column
+*/
 pub fn get_coord(pos: u8) -> (u8, u8) {
     for lin in 1..=LINESIZE {
         for col in 1..=COLUMNSIZE {
@@ -148,7 +195,30 @@ pub fn get_coord(pos: u8) -> (u8, u8) {
     }
     panic!("Position {} not supported", pos);
 }
+/**
+ * check the code that compute line/column from position
+ **/
+ #[test]
+ fn get_coord_test() {
+     let c = get_coord(1);
+     assert_eq!((1,1), c);
+     let c = get_coord(9);
+     assert_eq!((1,9), c);
+     let c = get_coord(10);
+     assert_eq!((2,1), c);
+     let c = get_coord(13);
+     assert_eq!((2,4), c);
+     let c = get_coord(15);
+     assert_eq!((2,6), c);
+     let c = get_coord(16);
+     assert_eq!((2,7), c);
+     let c = get_coord(81);
+     assert_eq!((9,9), c);
+ }
 
+ /*
+ from line and column calculate the square
+*/
 pub fn get_square(coord : (u8, u8))-> Cardinal{
     let res = match coord.0{
         1..=3 => {
@@ -180,103 +250,55 @@ pub fn get_square(coord : (u8, u8))-> Cardinal{
     let tmp = Cardinal::C;
     tmp.from(res)
 }
-
-#[test]
-fn get_line_test() {
-    let c = Cell::new(1);
-    assert_eq!(1, c.get_line());
-    let c = Cell::new(9);
-    assert_eq!(1, c.get_line());
-    let c = Cell::new(10);
-    assert_eq!(2, c.get_line());
-    let c = Cell::new(15);
-    assert_eq!(2, c.get_line());
-    let c = Cell::new(81);
-    assert_eq!(9, c.get_line());
-    let c = Cell::new(13);
-    assert_eq!(2, c.get_line());
-}
-
-#[test]
-fn get_column_test() {
-    let c = Cell::new(1);
-    assert_eq!(1, c.get_column());
-    let c = Cell::new(9);
-    assert_eq!(9, c.get_column());
-    let c = Cell::new(10);
-    assert_eq!(1, c.get_column());
-    let c = Cell::new(16);
-    assert_eq!(7, c.get_column());
-    let c = Cell::new(81);
-    assert_eq!(9, c.get_column());
-    let c = Cell::new(13);
-    assert_eq!(4, c.get_column());
-}
-
-#[test]
-fn possible_test() {
-    let mut c = Cell::new(1);
-    for i in 1..MAX + 1 {
-        let pos = i.try_into().unwrap();
-        assert_eq!(true, c.is_a_possible(pos));
-    }
-    c.remove_a_possible(5);
-    assert_eq!(false, c.is_a_possible(5));
-}
-
-#[test]
-fn resolution_test() {
-    let mut c = Cell::new(1);
-    assert_eq!(false, c.is_resolved());
-    assert_eq!(None, c.get_answer());
-    for i in 1..MAX {
-        let pos = i.try_into().unwrap();
-        c.remove_a_possible(pos);
-    }
-    assert_eq!(true, c.is_resolved());
-    assert_eq!(Some(9), c.get_answer());
-}
-
 #[test]
 fn get_square_test() {
-    assert_eq!(1, get_square(get_coord(1)).get_value());
-    assert_eq!(1, get_square(get_coord(2)).get_value());
-    assert_eq!(1, get_square(get_coord(3)).get_value());
-    assert_eq!(2, get_square(get_coord(4)).get_value());
-    assert_eq!(2, get_square(get_coord(5)).get_value());
-    assert_eq!(2, get_square(get_coord(6)).get_value());
-    assert_eq!(3, get_square(get_coord(7)).get_value());
-    assert_eq!(3, get_square(get_coord(8)).get_value());
-    assert_eq!(3, get_square(get_coord(9)).get_value());
-    assert_eq!(1, get_square(get_coord(10)).get_value());
-    assert_eq!(1, get_square(get_coord(11)).get_value());
-    assert_eq!(1, get_square(get_coord(12)).get_value());
-    assert_eq!(2, get_square(get_coord(13)).get_value());
-    assert_eq!(2, get_square(get_coord(14)).get_value());
-    assert_eq!(2, get_square(get_coord(15)).get_value());
-    assert_eq!(3, get_square(get_coord(16)).get_value());
-    assert_eq!(3, get_square(get_coord(17)).get_value());
-    assert_eq!(3, get_square(get_coord(18)).get_value());
-    assert_eq!(1, get_square(get_coord(19)).get_value());
-    assert_eq!(1, get_square(get_coord(20)).get_value());
-    assert_eq!(1, get_square(get_coord(21)).get_value());
-    assert_eq!(2, get_square(get_coord(22)).get_value());
-    assert_eq!(2, get_square(get_coord(23)).get_value());
-    assert_eq!(2, get_square(get_coord(24)).get_value());
-    assert_eq!(3, get_square(get_coord(25)).get_value());
-    assert_eq!(3, get_square(get_coord(26)).get_value());
-    assert_eq!(3, get_square(get_coord(27)).get_value());
+    //Macro (sort of)
+    fn local(i:u8)->u8{
+        local2(get_coord(i))
+    }
 
+    //Macro (sort of)
+    fn local2(i:(u8,u8))->u8{
+        get_square(i).get_value()
+    }    
+
+    assert_eq!(1, local(1));
+    assert_eq!(1, local(2));
+    assert_eq!(1, local(3));
+    assert_eq!(2, local(4));
+    assert_eq!(2, local(5));
+    assert_eq!(2, local(6));
+    assert_eq!(3, local(7));
+    assert_eq!(3, local(8));
+    assert_eq!(3, local(9));
+    assert_eq!(1, local(10));
+    assert_eq!(1, local(11));
+    assert_eq!(1, local(12));
+    assert_eq!(2, local(13));
+    assert_eq!(2, local(14));
+    assert_eq!(2, local(15));
+    assert_eq!(3, local(16));
+    assert_eq!(3, local(17));
+    assert_eq!(3, local(18));
+    assert_eq!(1, local(19));
+    assert_eq!(1, local(20));
+    assert_eq!(1, local(21));
+    assert_eq!(2, local(22));
+    assert_eq!(2, local(23));
+    assert_eq!(2, local(24));
+    assert_eq!(3, local(25));
+    assert_eq!(3, local(26));
+    assert_eq!(3, local(27));
     
-    assert_eq!(1, get_square((1,1)).get_value());
-    assert_eq!(1, get_square((2,1)).get_value());
-    assert_eq!(1, get_square((3,1)).get_value());
-    assert_eq!(1, get_square((1,2)).get_value());
-    assert_eq!(1, get_square((2,2)).get_value());
-    assert_eq!(1, get_square((3,2)).get_value());
-    assert_eq!(1, get_square((1,3)).get_value());
-    assert_eq!(1, get_square((2,3)).get_value());
-    assert_eq!(1, get_square((3,3)).get_value());
-    assert_eq!(5, get_square((5,5)).get_value());
-    assert_eq!(9, get_square((9,9)).get_value());
+    assert_eq!(1, local2((1,1)));
+    assert_eq!(1, local2((2,1)));
+    assert_eq!(1, local2((3,1)));
+    assert_eq!(1, local2((1,2)));
+    assert_eq!(1, local2((2,2)));
+    assert_eq!(1, local2((3,2)));
+    assert_eq!(1, local2((1,3)));
+    assert_eq!(1, local2((2,3)));
+    assert_eq!(1, local2((3,3)));
+    assert_eq!(5, local2((5,5)));
+    assert_eq!(9, local2((9,9)));
 }
