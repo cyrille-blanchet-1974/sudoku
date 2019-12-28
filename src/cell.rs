@@ -127,7 +127,13 @@ impl Cell {
         self.answer = val;
     }
     pub fn debug(&self) {
-        println!("pos:{} resolved:{} possibles:{:?}",self.position,self.is_resolved(),self.possibles);
+        let mut poss = Vec::new();
+        let mut i =1;
+        for r in &self.possibles{
+            if *r {poss.push(i);}
+            i+=1;
+        }
+        println!("pos:{} resolved:{} possibles:{:?}",self.position,self.is_resolved(),poss);
     }
 }
 
