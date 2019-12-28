@@ -1,5 +1,5 @@
 use super::constant::*;
-use super::accessor::Cardinal;
+use super::accessor::*;
 use std::convert::TryInto;
 
 //State of the cell Resolved or unknown
@@ -31,9 +31,9 @@ impl Cell {
             possibles.push(true);
         }
         //calculate line/column
-        let coord = get_coord(pos);
+        let coord = pos_to_coord(pos);
         //then square
-        let square = get_square(coord);
+        let square = pos_to_square(pos);
         Cell {
             state: State::Unknown,
             position: pos,
@@ -179,126 +179,4 @@ fn resolution_test() {
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());
-}
-
-/*
-  from a position calculate line and column
-*/
-pub fn get_coord(pos: u8) -> (u8, u8) {
-    for lin in 1..=LINESIZE {
-        for col in 1..=COLUMNSIZE {
-            let p = col + (lin - 1) * LINESIZE;
-            if p == pos {
-                return (lin, col);
-            }
-        }
-    }
-    panic!("Position {} not supported", pos);
-}
-/**
- * check the code that compute line/column from position
- **/
- #[test]
- fn get_coord_test() {
-     let c = get_coord(1);
-     assert_eq!((1,1), c);
-     let c = get_coord(9);
-     assert_eq!((1,9), c);
-     let c = get_coord(10);
-     assert_eq!((2,1), c);
-     let c = get_coord(13);
-     assert_eq!((2,4), c);
-     let c = get_coord(15);
-     assert_eq!((2,6), c);
-     let c = get_coord(16);
-     assert_eq!((2,7), c);
-     let c = get_coord(81);
-     assert_eq!((9,9), c);
- }
-
- /*
- from line and column calculate the square
-*/
-pub fn get_square(coord : (u8, u8))-> Cardinal{
-    let res = match coord.0{
-        1..=3 => {
-            match coord.1{
-                1..=3 => 1,
-                4..=6 => 2,
-                7..=9 => 3,
-                _=>0,
-            }        
-        },
-        4..=6 => {
-            match coord.1{
-                1..=3 => 4,
-                4..=6 => 5,
-                7..=9 => 6,
-                _=>0,
-            }        
-        },
-        7..=9 => {
-            match coord.1{
-                1..=3 => 7,
-                4..=6 => 8,
-                7..=9 => 9,
-                _=>0,
-            }        
-        },
-        _=>0,
-    };
-    let tmp = Cardinal::C;
-    tmp.from(res)
-}
-#[test]
-fn get_square_test() {
-    //Macro (sort of)
-    fn local(i:u8)->u8{
-        local2(get_coord(i))
-    }
-
-    //Macro (sort of)
-    fn local2(i:(u8,u8))->u8{
-        get_square(i).get_value()
-    }    
-
-    assert_eq!(1, local(1));
-    assert_eq!(1, local(2));
-    assert_eq!(1, local(3));
-    assert_eq!(2, local(4));
-    assert_eq!(2, local(5));
-    assert_eq!(2, local(6));
-    assert_eq!(3, local(7));
-    assert_eq!(3, local(8));
-    assert_eq!(3, local(9));
-    assert_eq!(1, local(10));
-    assert_eq!(1, local(11));
-    assert_eq!(1, local(12));
-    assert_eq!(2, local(13));
-    assert_eq!(2, local(14));
-    assert_eq!(2, local(15));
-    assert_eq!(3, local(16));
-    assert_eq!(3, local(17));
-    assert_eq!(3, local(18));
-    assert_eq!(1, local(19));
-    assert_eq!(1, local(20));
-    assert_eq!(1, local(21));
-    assert_eq!(2, local(22));
-    assert_eq!(2, local(23));
-    assert_eq!(2, local(24));
-    assert_eq!(3, local(25));
-    assert_eq!(3, local(26));
-    assert_eq!(3, local(27));
-    
-    assert_eq!(1, local2((1,1)));
-    assert_eq!(1, local2((2,1)));
-    assert_eq!(1, local2((3,1)));
-    assert_eq!(1, local2((1,2)));
-    assert_eq!(1, local2((2,2)));
-    assert_eq!(1, local2((3,2)));
-    assert_eq!(1, local2((1,3)));
-    assert_eq!(1, local2((2,3)));
-    assert_eq!(1, local2((3,3)));
-    assert_eq!(5, local2((5,5)));
-    assert_eq!(9, local2((9,9)));
 }

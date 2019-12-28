@@ -17,7 +17,7 @@ impl Grid {
         let mut data = Vec::new();
         //construct all cells
         for i in 0..GRIDSIZE {
-            data.push(Cell::new(i+1));
+            data.push(Cell::new(i));
         }
         Grid { 
             cells: data,
@@ -29,45 +29,6 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
-        /*
-        println!("setting value {} on cell[{}]",val,pos);
-        //TODO: remove this value from possibles of the line, the column and the square        
-        let lin = self.acc.get_line(cell.get_line());
-        println!("cleaning line {} -> {:?}",cell.get_line(),lin);
-        let col = self.acc.get_column(cell.get_column());
-        println!("cleaning column {} -> {:?}",cell.get_column(),col);
-        let squ = self.acc.get_square(cell.get_square());
-        println!("cleaning square {} -> {:?}",cell.get_square().get_value(),squ);
-        for c in lin{
-            let cc:usize = c.try_into().unwrap();
-            if cc != pos {
-                let cell: &mut Cell = &mut (self.cells[cc]);
-                if cell.is_a_possible(val.try_into().unwrap()) {
-                    println!("(line] removing value value {} from the possible of on cell[{}]",val,cc);
-                    cell.remove_a_possible(val.try_into().unwrap());
-                }
-            }
-        }
-        for c in col{
-            let cc:usize = c.try_into().unwrap();
-            if cc != pos {
-                let cell: &mut Cell = &mut (self.cells[cc]);
-                if cell.is_a_possible(val.try_into().unwrap()) {
-                    println!("[column] removing value value {} from the possible of on cell[{}]",val,cc);
-                    cell.remove_a_possible(val.try_into().unwrap());
-                }
-            }
-        }
-        for c in squ{
-            let cc:usize = c.try_into().unwrap();
-            if cc != pos {
-               let cell: &mut Cell = &mut (self.cells[cc]);
-                if cell.is_a_possible(val.try_into().unwrap()) {
-                    println!("[square] removing value value {} from the possible of on cell[{}]",val,cc);
-                    cell.remove_a_possible(val.try_into().unwrap());
-                }
-            }
-        }*/
     }
 
     /**
@@ -96,6 +57,73 @@ impl Grid {
         res
     }
 
+    /*
+    If a value is solved in all lines squares (left/right/up/down)
+    then it possible to determine where it is in the square
+    */
+    pub fn resolve_lvl2(&mut self,p:u8){
+        //iter on squares
+        let squ = Cardinal::C;
+        for sq in squ.get_all(){
+            //iter on values
+            for value in 1..=MAX{
+                if self.check_value(sq,value).is_none(){
+                    let mut cell_with_value = Vec::new();
+                    let mut solved_on_others = true;
+                    //iter on other squares
+                    for sq2 in sq.get_other(){
+                        match self.check_value(sq2,value){
+                            None=>{solved_on_others = false;},
+                            Some(n)=>cell_with_value.push(n),
+                        }
+                    }
+                    if solved_on_others{
+                        //find the row and line of cells that got the value
+                    }
+                }
+            }
+        }
+    }  
+    /*
+    resolve lvl 2:
+    Si 1 valeure  trouvée dans 4 carrés de côtés alors on peut trouver où est cette même valeure dans le carré courant
+    1/ trouve un carré
+    2/ trouver une valeur non résolue
+    3/ déterminer les autres carrés
+         NW => N NE SW W
+         N =>  C S NW NE
+         NE => NW N E SE
+         W => NW SW C E
+         C => N S E W
+         E => NE SE W C
+         SW => W NW S SE
+         S => SW SE C N
+         SE => S SW E NE
+    => methode a ajouter a Accessor ou cardinal
+    4/ vérifier si valeur trouvée dans les 4 autres carrés
+    5/ si oui trouver les 2 lignes et les 2 colonnes
+    6/ déterminer ligne et colonne restante dans le carré
+    => méthode a ajouter a Accessor ou cardinal 
+    => trouver cellule de ligne/colonne => set val
+    
+    boucler tant qu'on trouve des choses
+    => en fin de resolve lvl 2 si changement alors refaire resolve 1 puis 2
+    */
+    /**
+     * check if value is solved in the square
+     * if so return the position of the value
+    */
+    pub fn check_value(&self,s:Cardinal,val:u8)->Option<u8>{
+        for cel in s.get_cells(){
+            let pos:usize = cel.try_into().unwrap();
+            let cell: &Cell = &(self.cells[pos]);
+            match cell.get_answer() {
+                None => {},
+                Some(n) => if n == val {return Some(cel)},
+            }             
+        }
+        None
+    }
     /*
     If a cell is resolved then his value is in no other cells of the same Row, 
     in no other cells of the same column and in no other cells of the same square
@@ -250,11 +278,6 @@ impl Grid {
         true
     }
 
-}
-
-fn coord_to_pos(line: u8, column: u8) -> usize {
-    let pos = (line - 1) * LINESIZE + column - 1;
-    pos.try_into().unwrap()
 }
 
 #[test]

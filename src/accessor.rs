@@ -1,6 +1,7 @@
 use super::constant::*;
 use std::collections::HashMap;
 use std::cmp::PartialEq;
+use std::convert::TryInto;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Cardinal {
@@ -121,6 +122,23 @@ impl Cardinal {
             Cardinal::E  => vec!(7,8,9),
             Cardinal::NE => vec!(7,8,9),
             Cardinal::SE => vec!(7,8,9),
+            Cardinal::UNKNOWN => Vec::new(),
+        }
+    }
+    /*
+     get cells of square 
+    */
+    pub fn get_cells(self) -> Vec<u8>{
+        match self {
+            Cardinal::NW => vec!(0,1,2,9,10,11,18,19,20),
+            Cardinal::N  => vec!(3,4,5,12,13,14,21,22,23),
+            Cardinal::NE => vec!(6,7,8,15,16,17,24,25,26),
+            Cardinal::W  => vec!(27,28,29,36,37,38,45,46,47),
+            Cardinal::C  => vec!(30,31,32,39,40,41,48,49,50),
+            Cardinal::E  => vec!(33,34,35,42,43,44,51,52,53),
+            Cardinal::SW => vec!(54,55,56,63,64,65,72,73,74),
+            Cardinal::S  => vec!(57,58,59,66,67,68,75,76,77),
+            Cardinal::SE => vec!(60,61,62,69,70,71,78,79,80),
             Cardinal::UNKNOWN => Vec::new(),
         }
     }
@@ -263,4 +281,116 @@ fn squares_test() {
         l.get(&4).unwrap(),
         &vec!(27, 28, 29, 36, 37, 38, 45, 46, 47)
     );
+}
+
+ /*
+ from a position calculate the square
+*/
+pub fn pos_to_square(pos : u8)-> Cardinal{
+    let coord =pos_to_coord(pos);
+    let res = match coord.0{
+        1..=3 => {
+            match coord.1{
+                1..=3 => 1,
+                4..=6 => 2,
+                7..=9 => 3,
+                _=>0,
+            }        
+        },
+        4..=6 => {
+            match coord.1{
+                1..=3 => 4,
+                4..=6 => 5,
+                7..=9 => 6,
+                _=>0,
+            }        
+        },
+        7..=9 => {
+            match coord.1{
+                1..=3 => 7,
+                4..=6 => 8,
+                7..=9 => 9,
+                _=>0,
+            }        
+        },
+        _=>0,
+    };
+    let tmp = Cardinal::C;
+    tmp.from(res)
+}
+#[test]
+fn pos_to_square_test() {
+    //Macro (sort of)
+    fn local(i:u8)->u8{
+        pos_to_square(i).get_value()
+    }
+    assert_eq!(1, local(0));
+    assert_eq!(1, local(1));
+    assert_eq!(1, local(2));
+    assert_eq!(2, local(3));
+    assert_eq!(2, local(4));
+    assert_eq!(2, local(5));
+    assert_eq!(3, local(6));
+    assert_eq!(3, local(7));
+    assert_eq!(3, local(8));
+    assert_eq!(1, local(9));
+    assert_eq!(1, local(10));
+    assert_eq!(1, local(11));
+    assert_eq!(2, local(12));
+    assert_eq!(2, local(13));
+    assert_eq!(2, local(14));
+    assert_eq!(3, local(15));
+    assert_eq!(3, local(16));
+    assert_eq!(3, local(17));
+    assert_eq!(1, local(18));
+    assert_eq!(1, local(19));
+    assert_eq!(1, local(20));
+    assert_eq!(2, local(21));
+    assert_eq!(2, local(22));
+    assert_eq!(2, local(23));
+    assert_eq!(3, local(24));
+    assert_eq!(3, local(25));
+    assert_eq!(3, local(26));
+}
+/*
+  from a position calculate line and column
+*/
+pub fn pos_to_coord(pos: u8) -> (u8, u8) {
+    for lin in 1..=LINESIZE {
+        for col in 1..=COLUMNSIZE {
+            let p = col + (lin - 1) * LINESIZE -1;
+            if p == pos {
+                return (lin, col);
+            }
+        }
+    }
+    panic!("Position {} not supported", pos);
+}
+/**
+ * check the code that compute line/column from position
+ **/
+ #[test]
+ fn pos_to_coord_test() {
+     assert_eq!((1,1), pos_to_coord( 0));
+     assert_eq!((1,9), pos_to_coord( 8));
+     assert_eq!((2,1), pos_to_coord( 9));
+     assert_eq!((2,4), pos_to_coord(12));
+     assert_eq!((2,6), pos_to_coord(14));
+     assert_eq!((2,7), pos_to_coord(15));
+     assert_eq!((9,9), pos_to_coord(80));
+ }
+
+ pub fn coord_to_pos(line: u8, column: u8) -> usize {
+    let pos = (line - 1) * LINESIZE + column - 1;
+    pos.try_into().unwrap()
+}
+#[test]
+fn coord_to_pos_test() {
+    assert_eq!( 0, coord_to_pos(1,1));
+    assert_eq!( 8, coord_to_pos(1,9));
+    assert_eq!( 9, coord_to_pos(2,1));
+    assert_eq!(12, coord_to_pos(2,4));
+    assert_eq!(14, coord_to_pos(2,6));
+    assert_eq!(15, coord_to_pos(2,7));
+    assert_eq!(80, coord_to_pos(9,9));
 }
