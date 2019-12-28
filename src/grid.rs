@@ -24,6 +24,7 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
+        /*
         println!("setting value {} on cell[{}]",val,pos);
         //TODO: remove this value from possibles of the line, the column and the square        
         let lin = self.acc.get_line(cell.get_line());
@@ -61,7 +62,7 @@ impl Grid {
                     cell.remove_a_possible(val.try_into().unwrap());
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -76,6 +77,60 @@ impl Grid {
             }
         }
         true
+    }
+
+    pub fn get_resolved(&self) -> Vec<u8>{
+        let mut res = Vec::new();
+        for i in 0..GRIDSIZE{
+            let pos: usize = i.try_into().unwrap();
+            let cell: &Cell = &self.cells[pos];
+            if cell.is_resolved() {
+                res.push(i);
+            }
+        };
+        res
+    }
+
+    pub fn resolve_lvl1(&mut self,p:u8){
+       let clean = self.get_to_clean(p);       
+       let pos:usize = p.try_into().unwrap();
+       let cell: &mut Cell = &mut (self.cells[pos]);
+       let val = cell.get_val();
+       if val == 0 {
+           return;
+       }
+       println!("to clean = {:?}/val = {}",clean,val);
+       let val:usize = val.try_into().unwrap();
+       for c in clean{
+        let cc:usize = c.try_into().unwrap();
+           let cell: &mut Cell = &mut (self.cells[cc]);
+           cell.remove_a_possible(val);
+        }
+    }
+
+    fn get_to_clean(&self,p:u8)->Vec<u8>{
+        let mut res = Vec::new();
+        let pos:usize = p.try_into().unwrap();
+        let cell: &Cell = &(self.cells[pos]);
+        let lin = self.acc.get_line(cell.get_line());
+        for l in lin{
+            if l != p {
+                res.push(l);
+            }
+        }
+        let col = self.acc.get_column(cell.get_column());
+        for c in col{
+            if c != p {
+                res.push(c);
+            }
+        }
+        let squ = self.acc.get_square(cell.get_square());
+        for s in squ{
+            if s != p {
+                res.push(s);
+            }
+        }
+        res
     }
 
     /**
@@ -97,6 +152,15 @@ impl Grid {
             println!("Puzzle soled!");
         }
     }
+
+    pub fn debug(&self) {
+        for i in 0..GRIDSIZE {
+            let pos: usize = i.try_into().unwrap();
+            let cell: &Cell = &self.cells[pos];
+            cell.debug();
+        }        
+    }
+
 
     pub fn check_puzzle(&self) -> bool {
         let attendu = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1;

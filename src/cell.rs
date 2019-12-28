@@ -117,14 +117,17 @@ impl Cell {
         }
     }
     pub fn set_val(&mut self, val: u8) {
-        //self.state = State::Resolved;
-        //self.answer = val;
         for i in 1..=MAX {
             if i != val {
                 let pos = i.try_into().unwrap();
                 self.remove_a_possible(pos);
             }
         }
+        self.state = State::Resolved;
+        self.answer = val;
+    }
+    pub fn debug(&self) {
+        println!("pos:{} resolved:{} possibles:{:?}",self.position,self.is_resolved(),self.possibles);
     }
 }
 
