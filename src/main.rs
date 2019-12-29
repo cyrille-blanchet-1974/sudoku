@@ -1,16 +1,18 @@
 mod accessor;
 mod cell;
+mod column;
 mod constant;
 mod grid;
 mod line;
-mod column;
+mod read;
 mod square;
 
 use constant::*;
 use grid::*;
+use read::*;
 use std::io;
 
-//ask the user and read his guess
+//ask the user and read his answer
 fn read_u8(mess: String) -> Option<u8> {
     println!("{}", mess);
     let mut res = String::new();
@@ -22,11 +24,22 @@ fn read_u8(mess: String) -> Option<u8> {
     let r: u8 = match res.parse() {
         Err(e) => {
             println!("erreur {}", e);
-            return None
+            return None;
         }
         Ok(v) => v,
     };
     Some(r)
+}
+
+//ask the user and read his answer
+fn read_string(mess: String) -> String {
+    println!("{}", mess);
+    let mut res = String::new();
+    io::stdin()
+        .read_line(&mut res)
+        .expect("Failed to read line");
+    let res = res.trim();
+    res.to_string()
 }
 
 fn manual() {
@@ -36,38 +49,45 @@ fn manual() {
     g.display();
     loop {
         let l = read_u8("line?".to_string());
-        if l.is_none() {continue;}
+        if l.is_none() {
+            continue;
+        }
         let l = l.unwrap();
         let c = read_u8("column?".to_string());
-        if c.is_none() {continue;}
+        if c.is_none() {
+            continue;
+        }
         let c = c.unwrap();
         let v = read_u8("value?".to_string());
-        if v.is_none() {continue;}
+        if v.is_none() {
+            continue;
+        }
         let v = v.unwrap();
         g.set_val(l, c, v);
         println!();
         g.display();
         if g.check_puzzle() {
-            println!("Sudoku resolved!");        
+            println!("Sudoku resolved!");
             return;
         }
     }
 }
 
-pub fn resolve(g:&mut Grid) -> bool
-{
+pub fn resolve(g: &mut Grid) -> bool {
     //if already resolved...
-    if g.is_resolved(){
+    if g.is_resolved() {
         return true;
     }
     //loop until no more to solve
-    loop{
-        if !g.resolve_lvl1() && !g.resolve_lvl2(){ break;}
-    }    
+    loop {
+        if !g.resolve_lvl1() && !g.resolve_lvl2() {
+            break;
+        }
+    }
     g.is_resolved()
 }
 
-fn test_solving(){
+fn test_solving() {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(2, 4, 2);
@@ -80,16 +100,16 @@ fn test_solving(){
     g1.set_val(9, 9, 9);
     g1.set_val(2, 5, 1);
     g1.set_val(5, 8, 1);
-    g1.set_val(9, 7, 1);    
-    g1.display();//g1.debug();
+    g1.set_val(9, 7, 1);
+    g1.display(); //g1.debug();
     let r = resolve(&mut g1);
     if r {
         println!("grille résolue");
     }
-    g1.display();//g1.debug();
+    g1.display(); //g1.debug();
 }
 
-fn test_solving_easy(){
+fn test_solving_easy() {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(1, 3, 7);
@@ -132,46 +152,46 @@ fn test_solving_easy(){
 
     g1.set_val(9, 7, 9);
     g1.set_val(9, 9, 5);
-    g1.display();//g1.debug();
+    g1.display(); //g1.debug();
     let r = resolve(&mut g1);
     if r {
         println!("grille résolue");
     }
-    g1.display();//g1.debug();
-    /*
-    Grid:
--------------------------------
-| 1  ?  7 | ?  ?  ? | ?  ?  ? |
-| ?  ?  4 | 2  9  ? | ?  ?  6 |
-| ?  9  ? | ?  8  7 | ?  2  4 |
--------------------------------
-| 4  7  5 | 1  ?  ? | 8  6  ? |
-| ?  ?  ? | ?  ?  ? | ?  ?  ? |
-| ?  1  3 | ?  ?  8 | 5  7  9 |
--------------------------------
-| 3  4  ? | 8  6  ? | ?  1  ? |
-| 7  ?  ? | ?  2  4 | 6  ?  ? |
-| ?  ?  ? | ?  ?  ? | 9  ?  5 |
--------------------------------    
-    Solution found
--------------------------------
-| 1  2  7 | 4  5  2 | 3  9  8 |
-| 8  3  4 | 2  9  1 | 7  5  6 |
-| 5  9  6 | 3  8  7 | 1  2  4 |
--------------------------------
-| 4  7  5 | 1  3  9 | 8  6  2 |
-| 9  6  1 | 5  7  2 | 4  3  1 |
-| 2  1  3 | 6  4  8 | 5  7  9 |
--------------------------------
-| 3  4  9 | 8  6  5 | 2  1  7 |
-| 7  5  1 | 9  2  4 | 6  8  3 |
-| 6  8  2 | 7  1  3 | 9  4  5 |
--------------------------------
+    g1.display(); //g1.debug();
+                  /*
+                      Grid:
+                  -------------------------------
+                  | 1  ?  7 | ?  ?  ? | ?  ?  ? |
+                  | ?  ?  4 | 2  9  ? | ?  ?  6 |
+                  | ?  9  ? | ?  8  7 | ?  2  4 |
+                  -------------------------------
+                  | 4  7  5 | 1  ?  ? | 8  6  ? |
+                  | ?  ?  ? | ?  ?  ? | ?  ?  ? |
+                  | ?  1  3 | ?  ?  8 | 5  7  9 |
+                  -------------------------------
+                  | 3  4  ? | 8  6  ? | ?  1  ? |
+                  | 7  ?  ? | ?  2  4 | 6  ?  ? |
+                  | ?  ?  ? | ?  ?  ? | 9  ?  5 |
+                  -------------------------------
+                      Solution found
+                  -------------------------------
+                  | 1  2  7 | 4  5  2 | 3  9  8 |
+                  | 8  3  4 | 2  9  1 | 7  5  6 |
+                  | 5  9  6 | 3  8  7 | 1  2  4 |
+                  -------------------------------
+                  | 4  7  5 | 1  3  9 | 8  6  2 |
+                  | 9  6  1 | 5  7  2 | 4  3  1 |
+                  | 2  1  3 | 6  4  8 | 5  7  9 |
+                  -------------------------------
+                  | 3  4  9 | 8  6  5 | 2  1  7 |
+                  | 7  5  1 | 9  2  4 | 6  8  3 |
+                  | 6  8  2 | 7  1  3 | 9  4  5 |
+                  -------------------------------
 
-    */
+                      */
 }
 
-fn test_solving_medium(){
+fn test_solving_medium() {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 5);
     g1.set_val(1, 5, 4);
@@ -209,45 +229,45 @@ fn test_solving_medium(){
 
     g1.set_val(9, 5, 9);
     g1.set_val(9, 9, 2);
-    g1.display();//g1.debug();
+    g1.display(); //g1.debug();
     let r = resolve(&mut g1);
     if r {
         println!("grille résolue");
     }
-    g1.display();//g1.debug();
-    /*
-    Grid:
--------------------------------
-| 5  ?  ? | ?  4  ? | ?  ?  ? |
-| ?  8  ? | ?  ?  ? | ?  2  3 |
-| ?  ?  ? | 8  5  3 | 7  ?  ? |
--------------------------------
-| 2  ?  ? | ?  ?  ? | 6  4  ? |
-| 6  ?  8 | ?  ?  ? | 3  ?  1 |
-| ?  7  4 | ?  ?  ? | ?  ?  9 |
--------------------------------
-| ?  ?  1 | 3  7  2 | ?  ?  ? |
-| 8  ?  3 | ?  ?  ? | ?  1  ? |
-| ?  ?  ? | ?  9  ? | ?  ?  2 |
--------------------------------  
-    Solution not found
--------------------------------
-| 5  ?  ? | ?  3  ? | ?  ?  ? |   <- 1 in col 7 not found because lvl 2 need 1 found line 3
-| ?  8  ? | ?  1  ? | ?  2  3 |   as 3 is already used by 7 we could found => lvl 3 is there!!!
-| ?  ?  ? | 8  5  3 | 7  ?  ? |
--------------------------------
-| 2  ?  ? | ?  8  ? | 6  4  7 |
-| 6  ?  8 | ?  2  ? | 3  7  1 |
-| ?  7  4 | ?  8  ? | 5  5  9 |
--------------------------------
-| ?  ?  1 | 3  7  2 | ?  ?  ? |
-| 8  ?  3 | ?  6  ? | 2  1  ? |
-| ?  ?  ? | ?  9  ? | 1  3  2 |
--------------------------------
-    */
+    g1.display(); //g1.debug();
+                  /*
+                      Grid:
+                  -------------------------------
+                  | 5  ?  ? | ?  4  ? | ?  ?  ? |
+                  | ?  8  ? | ?  ?  ? | ?  2  3 |
+                  | ?  ?  ? | 8  5  3 | 7  ?  ? |
+                  -------------------------------
+                  | 2  ?  ? | ?  ?  ? | 6  4  ? |
+                  | 6  ?  8 | ?  ?  ? | 3  ?  1 |
+                  | ?  7  4 | ?  ?  ? | ?  ?  9 |
+                  -------------------------------
+                  | ?  ?  1 | 3  7  2 | ?  ?  ? |
+                  | 8  ?  3 | ?  ?  ? | ?  1  ? |
+                  | ?  ?  ? | ?  9  ? | ?  ?  2 |
+                  -------------------------------
+                      Solution not found
+                  -------------------------------
+                  | 5  ?  ? | ?  3  ? | ?  ?  ? |   <- 1 in col 7 not found because lvl 2 need 1 found line 3
+                  | ?  8  ? | ?  1  ? | ?  2  3 |   as 3 is already used by 7 we could found => lvl 3 is there!!!
+                  | ?  ?  ? | 8  5  3 | 7  ?  ? |
+                  -------------------------------
+                  | 2  ?  ? | ?  8  ? | 6  4  7 |
+                  | 6  ?  8 | ?  2  ? | 3  7  1 |
+                  | ?  7  4 | ?  8  ? | 5  5  9 |
+                  -------------------------------
+                  | ?  ?  1 | 3  7  2 | ?  ?  ? |
+                  | 8  ?  3 | ?  6  ? | 2  1  ? |
+                  | ?  ?  ? | ?  9  ? | 1  3  2 |
+                  -------------------------------
+                      */
 }
 
-fn test_solving_difficult(){
+fn test_solving_difficult() {
     let mut g1 = Grid::default();
 
     g1.set_val(2, 1, 5);
@@ -282,46 +302,45 @@ fn test_solving_difficult(){
     g1.set_val(8, 7, 8);
     g1.set_val(8, 9, 1);
 
-    g1.display();//g1.debug();
+    g1.display(); //g1.debug();
     let r = resolve(&mut g1);
     if r {
         println!("grille résolue");
     }
-    g1.display();//g1.debug();
-    /*
-    Grid:
--------------------------------
-| ?  ?  ? | ?  ?  ? | ?  ?  ? |
-| 5  ?  2 | 9  ?  8 | ?  ?  ? |
-| 1  6  ? | 2  3  ? | ?  ?  ? |
--------------------------------
-| ?  ?  1 | ?  ?  ? | 7  ?  4 |
-| ?  ?  4 | ?  9  ? | 3  ?  ? |
-| 7  ?  8 | ?  ?  ? | 5  ?  ? |
--------------------------------
-| ?  ?  ? | ?  8  5 | ?  6  7 |
-| ?  ?  ? | 6  ?  7 | 8  ?  1 |
-| ?  ?  ? | ?  ?  ? | ?  ?  ? |
--------------------------------
-    Solution not found
--------------------------------
-| ?  ?  ? | ?  ?  ? | ?  ?  ? |
-| 5  ?  2 | 9  ?  8 | ?  ?  ? |
-| 1  6  7 | 2  3  4 | 9  ?  ? |
--------------------------------
-| ?  ?  1 | ?  ?  ? | 7  ?  4 |
-| ?  ?  4 | ?  9  ? | 3  ?  ? |
-| 7  ?  8 | ?  ?  ? | 5  ?  ? |
--------------------------------
-| ?  ?  ? | ?  8  5 | ?  6  7 |
-| ?  ?  ? | 6  ?  7 | 8  ?  1 |
-| ?  ?  ? | 8  ?  ? | ?  7  ? |<= 8 here is invalid bug to investigate
--------------------------------
-*/
+    g1.display(); //g1.debug();
+                  /*
+                      Grid:
+                  -------------------------------
+                  | ?  ?  ? | ?  ?  ? | ?  ?  ? |
+                  | 5  ?  2 | 9  ?  8 | ?  ?  ? |
+                  | 1  6  ? | 2  3  ? | ?  ?  ? |
+                  -------------------------------
+                  | ?  ?  1 | ?  ?  ? | 7  ?  4 |
+                  | ?  ?  4 | ?  9  ? | 3  ?  ? |
+                  | 7  ?  8 | ?  ?  ? | 5  ?  ? |
+                  -------------------------------
+                  | ?  ?  ? | ?  8  5 | ?  6  7 |
+                  | ?  ?  ? | 6  ?  7 | 8  ?  1 |
+                  | ?  ?  ? | ?  ?  ? | ?  ?  ? |
+                  -------------------------------
+                      Solution not found
+                  -------------------------------
+                  | ?  ?  ? | ?  ?  ? | ?  ?  ? |
+                  | 5  ?  2 | 9  ?  8 | ?  ?  ? |
+                  | 1  6  7 | 2  3  4 | 9  ?  ? |
+                  -------------------------------
+                  | ?  ?  1 | ?  ?  ? | 7  ?  4 |
+                  | ?  ?  4 | ?  9  ? | 3  ?  ? |
+                  | 7  ?  8 | ?  ?  ? | 5  ?  ? |
+                  -------------------------------
+                  | ?  ?  ? | ?  8  5 | ?  6  7 |
+                  | ?  ?  ? | 6  ?  7 | 8  ?  1 |
+                  | ?  ?  ? | 8  ?  ? | ?  7  ? |<= 8 here is invalid bug to investigate
+                  -------------------------------
+                  */
 }
 
-
-fn test_solving_diabolical(){
+fn test_solving_diabolical() {
     let mut g1 = Grid::default();
 
     g1.set_val(1, 2, 8);
@@ -357,75 +376,95 @@ fn test_solving_diabolical(){
     g1.set_val(9, 7, 9);
     g1.set_val(9, 8, 3);
 
-    g1.display();//g1.debug();
+    g1.display(); //g1.debug();
     let r = resolve(&mut g1);
     if r {
         println!("grille résolue");
     }
-    g1.display();//g1.debug();
-    /*
-    Grid:
--------------------------------
-| ?  8  3 | 9  ?  ? | ?  ?  ? |
-| 5  ?  ? | ?  ?  ? | ?  ?  ? |
-| ?  ?  ? | 1  4  ? | ?  2  ? |
--------------------------------
-| 3  ?  9 | ?  ?  8 | 6  ?  ? |
-| ?  ?  7 | ?  ?  ? | 1  ?  ? |
-| ?  ?  4 | 2  ?  ? | 3  ?  7 |
--------------------------------
-| ?  4  ? | ?  6  3 | ?  ?  ? |
-| ?  ?  ? | ?  ?  ? | ?  ?  5 |
-| ?  ?  ? | ?  ?  4 | 9  3  ? |
--------------------------------
-    Solution not found
--------------------------------
-| ?  8  3 | 9  ?  ? | ?  ?  ? |
-| 5  ?  ? | ?  ?  ? | ?  ?  ? |
-| ?  ?  6 | 1  4  ? | ?  2  ? |
--------------------------------
-| 3  ?  9 | ?  ?  8 | 6  ?  ? |
-| ?  3  7 | ?  ?  ? | 1  ?  ? | <=3 here is incorrect!
-| ?  ?  4 | 2  ?  ? | 3  ?  7 |
--------------------------------
-| ?  4  ? | ?  6  3 | ?  ?  ? |
-| ?  ?  ? | 4  ?  ? | ?  ?  3 |<=4 here is wrong
-| ?  ?  ? | ?  ?  4 | 9  3  ? |
--------------------------------
-*/
+    g1.display(); //g1.debug();
+                  /*
+                      Grid:
+                  -------------------------------
+                  | ?  8  3 | 9  ?  ? | ?  ?  ? |
+                  | 5  ?  ? | ?  ?  ? | ?  ?  ? |
+                  | ?  ?  ? | 1  4  ? | ?  2  ? |
+                  -------------------------------
+                  | 3  ?  9 | ?  ?  8 | 6  ?  ? |
+                  | ?  ?  7 | ?  ?  ? | 1  ?  ? |
+                  | ?  ?  4 | 2  ?  ? | 3  ?  7 |
+                  -------------------------------
+                  | ?  4  ? | ?  6  3 | ?  ?  ? |
+                  | ?  ?  ? | ?  ?  ? | ?  ?  5 |
+                  | ?  ?  ? | ?  ?  4 | 9  3  ? |
+                  -------------------------------
+                      Solution not found
+                  -------------------------------
+                  | ?  8  3 | 9  ?  ? | ?  ?  ? |
+                  | 5  ?  ? | ?  ?  ? | ?  ?  ? |
+                  | ?  ?  6 | 1  4  ? | ?  2  ? |
+                  -------------------------------
+                  | 3  ?  9 | ?  ?  8 | 6  ?  ? |
+                  | ?  3  7 | ?  ?  ? | 1  ?  ? | <=3 here is incorrect!
+                  | ?  ?  4 | 2  ?  ? | 3  ?  7 |
+                  -------------------------------
+                  | ?  4  ? | ?  6  3 | ?  ?  ? |
+                  | ?  ?  ? | 4  ?  ? | ?  ?  3 |<=4 here is wrong
+                  | ?  ?  ? | ?  ?  4 | 9  3  ? |
+                  -------------------------------
+                  */
+}
+
+fn test_from_disk() {
+    let fic = read_string("Filename?".to_string());
+    let mut g1 = read(&fic);
+    let r = resolve(&mut g1);
+    if r {
+        println!("grille résolue");
+    }
+    g1.display(); //g1.debug();
 }
 
 fn main() {
     println!("Sudoku resolution!");
     println!("size = {}x{}", LINESIZE, COLUMNSIZE);
 
-    loop
-    {
+    loop {
         println!("1:test solving");
         println!("2:test solving easy");
         println!("3:test solving medium");
         println!("4:test solving difficult");
         println!("5:test solving diabolical");
+        println!("8:test a grid read from disk");
         println!("9:fill manualy");
         //TODO => add read from file
-        match read_u8("Your choice?".to_string()){
-            None => {continue;},
-            Some(1)=>{test_solving();},
-            Some(2)=>{test_solving_easy();}, //-> Ok
-            Some(3)=>{test_solving_medium();},//-> not yet
-            Some(4)=>{test_solving_difficult();},//-> not solved
-            Some(5)=>{test_solving_diabolical();},//->
-            Some(9)=>{manual();},//->
-            _=> {continue;},
+        match read_u8("Your choice?".to_string()) {
+            None => {
+                continue;
+            }
+            Some(1) => {
+                test_solving();
+            }
+            Some(2) => {
+                test_solving_easy();
+            } //-> Ok
+            Some(3) => {
+                test_solving_medium();
+            } //-> not yet
+            Some(4) => {
+                test_solving_difficult();
+            } //-> not solved
+            Some(5) => {
+                test_solving_diabolical();
+            } //->
+            Some(8) => {
+                test_from_disk();
+            }
+            Some(9) => {
+                manual();
+            } //->
+            _ => {
+                continue;
+            }
         }
-        
-    
-
     }
-
-
-    
-
-
-
 }

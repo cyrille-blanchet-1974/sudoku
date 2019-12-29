@@ -1,5 +1,5 @@
-use super::constant::*;
 use super::accessor::*;
+use super::constant::*;
 use std::convert::TryInto;
 
 //State of the cell Resolved or unknown
@@ -12,14 +12,14 @@ enum State {
 
 //the cell
 pub struct Cell {
-    state: State,    //its state 
-    position: usize,    //position in the grid (in the Vec in fact) -> see Map.txt
-    column: u8,      //column in the grid 1..9
-    line: u8,        //line in the grid 1..9
-    square: Cardinal,  //square in the grid
-    possibles: Vec<bool>,   //possibles values of the cell
+    state: State,         //its state
+    position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
+    column: u8,           //column in the grid 1..9
+    line: u8,             //line in the grid 1..9
+    square: Cardinal,     //square in the grid
+    possibles: Vec<bool>, //possibles values of the cell
     //TODO   hypothesis : u8, // for the future
-    answer: u8,         //value of the cell when solved
+    answer: u8, //value of the cell when solved
 }
 
 impl Cell {
@@ -70,17 +70,18 @@ impl Cell {
      * check if resolved
      */
     fn verify_resolvution(&mut self) {
-        let mut count = 0;//count of possible left
+        let mut count = 0; //count of possible left
         let mut val = 1; //val
-        //check all possible
+                         //check all possible
         for i in 1..=MAX {
             let pos = i.try_into().unwrap();
             if self.is_a_possible(pos) {
                 count += 1; //one more
-                val = i; 
+                val = i;
             }
         }
-        if count == 1 { //if only one possible left
+        if count == 1 {
+            //if only one possible left
             self.state = State::Resolved; //then cell is resolved
             self.answer = val; //and we got our answer
         }
@@ -91,11 +92,11 @@ impl Cell {
      */
     pub fn remove_a_possible(&mut self, val: usize) {
         match &self.state {
-            State::Resolved => {},//println!("cell {} is already solved", self.position),
+            State::Resolved => {} //println!("cell {} is already solved", self.position),
             State::Unknown => {
                 self.possibles[val - 1] = false;
                 self.verify_resolvution();
-            },
+            }
         };
     }
 
@@ -121,7 +122,7 @@ impl Cell {
     /**
      * return the square of the cell
      */
-    pub fn get_square(&self)-> Cardinal {
+    pub fn get_square(&self) -> Cardinal {
         self.square
     }
     /*
@@ -145,17 +146,21 @@ impl Cell {
     */
     pub fn debug(&self) {
         let mut poss = Vec::new();
-        let mut i =1;
-        for r in &self.possibles{
-            if *r {poss.push(i);}
-            i+=1;
+        let mut i = 1;
+        for r in &self.possibles {
+            if *r {
+                poss.push(i);
+            }
+            i += 1;
         }
-        println!("pos:{} resolved:{} possibles:{:?}",self.position,self.is_resolved(),poss);
+        println!(
+            "pos:{} resolved:{} possibles:{:?}",
+            self.position,
+            self.is_resolved(),
+            poss
+        );
     }
 }
-
- 
-
 
 #[test]
 fn possible_test() {

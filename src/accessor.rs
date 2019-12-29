@@ -1,6 +1,6 @@
 use super::constant::*;
-use std::collections::HashMap;
 use std::cmp::PartialEq;
+use std::collections::HashMap;
 use std::convert::TryInto;
 
 #[derive(Debug, Copy, Clone)]
@@ -32,119 +32,127 @@ impl Cardinal {
         }
     }
 
-    pub fn from(self, val:u8) -> Cardinal {
+    pub fn from(self, val: u8) -> Cardinal {
         match val {
-            1=>Cardinal::NW,
-            2=>Cardinal::N,
-            3=>Cardinal::NE,
-            4=>Cardinal::W,
-            5=>Cardinal::C,
-            6=>Cardinal::E,
-            7=>Cardinal::SW,
-            8=>Cardinal::S,
-            9=>Cardinal::SE,
-            _=>Cardinal::UNKNOWN,//default
+            1 => Cardinal::NW,
+            2 => Cardinal::N,
+            3 => Cardinal::NE,
+            4 => Cardinal::W,
+            5 => Cardinal::C,
+            6 => Cardinal::E,
+            7 => Cardinal::SW,
+            8 => Cardinal::S,
+            9 => Cardinal::SE,
+            _ => Cardinal::UNKNOWN, //default
         }
     }
     /*
      get coord of square ((line,column) ,(line,column))
     */
-    pub fn get_coord(self) -> ((u8,u8),(u8,u8)){
+    pub fn get_coord(self) -> ((u8, u8), (u8, u8)) {
         match self {
             Cardinal::NW => ((1, 1), (3, 3)),
-            Cardinal::N  => ((4, 1), (6, 3)),
+            Cardinal::N => ((4, 1), (6, 3)),
             Cardinal::NE => ((7, 1), (9, 3)),
-            Cardinal::W  => ((1, 4), (3, 6)),
-            Cardinal::C  => ((4, 4), (6, 6)),
-            Cardinal::E  => ((7, 4), (9, 6)),
+            Cardinal::W => ((1, 4), (3, 6)),
+            Cardinal::C => ((4, 4), (6, 6)),
+            Cardinal::E => ((7, 4), (9, 6)),
             Cardinal::SW => ((1, 7), (3, 9)),
-            Cardinal::S  => ((4, 7), (6, 9)),
+            Cardinal::S => ((4, 7), (6, 9)),
             Cardinal::SE => ((7, 7), (9, 9)),
-            Cardinal::UNKNOWN => ((0,0),(0,0)),
+            Cardinal::UNKNOWN => ((0, 0), (0, 0)),
         }
     }
     /*
      get other square of the same line/row
     */
-    pub fn get_other(self) -> Vec<Cardinal>{
+    pub fn _get_other(self) -> Vec<Cardinal> {
         match self {
-            Cardinal::NW => vec!(Cardinal::N,Cardinal::NE,Cardinal::W,Cardinal::SW),
-            Cardinal::N  => vec!(Cardinal::NW,Cardinal::NE,Cardinal::C,Cardinal::S),
-            Cardinal::NE => vec!(Cardinal::NW,Cardinal::N,Cardinal::E,Cardinal::SE),
-            Cardinal::W  => vec!(Cardinal::NW,Cardinal::SW,Cardinal::C,Cardinal::E),
-            Cardinal::C  => vec!(Cardinal::N,Cardinal::S,Cardinal::W,Cardinal::E),
-            Cardinal::E  => vec!(Cardinal::NE,Cardinal::SE,Cardinal::C,Cardinal::W),
-            Cardinal::SW => vec!(Cardinal::NW,Cardinal::W,Cardinal::S,Cardinal::SE),
-            Cardinal::S  => vec!(Cardinal::SW,Cardinal::SE,Cardinal::C,Cardinal::N),
-            Cardinal::SE => vec!(Cardinal::SW,Cardinal::S,Cardinal::E,Cardinal::NE),
+            Cardinal::NW => vec![Cardinal::N, Cardinal::NE, Cardinal::W, Cardinal::SW],
+            Cardinal::N => vec![Cardinal::NW, Cardinal::NE, Cardinal::C, Cardinal::S],
+            Cardinal::NE => vec![Cardinal::NW, Cardinal::N, Cardinal::E, Cardinal::SE],
+            Cardinal::W => vec![Cardinal::NW, Cardinal::SW, Cardinal::C, Cardinal::E],
+            Cardinal::C => vec![Cardinal::N, Cardinal::S, Cardinal::W, Cardinal::E],
+            Cardinal::E => vec![Cardinal::NE, Cardinal::SE, Cardinal::C, Cardinal::W],
+            Cardinal::SW => vec![Cardinal::NW, Cardinal::W, Cardinal::S, Cardinal::SE],
+            Cardinal::S => vec![Cardinal::SW, Cardinal::SE, Cardinal::C, Cardinal::N],
+            Cardinal::SE => vec![Cardinal::SW, Cardinal::S, Cardinal::E, Cardinal::NE],
             Cardinal::UNKNOWN => Vec::new(),
         }
     }
     /*
     get all squares
     */
-    pub fn get_all(self) -> Vec<Cardinal>{
-        vec!(Cardinal::NW,Cardinal::N,Cardinal::NE,
-             Cardinal::W ,Cardinal::C,Cardinal::S,
-             Cardinal::SW,Cardinal::S,Cardinal::SE)
+    pub fn get_all(self) -> Vec<Cardinal> {
+        vec![
+            Cardinal::NW,
+            Cardinal::N,
+            Cardinal::NE,
+            Cardinal::W,
+            Cardinal::C,
+            Cardinal::S,
+            Cardinal::SW,
+            Cardinal::S,
+            Cardinal::SE,
+        ]
     }
     /*
      get lines of a square
     */
-        /*
+    /*
      get coord of square ((line,column) ,(line,column))
     */
-    pub fn get_lines(self) -> Vec<u8>{
+    pub fn get_lines(self) -> Vec<u8> {
         match self {
-            Cardinal::NW => vec!(1,2,3),
-            Cardinal::N  => vec!(1,2,3),
-            Cardinal::NE => vec!(1,2,3),
-            Cardinal::W  => vec!(4,5,6),
-            Cardinal::C  => vec!(4,5,6),
-            Cardinal::E  => vec!(4,5,6),
-            Cardinal::SW => vec!(7,8,9),
-            Cardinal::S  => vec!(7,8,9),
-            Cardinal::SE => vec!(7,8,9),
+            Cardinal::NW => vec![1, 2, 3],
+            Cardinal::N => vec![1, 2, 3],
+            Cardinal::NE => vec![1, 2, 3],
+            Cardinal::W => vec![4, 5, 6],
+            Cardinal::C => vec![4, 5, 6],
+            Cardinal::E => vec![4, 5, 6],
+            Cardinal::SW => vec![7, 8, 9],
+            Cardinal::S => vec![7, 8, 9],
+            Cardinal::SE => vec![7, 8, 9],
             Cardinal::UNKNOWN => Vec::new(),
         }
     }
     /*
     get columns of a square
     */
-    pub fn get_columns(self) -> Vec<u8>{
+    pub fn get_columns(self) -> Vec<u8> {
         match self {
-            Cardinal::NW => vec!(1,2,3),
-            Cardinal::W  => vec!(1,2,3),
-            Cardinal::SW => vec!(1,2,3),
-            Cardinal::N  => vec!(4,5,6),
-            Cardinal::C  => vec!(4,5,6),
-            Cardinal::S  => vec!(4,5,6),
-            Cardinal::E  => vec!(7,8,9),
-            Cardinal::NE => vec!(7,8,9),
-            Cardinal::SE => vec!(7,8,9),
+            Cardinal::NW => vec![1, 2, 3],
+            Cardinal::W => vec![1, 2, 3],
+            Cardinal::SW => vec![1, 2, 3],
+            Cardinal::N => vec![4, 5, 6],
+            Cardinal::C => vec![4, 5, 6],
+            Cardinal::S => vec![4, 5, 6],
+            Cardinal::E => vec![7, 8, 9],
+            Cardinal::NE => vec![7, 8, 9],
+            Cardinal::SE => vec![7, 8, 9],
             Cardinal::UNKNOWN => Vec::new(),
         }
     }
     /*
-     get cells of square 
+     get cells of square
     */
-    pub fn get_cells(self) -> Vec<u8>{
+    pub fn _get_cells(self) -> Vec<u8> {
         match self {
-            Cardinal::NW => vec!(0,1,2,9,10,11,18,19,20),
-            Cardinal::N  => vec!(3,4,5,12,13,14,21,22,23),
-            Cardinal::NE => vec!(6,7,8,15,16,17,24,25,26),
-            Cardinal::W  => vec!(27,28,29,36,37,38,45,46,47),
-            Cardinal::C  => vec!(30,31,32,39,40,41,48,49,50),
-            Cardinal::E  => vec!(33,34,35,42,43,44,51,52,53),
-            Cardinal::SW => vec!(54,55,56,63,64,65,72,73,74),
-            Cardinal::S  => vec!(57,58,59,66,67,68,75,76,77),
-            Cardinal::SE => vec!(60,61,62,69,70,71,78,79,80),
+            Cardinal::NW => vec![0, 1, 2, 9, 10, 11, 18, 19, 20],
+            Cardinal::N => vec![3, 4, 5, 12, 13, 14, 21, 22, 23],
+            Cardinal::NE => vec![6, 7, 8, 15, 16, 17, 24, 25, 26],
+            Cardinal::W => vec![27, 28, 29, 36, 37, 38, 45, 46, 47],
+            Cardinal::C => vec![30, 31, 32, 39, 40, 41, 48, 49, 50],
+            Cardinal::E => vec![33, 34, 35, 42, 43, 44, 51, 52, 53],
+            Cardinal::SW => vec![54, 55, 56, 63, 64, 65, 72, 73, 74],
+            Cardinal::S => vec![57, 58, 59, 66, 67, 68, 75, 76, 77],
+            Cardinal::SE => vec![60, 61, 62, 69, 70, 71, 78, 79, 80],
             Cardinal::UNKNOWN => Vec::new(),
         }
     }
 }
 
-impl PartialEq for Cardinal{
+impl PartialEq for Cardinal {
     fn eq(&self, other: &Self) -> bool {
         self.get_value() == other.get_value()
     }
@@ -165,22 +173,22 @@ impl Accessor {
         }
     }
 
-    pub fn get_line(&self,l:u8)->Vec<u8>{
-        match self.lines.get(&l){
-            None =>Vec::new(),
-            Some(x)=>x.clone()
+    pub fn get_line(&self, l: u8) -> Vec<u8> {
+        match self.lines.get(&l) {
+            None => Vec::new(),
+            Some(x) => x.clone(),
         }
     }
-    pub fn get_column(&self,c:u8)->Vec<u8>{
-        match self.columns.get(&c){
-            None =>Vec::new(),
-            Some(x)=>x.clone()
+    pub fn get_column(&self, c: u8) -> Vec<u8> {
+        match self.columns.get(&c) {
+            None => Vec::new(),
+            Some(x) => x.clone(),
         }
     }
-    pub fn get_square(&self,s:Cardinal)->Vec<u8>{
-        match self.squares.get(&(s.get_value())){
-            None =>Vec::new(),
-            Some(x)=>x.clone()
+    pub fn get_square(&self, s: Cardinal) -> Vec<u8> {
+        match self.squares.get(&(s.get_value())) {
+            None => Vec::new(),
+            Some(x) => x.clone(),
         }
     }
 }
@@ -210,7 +218,7 @@ fn gen_square(l1: u8, l2: u8, c1: u8, c2: u8) -> Vec<u8> {
 fn gen_lines() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
     for i in 0..LINESIZE {
-        res.insert(i+1, gen_line(i));
+        res.insert(i + 1, gen_line(i));
     }
     res
 }
@@ -228,7 +236,7 @@ fn gen_line(l: u8) -> Vec<u8> {
 fn gen_columns() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
     for i in 0..COLUMNSIZE {
-        res.insert(i+1, gen_column(i));
+        res.insert(i + 1, gen_column(i));
     }
     res
 }
@@ -283,37 +291,31 @@ fn squares_test() {
     );
 }
 
- /*
+/*
  from a position calculate the square
 */
-pub fn pos_to_square(pos : usize)-> Cardinal{
-    let coord =pos_to_coord(pos);
-    let res = match coord.0{
-        1..=3 => {
-            match coord.1{
-                1..=3 => 1,
-                4..=6 => 2,
-                7..=9 => 3,
-                _=>0,
-            }        
+pub fn pos_to_square(pos: usize) -> Cardinal {
+    let coord = pos_to_coord(pos);
+    let res = match coord.0 {
+        1..=3 => match coord.1 {
+            1..=3 => 1,
+            4..=6 => 2,
+            7..=9 => 3,
+            _ => 0,
         },
-        4..=6 => {
-            match coord.1{
-                1..=3 => 4,
-                4..=6 => 5,
-                7..=9 => 6,
-                _=>0,
-            }        
+        4..=6 => match coord.1 {
+            1..=3 => 4,
+            4..=6 => 5,
+            7..=9 => 6,
+            _ => 0,
         },
-        7..=9 => {
-            match coord.1{
-                1..=3 => 7,
-                4..=6 => 8,
-                7..=9 => 9,
-                _=>0,
-            }        
+        7..=9 => match coord.1 {
+            1..=3 => 7,
+            4..=6 => 8,
+            7..=9 => 9,
+            _ => 0,
         },
-        _=>0,
+        _ => 0,
     };
     let tmp = Cardinal::C;
     tmp.from(res)
@@ -321,7 +323,7 @@ pub fn pos_to_square(pos : usize)-> Cardinal{
 #[test]
 fn pos_to_square_test() {
     //Macro (sort of)
-    fn local(i:usize)->u8{
+    fn local(i: usize) -> u8 {
         pos_to_square(i).get_value()
     }
     assert_eq!(1, local(0));
@@ -356,10 +358,10 @@ fn pos_to_square_test() {
   from a position calculate line and column
 */
 pub fn pos_to_coord(pos: usize) -> (u8, u8) {
-    let pos:u8 = pos.try_into().unwrap();
+    let pos: u8 = pos.try_into().unwrap();
     for lin in 1..=LINESIZE {
         for col in 1..=COLUMNSIZE {
-            let p = col + (lin - 1) * LINESIZE -1;            
+            let p = col + (lin - 1) * LINESIZE - 1;
             if p == pos {
                 return (lin, col);
             }
@@ -370,28 +372,28 @@ pub fn pos_to_coord(pos: usize) -> (u8, u8) {
 /**
  * check the code that compute line/column from position
  **/
- #[test]
- fn pos_to_coord_test() {
-     assert_eq!((1,1), pos_to_coord( 0));
-     assert_eq!((1,9), pos_to_coord( 8));
-     assert_eq!((2,1), pos_to_coord( 9));
-     assert_eq!((2,4), pos_to_coord(12));
-     assert_eq!((2,6), pos_to_coord(14));
-     assert_eq!((2,7), pos_to_coord(15));
-     assert_eq!((9,9), pos_to_coord(80));
- }
+#[test]
+fn pos_to_coord_test() {
+    assert_eq!((1, 1), pos_to_coord(0));
+    assert_eq!((1, 9), pos_to_coord(8));
+    assert_eq!((2, 1), pos_to_coord(9));
+    assert_eq!((2, 4), pos_to_coord(12));
+    assert_eq!((2, 6), pos_to_coord(14));
+    assert_eq!((2, 7), pos_to_coord(15));
+    assert_eq!((9, 9), pos_to_coord(80));
+}
 
- pub fn coord_to_pos(line: u8, column: u8) -> usize {
+pub fn coord_to_pos(line: u8, column: u8) -> usize {
     let pos = (line - 1) * LINESIZE + column - 1;
     pos.try_into().unwrap()
 }
 #[test]
 fn coord_to_pos_test() {
-    assert_eq!( 0, coord_to_pos(1,1));
-    assert_eq!( 8, coord_to_pos(1,9));
-    assert_eq!( 9, coord_to_pos(2,1));
-    assert_eq!(12, coord_to_pos(2,4));
-    assert_eq!(14, coord_to_pos(2,6));
-    assert_eq!(15, coord_to_pos(2,7));
-    assert_eq!(80, coord_to_pos(9,9));
+    assert_eq!(0, coord_to_pos(1, 1));
+    assert_eq!(8, coord_to_pos(1, 9));
+    assert_eq!(9, coord_to_pos(2, 1));
+    assert_eq!(12, coord_to_pos(2, 4));
+    assert_eq!(14, coord_to_pos(2, 6));
+    assert_eq!(15, coord_to_pos(2, 7));
+    assert_eq!(80, coord_to_pos(9, 9));
 }

@@ -3,31 +3,34 @@ use std::convert::TryInto;
 
 //the column
 pub struct Column {
-    position: u8,    //position in the grid 0..LINESIZE
-    known_values: Vec<bool>,   //Value already solve in the line
+    known_values: Vec<bool>, //Value already solve in the line
 }
 
-impl Column {
-    //construct a column giving his position
-    pub fn new(pos: u8) -> Column {
+impl Default for Column {
+    fn default() -> Self {
         //add all known values (False at start)
         let mut known = Vec::new();
         for _i in 0..MAX {
             known.push(false);
         }
         Column {
-            position: pos,
             known_values: known,
         }
     }
+}
 
+impl Column {
     /**
      * add a known value to the column
      */
     pub fn add_a_known_value(&mut self, val: u8) {
-        if val < 1 { return;}
-        if val > MAX { return;}
-        let val:usize = (val-1).try_into().unwrap();
+        if val < 1 {
+            return;
+        }
+        if val > MAX {
+            return;
+        }
+        let val: usize = (val - 1).try_into().unwrap();
         self.known_values[val] = true;
     }
 
@@ -35,21 +38,25 @@ impl Column {
      * is the value already solved in the column
      */
     pub fn is_known(&self, val: u8) -> bool {
-        if val < 1 { return false;}
-        if val > MAX { return false;}
-        let val:usize = (val-1).try_into().unwrap();
+        if val < 1 {
+            return false;
+        }
+        if val > MAX {
+            return false;
+        }
+        let val: usize = (val - 1).try_into().unwrap();
         self.known_values[val]
     }
 
     /*
      return remaining values
     */
-    pub fn get_unknown(&self)->Vec<u8> {
+    pub fn _get_unknown(&self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 0..MAX {
-            let pos:usize = i.try_into().unwrap();
+            let pos: usize = i.try_into().unwrap();
             if !self.known_values[pos] {
-                res.push(i+1);
+                res.push(i + 1);
             }
         }
         res
@@ -58,7 +65,7 @@ impl Column {
 
 #[test]
 fn add_a_known_value_test() {
-    let mut c = Column::new(1);
+    let mut c = Column::default();
     c.add_a_known_value(1);
     c.add_a_known_value(2);
     c.add_a_known_value(3);
@@ -75,10 +82,9 @@ fn add_a_known_value_test() {
     }
 }
 
-
 #[test]
 fn is_known_test() {
-    let mut c = Column::new(1);
+    let mut c = Column::default();
     c.add_a_known_value(1);
     c.add_a_known_value(3);
     assert_eq!(true, c.is_known(1));
@@ -96,8 +102,8 @@ fn is_known_test() {
 
 #[test]
 fn get_unknown_test() {
-    let mut c = Column::new(1);
+    let mut c = Column::default();
     c.add_a_known_value(1);
     c.add_a_known_value(3);
-    assert_eq!(vec!(2,4,5,6,7,8,9), c.get_unknown());
+    assert_eq!(vec!(2, 4, 5, 6, 7, 8, 9), c._get_unknown());
 }

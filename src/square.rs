@@ -1,56 +1,62 @@
 use super::constant::*;
-use super::accessor::Cardinal;
 use std::convert::TryInto;
 
 //the square
 pub struct Square {
-    position: Cardinal,        //position in the grid 0..LINESIZE
-    known_values: Vec<bool>,   //Value already solve in the line
+    known_values: Vec<bool>, //Value already solve in the line
 }
 
-impl Square {
-    //construct a square giving his position
-    pub fn new(pos: Cardinal) -> Square {
+impl Default for Square {
+    fn default() -> Self {
         //add all known values (False at start)
         let mut known = Vec::new();
         for _i in 0..MAX {
             known.push(false);
         }
         Square {
-            position: pos,
             known_values: known,
         }
     }
+}
 
+impl Square {
     /**
      * add a known value to the square
      */
     pub fn add_a_known_value(&mut self, val: u8) {
-        if val < 1 { return;}
-        if val > MAX { return;}
-        let val:usize = (val-1).try_into().unwrap();
+        if val < 1 {
+            return;
+        }
+        if val > MAX {
+            return;
+        }
+        let val: usize = (val - 1).try_into().unwrap();
         self.known_values[val] = true;
     }
 
     /**
      * is the value already solved in the square
      */
-    pub fn is_known(&self, val: u8) -> bool {
-        if val < 1 { return false;}
-        if val > MAX { return false;}
-        let val:usize = (val-1).try_into().unwrap();
+    pub fn _is_known(&self, val: u8) -> bool {
+        if val < 1 {
+            return false;
+        }
+        if val > MAX {
+            return false;
+        }
+        let val: usize = (val - 1).try_into().unwrap();
         self.known_values[val]
     }
 
     /*
      return remaining values
     */
-    pub fn get_unknown(&self)->Vec<u8> {
+    pub fn _get_unknown(&self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 0..MAX {
-            let pos:usize = i.try_into().unwrap();
+            let pos: usize = i.try_into().unwrap();
             if !self.known_values[pos] {
-                res.push(i+1);
+                res.push(i + 1);
             }
         }
         res
@@ -59,7 +65,7 @@ impl Square {
 
 #[test]
 fn add_a_known_value_test() {
-    let mut c = Square::new(Cardinal::C);
+    let mut c = Square::default();
     c.add_a_known_value(1);
     c.add_a_known_value(2);
     c.add_a_known_value(3);
@@ -76,29 +82,28 @@ fn add_a_known_value_test() {
     }
 }
 
-
 #[test]
 fn is_known_test() {
-    let mut c = Square::new(Cardinal::C);
+    let mut c = Square::default();
     c.add_a_known_value(1);
     c.add_a_known_value(3);
-    assert_eq!(true, c.is_known(1));
-    assert_eq!(true, c.is_known(3));
-    assert_eq!(false, c.is_known(0));
-    assert_eq!(false, c.is_known(2));
-    assert_eq!(false, c.is_known(4));
-    assert_eq!(false, c.is_known(5));
-    assert_eq!(false, c.is_known(6));
-    assert_eq!(false, c.is_known(7));
-    assert_eq!(false, c.is_known(8));
-    assert_eq!(false, c.is_known(9));
-    assert_eq!(false, c.is_known(11));
+    assert_eq!(true, c._is_known(1));
+    assert_eq!(true, c._is_known(3));
+    assert_eq!(false, c._is_known(0));
+    assert_eq!(false, c._is_known(2));
+    assert_eq!(false, c._is_known(4));
+    assert_eq!(false, c._is_known(5));
+    assert_eq!(false, c._is_known(6));
+    assert_eq!(false, c._is_known(7));
+    assert_eq!(false, c._is_known(8));
+    assert_eq!(false, c._is_known(9));
+    assert_eq!(false, c._is_known(11));
 }
 
 #[test]
 fn get_unknown_test() {
-    let mut c = Square::new(Cardinal::C);
+    let mut c = Square::default();
     c.add_a_known_value(1);
     c.add_a_known_value(3);
-    assert_eq!(vec!(2,4,5,6,7,8,9), c.get_unknown());
+    assert_eq!(vec!(2, 4, 5, 6, 7, 8, 9), c._get_unknown());
 }
