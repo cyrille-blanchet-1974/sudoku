@@ -15,11 +15,8 @@ pub struct Grid {
     squares: Vec<Square>,
 }
 
-impl Grid {
-    /*
-    Construct the grid
-    */
-    pub fn new() -> Grid {
+impl Default for Grid{
+    fn default() -> Self { 
         let mut cells = Vec::new();
         //construct all cells
         for i in 0..GRIDSIZE {
@@ -50,7 +47,10 @@ impl Grid {
             squares,
          }
     }
+}
 
+
+impl Grid {
     pub fn set_val(&mut self, line: u8, column: u8, val: u8) {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
@@ -99,6 +99,7 @@ impl Grid {
     return true if found at least a new value for a cell
     */
     pub fn resolve_lvl2(&mut self)->bool{
+        println!("Lvl2-resolving");
         let mut resolve_some = false;
         //iter on squares
         let squ = Cardinal::C;
@@ -126,9 +127,7 @@ impl Grid {
                 //first unsolved ?
                 if unsolved_line == 255 {
                     unsolved_line = l;
-                }
-                else
-                {
+                } else {
                     //if two lines unsolved then let go
                     return false;
                 }
@@ -147,9 +146,7 @@ impl Grid {
                 //first unsolved ?
                 if unsolved_column == 255 {
                     unsolved_column = c;
-                }
-                else
-                {
+                } else {
                     //if two columns unsolved then let go
                     return false;
                 }
@@ -199,10 +196,11 @@ impl Grid {
     */
     pub fn resolve_lvl1(&mut self) -> bool
     {
+        println!("Lvl1-resolving");
         //get resolved cells positions
         let mut resolved = self.get_resolved();    
         let prev_count = resolved.len();
-        println!("Lvl1-resolved = {:?}",resolved);
+        //println!("Lvl1-resolved = {:?}",resolved);
         //for each resolved cell call lvl1
         for p in resolved{
             self.resolve_lvl1_val(p);
@@ -226,7 +224,7 @@ impl Grid {
        };
        //get other cells
        let clean = self.get_to_clean(p);       
-       println!("Lvl1-to clean = {:?}/val = {}",clean,val);
+       //println!("Lvl1-to clean = {:?}/val = {}",clean,val);
        let val:usize = val.try_into().unwrap();
        //remove the value to all the others
        for c in clean{
@@ -269,20 +267,23 @@ impl Grid {
      * check if resolved
      */
     pub fn display(&self) {
-        for line in 1..=LINESIZE {
-            println!("------------------------------------");
+        println!("-------------------------------");
+        for line in 1..=LINESIZE {            
             print!("|");
             for column in 1..=COLUMNSIZE {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
                 match cell.get_answer(){
-                    None => print!(" ? |"),
-                    Some(x) => print!(" {} |", x),
-                };         
+                    None => print!(" ? "),
+                    Some(x) => print!(" {} ", x),
+                };
+                if column % 3 == 0 {print!("|");}
             }
             println!();
+            if line % 3 == 0 {
+                println!("-------------------------------");
+            }
         }
-        println!("------------------------------------");
         if self.is_resolved() {
             println!("Puzzle soled!");
         }
@@ -370,13 +371,13 @@ impl Grid {
 
 #[test]
 fn resolution_test() {
-    let g = Grid::new();
+    let g = Grid::default();
     assert_eq!(false, g.is_resolved());
 }
 
 #[test]
 fn display_test() {
-    let mut g = Grid::new();
+    let mut g = Grid::default();
     g.display();
     g.set_val(1, 1, 1);
     g.set_val(1, 2, 2);
@@ -464,7 +465,7 @@ fn display_test() {
 
 #[test]
 fn check_test() {
-    let mut g = Grid::new();
+    let mut g = Grid::default();
     assert_eq!(false, g.check_puzzle());
     g.set_val(1, 1, 1);
     g.set_val(1, 2, 2);
