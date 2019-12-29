@@ -321,6 +321,79 @@ fn test_solving_difficult(){
 }
 
 
+fn test_solving_diabolical(){
+    let mut g1 = Grid::default();
+
+    g1.set_val(1, 2, 8);
+    g1.set_val(1, 3, 3);
+    g1.set_val(1, 4, 9);
+
+    g1.set_val(2, 1, 5);
+
+    g1.set_val(3, 4, 1);
+    g1.set_val(3, 5, 4);
+    g1.set_val(3, 8, 2);
+
+    g1.set_val(4, 1, 3);
+    g1.set_val(4, 3, 9);
+    g1.set_val(4, 6, 8);
+    g1.set_val(4, 7, 6);
+
+    g1.set_val(5, 3, 7);
+    g1.set_val(5, 7, 1);
+
+    g1.set_val(6, 3, 4);
+    g1.set_val(6, 4, 2);
+    g1.set_val(6, 7, 3);
+    g1.set_val(6, 9, 7);
+
+    g1.set_val(7, 2, 4);
+    g1.set_val(7, 5, 6);
+    g1.set_val(7, 6, 3);
+
+    g1.set_val(8, 9, 5);
+
+    g1.set_val(9, 6, 4);
+    g1.set_val(9, 7, 9);
+    g1.set_val(9, 8, 3);
+
+    g1.display();//g1.debug();
+    let r = resolve(&mut g1);
+    if r {
+        println!("grille résolue");
+    }
+    g1.display();//g1.debug();
+    /*
+    Grid:
+-------------------------------
+| ?  8  3 | 9  ?  ? | ?  ?  ? |
+| 5  ?  ? | ?  ?  ? | ?  ?  ? |
+| ?  ?  ? | 1  4  ? | ?  2  ? |
+-------------------------------
+| 3  ?  9 | ?  ?  8 | 6  ?  ? |
+| ?  ?  7 | ?  ?  ? | 1  ?  ? |
+| ?  ?  4 | 2  ?  ? | 3  ?  7 |
+-------------------------------
+| ?  4  ? | ?  6  3 | ?  ?  ? |
+| ?  ?  ? | ?  ?  ? | ?  ?  5 |
+| ?  ?  ? | ?  ?  4 | 9  3  ? |
+-------------------------------
+    Solution not found
+-------------------------------
+| ?  8  3 | 9  ?  ? | ?  ?  ? |
+| 5  ?  ? | ?  ?  ? | ?  ?  ? |
+| ?  ?  6 | 1  4  ? | ?  2  ? |
+-------------------------------
+| 3  ?  9 | ?  ?  8 | 6  ?  ? |
+| ?  3  7 | ?  ?  ? | 1  ?  ? | <=3 here is incorrect!
+| ?  ?  4 | 2  ?  ? | 3  ?  7 |
+-------------------------------
+| ?  4  ? | ?  6  3 | ?  ?  ? |
+| ?  ?  ? | 4  ?  ? | ?  ?  3 |<=4 here is wrong
+| ?  ?  ? | ?  ?  4 | 9  3  ? |
+-------------------------------
+*/
+}
 
 fn main() {
     println!("Sudoku resolution!");
@@ -332,15 +405,17 @@ fn main() {
         println!("2:test solving easy");
         println!("3:test solving medium");
         println!("4:test solving difficult");
-        println!("5:fill manualy");
+        println!("5:test solving diabolical");
+        println!("9:fill manualy");
         //TODO => add read from file
         match read_u8("Your choice?".to_string()){
             None => {continue;},
             Some(1)=>{test_solving();},
             Some(2)=>{test_solving_easy();}, //-> Ok
             Some(3)=>{test_solving_medium();},//-> not yet
-            Some(4)=>{test_solving_difficult();},//->
-            Some(5)=>{manual();},//->
+            Some(4)=>{test_solving_difficult();},//-> not solved
+            Some(5)=>{test_solving_diabolical();},//->
+            Some(9)=>{manual();},//->
             _=> {continue;},
         }
         
