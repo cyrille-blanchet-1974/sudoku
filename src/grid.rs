@@ -59,11 +59,11 @@ impl Grid {
         let col: &mut Column = &mut (self.columns[c]);
         col.add_a_known_value(val);
         let l:usize = (line-1).try_into().unwrap();
-        let lin: &mut Line = &mut (self.lines[c]);
+        let lin: &mut Line = &mut (self.lines[l]);
         lin.add_a_known_value(val);
-        let s = pos_to_square(pos);
-        let col: &mut Column = &mut (self.columns[c]);
-        col.add_a_known_value(val);
+        let s:usize = (pos_to_square(pos).get_value()-1).try_into().unwrap();
+        let squ: &mut Square = &mut (self.squares[s]);
+        squ.add_a_known_value(val);
     }
 
     /**
@@ -80,7 +80,7 @@ impl Grid {
         true
     }
 
-    pub fn get_resolved(&self) -> Vec<u8>{
+    fn get_resolved(&self) -> Vec<u8>{
         let mut res = Vec::new();
         for i in 0..GRIDSIZE{
             let pos: usize = i.try_into().unwrap();
@@ -93,87 +93,140 @@ impl Grid {
     }
 
     /*
-    If a value is solved in all lines squares (left/right/up/down)
-    then it possible to determine where it is in the square
+    for a square and a value, if all lines but one and all columns but one are solved then 
+    the cell in the remainig line and column si solved with this value
+
+    return true if found at least a new value for a cell
     */
-    pub fn resolve_lvl2(&mut self,p:u8){
+    pub fn resolve_lvl2(&mut self)->bool{
+        let mut resolve_some = false;
         //iter on squares
         let squ = Cardinal::C;
         for sq in squ.get_all(){
             //iter on values
             for value in 1..=MAX{
-                if self.check_value(sq,value).is_none(){
-                    let mut cell_with_value = Vec::new();
-                    let mut solved_on_others = true;
-                    //iter on other squares
-                    for sq2 in sq.get_other(){
-                        match self.check_value(sq2,value){
-                            None=>{solved_on_others = false;},
-                            Some(n)=>cell_with_value.push(n),
-                        }
-                    }
-                    if solved_on_others{
-                        //find the row and line of cells that got the value
-                    }
+                if self.resolve_lvl2_square_val(sq,value){
+                    println!("Lvl2- found {} in {:?}",value,sq);
+                    resolve_some=true
                 }
             }
         }
+        resolve_some
     }  
-    /*
-    resolve lvl 2:
-    Si 1 valeure  trouvée dans 4 carrés de côtés alors on peut trouver où est cette même valeure dans le carré courant
-    1/ trouve un carré
-    2/ trouver une valeur non résolue
-    3/ déterminer les autres carrés
-         NW => N NE SW W
-         N =>  C S NW NE
-         NE => NW N E SE
-         W => NW SW C E
-         C => N S E W
-         E => NE SE W C
-         SW => W NW S SE
-         S => SW SE C N
-         SE => S SW E NE
-    => methode a ajouter a Accessor ou cardinal
-    4/ vérifier si valeur trouvée dans les 4 autres carrés
-    5/ si oui trouver les 2 lignes et les 2 colonnes
-    6/ déterminer ligne et colonne restante dans le carré
-    => méthode a ajouter a Accessor ou cardinal 
-    => trouver cellule de ligne/colonne => set val
-    
-    boucler tant qu'on trouve des choses
-    => en fin de resolve lvl 2 si changement alors refaire resolve 1 puis 2
-    */
     /**
-     * check if value is solved in the square
-     * if so return the position of the value
+     * check a value in a square
+     * return true if a new cell is solved
     */
-    pub fn check_value(&self,s:Cardinal,val:u8)->Option<u8>{
-        for cel in s.get_cells(){
-            let pos:usize = cel.try_into().unwrap();
-            let cell: &Cell = &(self.cells[pos]);
-            match cell.get_answer() {
-                None => {},
-                Some(n) => if n == val {return Some(cel)},
-            }             
+    fn resolve_lvl2_square_val(&mut self,squ:Cardinal,value:u8)->bool{
+        //check if all but one line solved
+        let mut unsolved_line=255 ;
+        for l in squ.get_lines(){
+            //if unsolved in this line
+            if !self.check_value_in_line(l,value){
+                //first unsolved ?
+                if unsolved_line == 255 {
+                    unsolved_line = l;
+                }
+                else
+                {
+                    //if two lines unsolved then let go
+                    return false;
+                }
+            }
         }
-        None
+        if unsolved_line == 255{
+            //if tree line solved then let go
+            return false;
+        }
+        //now check the columns
+        //check if all but one column solved
+        let mut unsolved_column=255;
+        for c in squ.get_columns(){
+            //if unsolved in this column
+            if !self.check_value_in_column(c,value){
+                //first unsolved ?
+                if unsolved_column == 255 {
+                    unsolved_column = c;
+                }
+                else
+                {
+                    //if two columns unsolved then let go
+                    return false;
+                }
+            }
+        }
+        if unsolved_column == 255{
+            //if tree columns solved then let go
+            return false;
+        }
+        //at this point only one line and one column unsolved => it is now
+        self.set_val(unsolved_line, unsolved_column, value);
+        true
+    }  
+
+    /**
+     * check if value is solved in a square
+    */
+    fn check_value_in_square(&mut self,s:Cardinal,val:u8)->bool{
+        //check if value is resolve
+        let pos:usize = (s.get_value()-1).try_into().unwrap();
+        let squ: &mut Square = &mut (self.squares[pos]);
+        squ.is_known(val)
     }
+    /**
+     * check if value is solved in a line
+    */
+    fn check_value_in_line(&mut self,line:u8,val:u8)->bool{
+        //check if value is resolve
+        let pos:usize = (line-1).try_into().unwrap();
+        let lin: &mut Line = &mut (self.lines[pos]);
+        lin.is_known(val)
+    }
+    /**
+     * check if value is solved in a column
+    */
+    fn check_value_in_column(&mut self,column:u8,val:u8)->bool{
+        //check if value is resolve
+        let pos:usize = (column-1).try_into().unwrap();
+        let col: &mut Column = &mut (self.columns[pos]);
+        col.is_known(val)
+    }
+
+    /*
+    If a cell is resolved then his value is in no other cells of the same Row, 
+    in no other cells of the same column and in no other cells of the same square
+    return true if found one or more
+    */
+    pub fn resolve_lvl1(&mut self) -> bool
+    {
+        //get resolved cells positions
+        let mut resolved = self.get_resolved();    
+        let prev_count = resolved.len();
+        println!("Lvl1-resolved = {:?}",resolved);
+        //for each resolved cell call lvl1
+        for p in resolved{
+            self.resolve_lvl1_val(p);
+        }
+        resolved = self.get_resolved();    
+        //if count of solved has change then we found something
+        resolved.len() != prev_count
+    }
+
     /*
     If a cell is resolved then his value is in no other cells of the same Row, 
     in no other cells of the same column and in no other cells of the same square
     */
-    pub fn resolve_lvl1(&mut self,p:u8){
-       //get other cells
-       let clean = self.get_to_clean(p);       
-       //get value of the received one
+    fn resolve_lvl1_val(&mut self,p:u8){
+       //get value of the received cell
        let pos:usize = p.try_into().unwrap();
        let cell: &mut Cell = &mut (self.cells[pos]);
        let val = match cell.get_answer(){
-           None => return,
+           None => return,//if not solve... noting to do
            Some(x) => x,
        };
-       println!("to clean = {:?}/val = {}",clean,val);
+       //get other cells
+       let clean = self.get_to_clean(p);       
+       println!("Lvl1-to clean = {:?}/val = {}",clean,val);
        let val:usize = val.try_into().unwrap();
        //remove the value to all the others
        for c in clean{
