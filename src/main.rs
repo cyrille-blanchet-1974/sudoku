@@ -11,7 +11,7 @@ use grid::*;
 use std::io;
 
 //ask the user and read his guess
-fn read_u8(mess: String) -> u8 {
+fn read_u8(mess: String) -> Option<u8> {
     println!("{}", mess);
     let mut res = String::new();
     io::stdin()
@@ -22,18 +22,28 @@ fn read_u8(mess: String) -> u8 {
     let r: u8 = match res.parse() {
         Err(e) => {
             println!("erreur {}", e);
-            0
+            return None
         }
         Ok(v) => v,
     };
-    r
+    Some(r)
 }
 
-fn fill(g: &mut Grid) {
+fn manual() {
+    let mut g = Grid::default();
+    println!("resolved = {}", g.is_resolved());
+    println!();
+    g.display();
     loop {
         let l = read_u8("line?".to_string());
+        if l.is_none() {continue;}
+        let l = l.unwrap();
         let c = read_u8("column?".to_string());
+        if c.is_none() {continue;}
+        let c = c.unwrap();
         let v = read_u8("value?".to_string());
+        if v.is_none() {continue;}
+        let v = v.unwrap();
         g.set_val(l, c, v);
         println!();
         g.display();
@@ -237,21 +247,110 @@ fn test_solving_medium(){
     */
 }
 
+fn test_solving_difficult(){
+    let mut g1 = Grid::default();
+
+    g1.set_val(2, 1, 5);
+    g1.set_val(2, 3, 2);
+    g1.set_val(2, 4, 9);
+    g1.set_val(2, 6, 8);
+
+    g1.set_val(3, 1, 1);
+    g1.set_val(3, 2, 6);
+    g1.set_val(3, 4, 2);
+    g1.set_val(3, 5, 3);
+
+    g1.set_val(4, 3, 1);
+    g1.set_val(4, 7, 7);
+    g1.set_val(4, 9, 4);
+
+    g1.set_val(5, 3, 4);
+    g1.set_val(5, 5, 9);
+    g1.set_val(5, 7, 3);
+
+    g1.set_val(6, 1, 7);
+    g1.set_val(6, 3, 8);
+    g1.set_val(6, 7, 5);
+
+    g1.set_val(7, 5, 8);
+    g1.set_val(7, 6, 5);
+    g1.set_val(7, 8, 6);
+    g1.set_val(7, 9, 7);
+
+    g1.set_val(8, 4, 6);
+    g1.set_val(8, 6, 7);
+    g1.set_val(8, 7, 8);
+    g1.set_val(8, 9, 1);
+
+    g1.display();//g1.debug();
+    let r = resolve(&mut g1);
+    if r {
+        println!("grille résolue");
+    }
+    g1.display();//g1.debug();
+    /*
+    Grid:
+-------------------------------
+| ?  ?  ? | ?  ?  ? | ?  ?  ? |
+| 5  ?  2 | 9  ?  8 | ?  ?  ? |
+| 1  6  ? | 2  3  ? | ?  ?  ? |
+-------------------------------
+| ?  ?  1 | ?  ?  ? | 7  ?  4 |
+| ?  ?  4 | ?  9  ? | 3  ?  ? |
+| 7  ?  8 | ?  ?  ? | 5  ?  ? |
+-------------------------------
+| ?  ?  ? | ?  8  5 | ?  6  7 |
+| ?  ?  ? | 6  ?  7 | 8  ?  1 |
+| ?  ?  ? | ?  ?  ? | ?  ?  ? |
+-------------------------------
+    Solution not found
+-------------------------------
+| ?  ?  ? | ?  ?  ? | ?  ?  ? |
+| 5  ?  2 | 9  ?  8 | ?  ?  ? |
+| 1  6  7 | 2  3  4 | 9  ?  ? |
+-------------------------------
+| ?  ?  1 | ?  ?  ? | 7  ?  4 |
+| ?  ?  4 | ?  9  ? | 3  ?  ? |
+| 7  ?  8 | ?  ?  ? | 5  ?  ? |
+-------------------------------
+| ?  ?  ? | ?  8  5 | ?  6  7 |
+| ?  ?  ? | 6  ?  7 | 8  ?  1 |
+| ?  ?  ? | 8  ?  ? | ?  7  ? |<= 8 here is invalid bug to investigate
+-------------------------------
+*/
+}
+
+
 
 fn main() {
     println!("Sudoku resolution!");
     println!("size = {}x{}", LINESIZE, COLUMNSIZE);
 
-    test_solving();
+    loop
+    {
+        println!("1:test solving");
+        println!("2:test solving easy");
+        println!("3:test solving medium");
+        println!("4:test solving difficult");
+        println!("5:fill manualy");
+        //TODO => add read from file
+        match read_u8("Your choice?".to_string()){
+            None => {continue;},
+            Some(1)=>{test_solving();},
+            Some(2)=>{test_solving_easy();}, //-> Ok
+            Some(3)=>{test_solving_medium();},//-> not yet
+            Some(4)=>{test_solving_difficult();},//->
+            Some(5)=>{manual();},//->
+            _=> {continue;},
+        }
+        
+    
 
-    test_solving_easy(); //-> Ok
-
-    test_solving_medium();//->
+    }
 
 
-    let mut g = Grid::default();
-    println!("résolue = {}", g.is_resolved());
-    println!();
-    g.display();
-    fill(&mut g);
+    
+
+
+
 }
