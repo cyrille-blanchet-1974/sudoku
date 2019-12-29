@@ -3,6 +3,9 @@ mod cell;
 mod constant;
 mod grid;
 mod resolve;
+mod line;
+mod column;
+mod square;
 
 use constant::*;
 use grid::*;

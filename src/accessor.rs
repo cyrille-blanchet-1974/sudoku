@@ -286,7 +286,7 @@ fn squares_test() {
  /*
  from a position calculate the square
 */
-pub fn pos_to_square(pos : u8)-> Cardinal{
+pub fn pos_to_square(pos : usize)-> Cardinal{
     let coord =pos_to_coord(pos);
     let res = match coord.0{
         1..=3 => {
@@ -321,7 +321,7 @@ pub fn pos_to_square(pos : u8)-> Cardinal{
 #[test]
 fn pos_to_square_test() {
     //Macro (sort of)
-    fn local(i:u8)->u8{
+    fn local(i:usize)->u8{
         pos_to_square(i).get_value()
     }
     assert_eq!(1, local(0));
@@ -355,10 +355,11 @@ fn pos_to_square_test() {
 /*
   from a position calculate line and column
 */
-pub fn pos_to_coord(pos: u8) -> (u8, u8) {
+pub fn pos_to_coord(pos: usize) -> (u8, u8) {
+    let pos:u8 = pos.try_into().unwrap();
     for lin in 1..=LINESIZE {
         for col in 1..=COLUMNSIZE {
-            let p = col + (lin - 1) * LINESIZE -1;
+            let p = col + (lin - 1) * LINESIZE -1;            
             if p == pos {
                 return (lin, col);
             }

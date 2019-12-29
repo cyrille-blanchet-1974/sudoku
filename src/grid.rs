@@ -1,12 +1,18 @@
 use super::accessor::*;
-use super::cell::*;
 use super::constant::*;
+use super::cell::*;
+use super::line::*;
+use super::column::*;
+use super::square::*;
 use std::convert::TryInto;
 
 //Gris => 81 cells
 pub struct Grid {
     cells: Vec<Cell>, //the cells are stored in a Vec
     acc: Accessor, //methods to retreive cells by coordinates
+    lines: Vec<Line>,
+    columns: Vec<Column>,
+    squares: Vec<Square>,
 }
 
 impl Grid {
@@ -14,14 +20,34 @@ impl Grid {
     Construct the grid
     */
     pub fn new() -> Grid {
-        let mut data = Vec::new();
+        let mut cells = Vec::new();
         //construct all cells
         for i in 0..GRIDSIZE {
-            data.push(Cell::new(i));
+            cells.push(Cell::new(i.try_into().unwrap()));
+        }
+        let acc = Accessor::new();
+        let mut lines = Vec::new();
+        //construct all lines
+        for i in 0..COLUMNSIZE {
+            lines.push(Line::new(i+1));
+        }
+        let mut columns = Vec::new();
+        //construct all columns
+        for i in 0..LINESIZE {
+            columns.push(Column::new(i+1));
+        }
+        let mut squares = Vec::new();
+        let c=Cardinal::C;
+        //construct all Squares
+        for i in c.get_all() {
+            squares.push(Square::new(i));
         }
         Grid { 
-            cells: data,
-            acc: Accessor::new(),
+            cells,
+            acc,
+            lines,
+            columns,
+            squares,
          }
     }
 
@@ -29,6 +55,15 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val);
+        let c:usize = (column-1).try_into().unwrap();
+        let col: &mut Column = &mut (self.columns[c]);
+        col.add_a_known_value(val);
+        let l:usize = (line-1).try_into().unwrap();
+        let lin: &mut Line = &mut (self.lines[c]);
+        lin.add_a_known_value(val);
+        let s = pos_to_square(pos);
+        let col: &mut Column = &mut (self.columns[c]);
+        col.add_a_known_value(val);
     }
 
     /**

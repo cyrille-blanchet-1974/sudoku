@@ -13,7 +13,7 @@ enum State {
 //the cell
 pub struct Cell {
     state: State,    //its state 
-    position: u8,    //position in the grid (in the Vec in fact) -> see Map.txt
+    position: usize,    //position in the grid (in the Vec in fact) -> see Map.txt
     column: u8,      //column in the grid 1..9
     line: u8,        //line in the grid 1..9
     square: Cardinal,  //square in the grid
@@ -23,8 +23,8 @@ pub struct Cell {
 }
 
 impl Cell {
-    //construct a cell giving is position in the grid
-    pub fn new(pos: u8) -> Cell {
+    //construct a cell giving his position in the grid
+    pub fn new(pos: usize) -> Cell {
         //add all possibles
         let mut possibles = Vec::new();
         for _i in 0..MAX {
@@ -125,7 +125,7 @@ impl Cell {
         self.square
     }
     /*
-     se the value of the cell
+     set the value of the cell
     */
     pub fn set_val(&mut self, val: u8) {
         //remove other possibles
