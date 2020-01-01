@@ -6,13 +6,14 @@ use super::line::*;
 use super::square::*;
 use std::convert::TryInto;
 
-//Gris => 81 cells
+//Grid => 81 cells
 pub struct Grid {
     cells: Vec<Cell>, //the cells are stored in a Vec
     acc: Accessor,    //methods to retreive cells by coordinates
     lines: Vec<Line>,
     columns: Vec<Column>,
     squares: Vec<Square>,
+    resolved: bool,
 }
 
 impl Default for Grid {
@@ -45,6 +46,7 @@ impl Default for Grid {
             lines,
             columns,
             squares,
+            resolved: false,
         }
     }
 }
@@ -68,22 +70,25 @@ impl Grid {
     /**
      * check if resolved
      */
-    pub fn is_resolved(&self) -> bool {
-        for i in 0..GRIDSIZE {
-            let pos: usize = i.try_into().unwrap();
-            let cell: &Cell = &self.cells[pos];
-            if !cell.is_resolved() {
-                return false;
+    pub fn is_resolved(&mut self) -> bool {
+        if !self.resolved {
+            for i in 0..GRIDSIZE {
+                let pos: usize = i.try_into().unwrap();
+                let cell: &mut Cell = &mut (self.cells[pos]);
+                if !cell.is_resolved() {
+                    return false;
+                }
             }
+            self.resolved = true;
         }
-        true
+        self.resolved
     }
 
-    fn get_resolved(&self) -> Vec<u8> {
+    fn get_resolved(&mut self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 0..GRIDSIZE {
             let pos: usize = i.try_into().unwrap();
-            let cell: &Cell = &self.cells[pos];
+            let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_resolved() {
                 res.push(i);
             }
@@ -97,7 +102,10 @@ impl Grid {
 
     return true if found at least a new value for a cell
     */
-    pub fn resolve_lvl2(&mut self) -> bool {
+    fn resolve_lvl2(&mut self) -> bool {
+        if self.is_resolved() {
+            return false;
+        }
         println!("Lvl2-resolving");
         let mut resolve_some = false;
         //iter on squares
@@ -118,6 +126,11 @@ impl Grid {
      * return true if a new cell is solved
      */
     fn resolve_lvl2_square_val(&mut self, squ: Cardinal, value: u8) -> bool {
+        //check if the value is already in the square
+        if self.check_value_in_square(squ, value) {
+            return false;
+        }
+
         //check if all but one line solved
         let mut unsolved_line = 255;
         for l in squ.get_lines() {
@@ -155,6 +168,18 @@ impl Grid {
             //if tree columns solved then let go
             return false;
         }
+        //check if cell is already solved
+        let pos: usize = coord_to_pos(unsolved_line, unsolved_column)
+            .try_into()
+            .unwrap();
+        let cell: &mut Cell = &mut (self.cells[pos]);
+        if cell.is_resolved() {
+            return false;
+        }
+        println!(
+            "Value {} not found on either line {} column {} or square {:?}",
+            value, unsolved_line, unsolved_column,squ
+        );
         //at this point only one line and one column unsolved => it is now
         self.set_val(unsolved_line, unsolved_column, value);
         true
@@ -163,7 +188,7 @@ impl Grid {
     /**
      * check if value is solved in a square
      */
-    fn _check_value_in_square(&mut self, s: Cardinal, val: u8) -> bool {
+    fn check_value_in_square(&mut self, s: Cardinal, val: u8) -> bool {
         //check if value is resolve
         let pos: usize = (s.get_value() - 1).try_into().unwrap();
         let squ: &mut Square = &mut (self.squares[pos]);
@@ -188,12 +213,19 @@ impl Grid {
         col.is_known(val)
     }
 
+    pub fn resolve(&mut self) -> bool {
+        self.resolve_lvl1() || self.resolve_lvl2() || self.resolve_lvl3()
+    }
+
     /*
     If a cell is resolved then his value is in no other cells of the same Row,
     in no other cells of the same column and in no other cells of the same square
     return true if found one or more
     */
-    pub fn resolve_lvl1(&mut self) -> bool {
+    fn resolve_lvl1(&mut self) -> bool {
+        if self.is_resolved() {
+            return false;
+        }
         println!("Lvl1-resolving");
         //get resolved cells positions
         let mut resolved = self.get_resolved();
@@ -226,9 +258,18 @@ impl Grid {
         let val: usize = val.try_into().unwrap();
         //remove the value to all the others
         for c in clean {
+            //println!("removing value {} from possibles of cell {}",val,c);
             let cc: usize = c.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[cc]);
-            cell.remove_a_possible(val);
+            if cell.remove_a_possible_and_verify(val) {
+                //removing a possible we found the answer of the cell
+                //so we must clean lines,columns and squares
+                if let Some(x) = cell.get_answer() {
+                    let col = cell.get_column();
+                    let line = cell.get_line();
+                    self.set_val(line, col, x);
+                }
+            }
         }
     }
 
@@ -261,10 +302,119 @@ impl Grid {
         res
     }
 
+    /*
+    If a value is not in the possible of a line less a cell then the cell has this values
+    idem for column
+    and square
+    return true if found one or more
+    */
+    fn resolve_lvl3(&mut self) -> bool {
+        if self.is_resolved() {
+            return false;
+        }
+        println!("Lvl3-resolving");
+        let mut solve_one_at_least = false;
+        for v in 1..=MAX {
+            let val: usize = v.try_into().unwrap();
+            for line in 1..=COLUMNSIZE {
+                if self.resolve_lvl3_line(line, val) {
+                    solve_one_at_least = true;
+                }
+            }
+            for column in 1..=LINESIZE {
+                if self.resolve_lvl3_column(column, val) {
+                    solve_one_at_least = true;
+                }
+            }
+            let c = Cardinal::C;
+            for square in c.get_all() {
+                if self.resolve_lvl3_square(square, val) {
+                    solve_one_at_least = true;
+                }
+            }
+        }
+        solve_one_at_least
+    }
+
+    fn resolve_lvl3_line(&mut self, line: u8, val: usize) -> bool {
+        let mut unsolve = 255;
+        //iterate on all cells of the line
+        for p in self.acc.get_line(line) {
+            let pos: usize = p.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            if cell.is_a_possible(val) {
+                if p != 255 {
+                    //second possible? -> 2 possibles -> not a solution
+                    return false;
+                }
+                unsolve = p;
+            }
+        }
+        if unsolve != 255 {
+            //found
+            let pos: usize = unsolve.try_into().unwrap();
+            let v: u8 = val.try_into().unwrap();
+            let coord = pos_to_coord(pos);
+            self.set_val(coord.0, coord.1, v);
+            return true;
+        }
+        false
+    }
+
+    fn resolve_lvl3_column(&mut self, column: u8, val: usize) -> bool {
+        let mut unsolve = 255;
+        //iterate on all cells of the line
+        for p in self.acc.get_column(column) {
+            let pos: usize = p.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            if cell.is_a_possible(val) {
+                if p != 255 {
+                    //second possible? -> 2 possibles -> not a solution
+                    return false;
+                }
+                unsolve = p;
+            }
+        }
+        if unsolve != 255 {
+            //found
+            let pos: usize = unsolve.try_into().unwrap();
+            let v: u8 = val.try_into().unwrap();
+            let coord = pos_to_coord(pos);
+            self.set_val(coord.0, coord.1, v);
+            return true;
+        }
+        false
+    }
+
+    fn resolve_lvl3_square(&mut self, square: Cardinal, val: usize) -> bool {
+        let mut unsolve = 255;
+        //iterate on all cells of the line
+        for p in self.acc.get_square(square) {
+            let pos: usize = p.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            if cell.is_a_possible(val) {
+                if p != 255 {
+                    //second possible? -> 2 possibles -> not a solution
+                    return false;
+                }
+                unsolve = p;
+            }
+        }
+        if unsolve != 255 {
+            //found
+            let pos: usize = unsolve.try_into().unwrap();
+            let v: u8 = val.try_into().unwrap();
+            let coord = pos_to_coord(pos);
+            self.set_val(coord.0, coord.1, v);
+            return true;
+        }
+        false
+    }
+
     /**
      * check if resolved
      */
-    pub fn display(&self) {
+    pub fn display(&mut self) {
         println!("-------------------------------");
         for line in 1..=LINESIZE {
             print!("|");
@@ -285,14 +435,14 @@ impl Grid {
             }
         }
         if self.is_resolved() {
-            println!("Puzzle soled!");
+            println!("Puzzle solved!");
         }
     }
 
-    pub fn debug(&self) {
+    pub fn debug(&mut self) {
         for i in 0..GRIDSIZE {
             let pos: usize = i.try_into().unwrap();
-            let cell: &Cell = &self.cells[pos];
+            let cell: &mut Cell = &mut (self.cells[pos]);
             cell.debug();
         }
     }
@@ -369,7 +519,7 @@ impl Grid {
 
 #[test]
 fn resolution_test() {
-    let g = Grid::default();
+    let mut g = Grid::default();
     assert_eq!(false, g.is_resolved());
 }
 

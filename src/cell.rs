@@ -49,8 +49,8 @@ impl Cell {
     /**
      * check if resolved
      */
-    pub fn is_resolved(&self) -> bool {
-        match &self.state {
+    pub fn is_resolved(&mut self) -> bool {
+        match self.state {
             State::Resolved => true,
             _ => false,
         }
@@ -68,8 +68,12 @@ impl Cell {
 
     /**
      * check if resolved
+     * return true if resolved
      */
-    fn verify_resolvution(&mut self) {
+    fn verify_resolution(&mut self) -> bool {
+        if let State::Resolved = self.state {
+            return true;
+        }
         let mut count = 0; //count of possible left
         let mut val = 1; //val
                          //check all possible
@@ -81,23 +85,37 @@ impl Cell {
             }
         }
         if count == 1 {
+            println!(
+                "Found a value {}  on cell {} (l:{}/c:{})",
+                val, self.position, self.line, self.column
+            );
             //if only one possible left
             self.state = State::Resolved; //then cell is resolved
             self.answer = val; //and we got our answer
+            return true;
+        }
+        false
+    }
+
+    /**
+     * remove a value from the possibles
+     * and return true if the cell is resolve
+     */
+    pub fn remove_a_possible_and_verify(&mut self, val: usize) -> bool {
+        match &self.state {
+            State::Resolved => true, //println!("cell {} is already solved", self.position),
+            State::Unknown => {
+                self.remove_a_possible(val);
+                return self.verify_resolution();
+            }
         }
     }
 
     /**
      * remove a value from the possibles
      */
-    pub fn remove_a_possible(&mut self, val: usize) {
-        match &self.state {
-            State::Resolved => {} //println!("cell {} is already solved", self.position),
-            State::Unknown => {
-                self.possibles[val - 1] = false;
-                self.verify_resolvution();
-            }
-        };
+    fn remove_a_possible(&mut self, val: usize) {
+        self.possibles[val - 1] = false;
     }
 
     /**
@@ -125,10 +143,29 @@ impl Cell {
     pub fn get_square(&self) -> Cardinal {
         self.square
     }
+
+    fn get_possibles(&mut self) -> Vec<u8> {
+        let mut res = Vec::new();
+        for i in 1..=MAX {
+            if self.is_a_possible(i.try_into().unwrap()) {
+                res.push(i);
+            }
+        }
+        res
+    }
+
     /*
      set the value of the cell
     */
     pub fn set_val(&mut self, val: u8) {
+        if !self.is_a_possible(val.try_into().unwrap()) {
+            println!(
+                "ERROR! {} is not possible on cell {} (l:{}/c:{})",
+                val, self.position, self.line, self.column
+            );
+            println!("ERROR! remaining possibles: {:?}", self.get_possibles());
+            return;
+        }
         //remove other possibles
         for i in 1..=MAX {
             if i != val {
@@ -144,7 +181,7 @@ impl Cell {
     /*
       display data of the cell
     */
-    pub fn debug(&self) {
+    pub fn debug(&mut self) {
         let mut poss = Vec::new();
         let mut i = 1;
         for r in &self.possibles {
@@ -153,11 +190,10 @@ impl Cell {
             }
             i += 1;
         }
+        let resolved = self.is_resolved();
         println!(
             "pos:{} resolved:{} possibles:{:?}",
-            self.position,
-            self.is_resolved(),
-            poss
+            self.position, resolved, poss
         );
     }
 }
@@ -178,9 +214,9 @@ fn resolution_test() {
     let mut c = Cell::new(1);
     assert_eq!(false, c.is_resolved());
     assert_eq!(None, c.get_answer());
-    for i in 1..MAX {
-        let pos = i.try_into().unwrap();
-        c.remove_a_possible(pos);
+    for v in 1..MAX {
+        let val = v.try_into().unwrap();
+        c.remove_a_possible_and_verify(val);
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());
