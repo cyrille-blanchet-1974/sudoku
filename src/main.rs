@@ -76,7 +76,7 @@ fn manual() {
 pub fn resolve(g: &mut Grid, debug: bool) {
     g.display();
     //if already resolved...
-    if ! g.is_resolved() {
+    if !g.is_resolved() {
         let mut step = 0;
         //loop until no more to solve
         loop {
@@ -90,7 +90,7 @@ pub fn resolve(g: &mut Grid, debug: bool) {
                 g.display();
             }
             step += 1;
-        }    
+        }
     }
     g.display();
     if g.is_resolved() {

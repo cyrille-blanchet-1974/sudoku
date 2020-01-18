@@ -85,10 +85,10 @@ impl Cell {
             }
         }
         if count == 1 {
-            println!(
-                "Found a value {}  on cell {} (l:{}/c:{})",
+            /*println!(
+                "Cell-Found a value {}  on cell {} (l:{}/c:{})",
                 val, self.position, self.line, self.column
-            );
+            );*/
             //if only one possible left
             self.state = State::Resolved; //then cell is resolved
             self.answer = val; //and we got our answer
@@ -106,7 +106,7 @@ impl Cell {
             State::Resolved => true, //println!("cell {} is already solved", self.position),
             State::Unknown => {
                 self.remove_a_possible(val);
-                return self.verify_resolution();
+                self.verify_resolution()
             }
         }
     }
@@ -181,7 +181,10 @@ impl Cell {
     /*
       display data of the cell
     */
-    pub fn debug(&mut self) {
+    pub fn debug(&mut self) -> bool {
+        if self.is_resolved() {
+            return false;
+        }
         let mut poss = Vec::new();
         let mut i = 1;
         for r in &self.possibles {
@@ -190,11 +193,8 @@ impl Cell {
             }
             i += 1;
         }
-        let resolved = self.is_resolved();
-        println!(
-            "pos:{} resolved:{} possibles:{:?}",
-            self.position, resolved, poss
-        );
+        print!("  Cell:{} possibles:{:?}", self.position, poss);
+        true
     }
 }
 

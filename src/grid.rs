@@ -106,7 +106,8 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!("Lvl2-resolving");
+        println!();
+        print!("Lvl2->");
         let mut resolve_some = false;
         //iter on squares
         let squ = Cardinal::C;
@@ -114,7 +115,7 @@ impl Grid {
             //iter on values
             for value in 1..=MAX {
                 if self.resolve_lvl2_square_val(sq, value) {
-                    println!("Lvl2- found {} in {:?}", value, sq);
+                    print!(" -Found a value {} in square {:?}", value, sq);
                     resolve_some = true
                 }
             }
@@ -176,10 +177,6 @@ impl Grid {
         if cell.is_resolved() {
             return false;
         }
-        println!(
-            "Value {} not found on either line {} column {} or square {:?}",
-            value, unsolved_line, unsolved_column,squ
-        );
         //at this point only one line and one column unsolved => it is now
         self.set_val(unsolved_line, unsolved_column, value);
         true
@@ -214,7 +211,10 @@ impl Grid {
     }
 
     pub fn resolve(&mut self) -> bool {
-        self.resolve_lvl1() || self.resolve_lvl2() || self.resolve_lvl3()
+        let res1 = self.resolve_lvl1();
+        let res2 = self.resolve_lvl2();
+        let res3 = self.resolve_lvl3();
+        res1 || res2 || res3
     }
 
     /*
@@ -226,7 +226,8 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!("Lvl1-resolving");
+        println!();
+        print!("Lvl1->");
         //get resolved cells positions
         let mut resolved = self.get_resolved();
         let prev_count = resolved.len();
@@ -258,13 +259,19 @@ impl Grid {
         for c in clean {
             let cc: usize = c.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[cc]);
+            if cell.is_resolved() {
+                continue;
+            }
             if cell.remove_a_possible_and_verify(val) {
                 //removing a possible we found the answer of the cell
                 //so we must clean lines,columns and squares
                 if let Some(x) = cell.get_answer() {
                     let col = cell.get_column();
                     let line = cell.get_line();
-                    println!("Lvl1- found {} in {}", x, cc);
+                    print!(
+                        " -Found a value {} on cell {} (l:{}/c:{})  ",
+                        x, cc, line, col
+                    );
                     self.set_val(line, col, x);
                 }
             }
@@ -310,7 +317,8 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!("Lvl3-resolving");
+        println!();
+        print!("Lvl3->");
         let mut solve_one_at_least = false;
         for v in 1..=MAX {
             let val: usize = v.try_into().unwrap();
@@ -336,7 +344,7 @@ impl Grid {
 
     fn resolve_lvl3_line(&mut self, line: u8, val: usize) -> bool {
         if self.check_value_in_line(line, val.try_into().unwrap()) {
-            //if val already solved in the line 
+            //if val already solved in the line
             return false;
         }
         let mut unsolve = 255;
@@ -358,7 +366,10 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
-            println!("Lvl3- found {} in  {:?}", val, coord);
+            print!(
+                " -Found a value {} on cell {} (l:{}/c:{})  ",
+                val, unsolve, coord.0, coord.1
+            );
             return true;
         }
         false
@@ -388,7 +399,10 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
-            println!("Lvl3- found {} in  {:?}", val, coord);
+            print!(
+                " -Found a value {} on cell {} (l:{}/c:{})  ",
+                val, unsolve, coord.0, coord.1
+            );
             return true;
         }
         false
@@ -418,7 +432,10 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
-            println!("Lvl3- found {} in  {:?}", val, coord);
+            print!(
+                " -Found a value {} on cell {} (l:{}/c:{})  ",
+                val, unsolve, coord.0, coord.1
+            );
             return true;
         }
         false
@@ -428,6 +445,7 @@ impl Grid {
      * check if resolved
      */
     pub fn display(&mut self) {
+        println!();
         println!("-------------------------------");
         for line in 1..=LINESIZE {
             print!("|");
@@ -453,11 +471,23 @@ impl Grid {
     }
 
     pub fn debug(&mut self) {
+        println!("-------------------------------DEBUG-------------------------------");
+        let mut nb = 0;
         for i in 0..GRIDSIZE {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
-            cell.debug();
+            if cell.debug() {
+                nb += 1;
+            }
+            if nb == 3 {
+                println!();
+                nb = 0;
+            }
         }
+        if nb != 3 {
+            println!();
+        }
+        println!("-------------------------------DEBUG-------------------------------");
     }
 
     pub fn check_puzzle(&self) -> bool {
