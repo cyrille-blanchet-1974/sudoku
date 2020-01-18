@@ -73,24 +73,32 @@ fn manual() {
     }
 }
 
-pub fn resolve(g: &mut Grid, debug: bool) -> bool {
+pub fn resolve(g: &mut Grid, debug: bool) {
+    g.display();
     //if already resolved...
+    if ! g.is_resolved() {
+        let mut step = 0;
+        //loop until no more to solve
+        loop {
+            if debug {
+                println!("--------------------step {}--------------------", step);
+            }
+            if !g.resolve() {
+                break;
+            }
+            if debug {
+                g.display();
+            }
+            step += 1;
+        }    
+    }
+    g.display();
     if g.is_resolved() {
-        return true;
+        println!("Grid resolved!!!!!");
     }
-    let mut step = 0;
-    //loop until no more to solve
-    loop {
-        if debug {
-            println!("step {}", step);
-            g.display();
-        }
-        if !g.resolve() {
-            break;
-        }
-        step += 1;
+    if debug {
+        g.debug();
     }
-    g.is_resolved()
 }
 
 fn test_solving(debug: bool) {
@@ -107,18 +115,7 @@ fn test_solving(debug: bool) {
     g1.set_val(2, 5, 1);
     g1.set_val(5, 8, 1);
     g1.set_val(9, 7, 1);
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+    resolve(&mut g1, debug);
 }
 
 fn test_solving_easy(debug: bool) {
@@ -164,18 +161,8 @@ fn test_solving_easy(debug: bool) {
 
     g1.set_val(9, 7, 9);
     g1.set_val(9, 9, 5);
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+
+    resolve(&mut g1, debug);
     /*
         Grid:
     -------------------------------
@@ -193,19 +180,18 @@ fn test_solving_easy(debug: bool) {
     -------------------------------
         Solution found
     -------------------------------
-    | 1  2  7 | 4  5  2 | 3  9  8 |
+    | 1  2  7 | 4  5  6 | 3  9  8 |
     | 8  3  4 | 2  9  1 | 7  5  6 |
     | 5  9  6 | 3  8  7 | 1  2  4 |
     -------------------------------
     | 4  7  5 | 1  3  9 | 8  6  2 |
-    | 9  6  1 | 5  7  2 | 4  3  1 |
+    | 9  6  8 | 5  7  2 | 4  3  1 |
     | 2  1  3 | 6  4  8 | 5  7  9 |
     -------------------------------
     | 3  4  9 | 8  6  5 | 2  1  7 |
     | 7  5  1 | 9  2  4 | 6  8  3 |
     | 6  8  2 | 7  1  3 | 9  4  5 |
     -------------------------------
-
         */
 }
 
@@ -247,18 +233,7 @@ fn test_solving_medium(debug: bool) {
 
     g1.set_val(9, 5, 9);
     g1.set_val(9, 9, 2);
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+    resolve(&mut g1, debug);
     /*
         Grid:
     -------------------------------
@@ -276,19 +251,19 @@ fn test_solving_medium(debug: bool) {
     -------------------------------
         Solution not found
     -------------------------------
-    | 5  ?  ? | ?  3  ? | ?  ?  ? |   <- 1 in col 7 not found because lvl 2 need 1 found line 3
-    | ?  8  ? | ?  1  ? | ?  2  3 |   as 3 is already used by 7 we could found => lvl 3 is there!!!
-    | ?  ?  ? | 8  5  3 | 7  ?  ? |
+    | 5  3  ? | 2  4  ? | 1  8  6 |
+    | 4  8  ? | ?  1  6 | 5  2  3 |
+    | 1  6  2 | 8  5  3 | 7  9  4 |
     -------------------------------
-    | 2  ?  ? | ?  8  ? | 6  4  7 |
-    | 6  ?  8 | ?  2  ? | 3  7  1 |
-    | ?  7  4 | ?  8  ? | 5  5  9 | <= 5 wrong here
+    | 2  1  5 | ?  3  ? | 6  4  8 |
+    | 6  9  8 | ?  2  ? | 3  7  1 |
+    | 3  7  4 | 6  8  1 | 2  5  9 |
     -------------------------------
-    | ?  ?  1 | 3  7  2 | ?  ?  ? |
-    | 8  ?  3 | ?  6  ? | 2  1  ? |
-    | ?  ?  ? | ?  9  ? | 1  3  2 |
+    | 9  4  1 | 3  7  2 | 8  6  5 |
+    | 8  2  3 | ?  6  ? | 9  1  7 |
+    | 7  5  6 | 1  9  8 | 4  3  2 |
     -------------------------------
-        */
+    */
 }
 
 fn test_solving_difficult(debug: bool) {
@@ -326,18 +301,7 @@ fn test_solving_difficult(debug: bool) {
     g1.set_val(8, 7, 8);
     g1.set_val(8, 9, 1);
 
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+    resolve(&mut g1, debug);
     /*
         Grid:
     -------------------------------
@@ -353,19 +317,19 @@ fn test_solving_difficult(debug: bool) {
     | ?  ?  ? | 6  ?  7 | 8  ?  1 |
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     -------------------------------
-        Solution not found
+        Solution found (17 steps)
     -------------------------------
-    | ?  ?  ? | ?  ?  ? | ?  ?  ? |
-    | 5  ?  2 | 9  ?  8 | ?  ?  ? |
-    | 1  6  7 | 2  3  4 | 9  ?  ? |
+    | 9  8  3 | 5  7  6 | 1  4  2 |
+    | 5  4  2 | 9  1  8 | 6  7  3 |
+    | 1  6  7 | 2  3  4 | 9  5  8 |
     -------------------------------
-    | ?  ?  1 | ?  ?  ? | 7  ?  4 |
-    | ?  ?  4 | ?  9  ? | 3  ?  ? |
-    | 7  ?  8 | ?  ?  ? | 5  ?  ? |
+    | 6  9  1 | 8  5  3 | 7  2  4 |
+    | 2  5  4 | 7  9  1 | 3  8  6 |
+    | 7  3  8 | 4  6  2 | 5  1  9 |
     -------------------------------
-    | ?  ?  ? | ?  8  5 | ?  6  7 |
-    | ?  ?  ? | 6  ?  7 | 8  ?  1 |
-    | ?  ?  ? | 8  ?  ? | ?  7  ? |<= 8 here is invalid bug to investigate
+    | 4  1  9 | 3  8  5 | 2  6  7 |
+    | 3  2  5 | 6  4  7 | 8  9  1 |
+    | 8  7  6 | 1  2  9 | 4  3  5 |
     -------------------------------
     */
 }
@@ -406,18 +370,7 @@ fn test_solving_diabolical(debug: bool) {
     g1.set_val(9, 7, 9);
     g1.set_val(9, 8, 3);
 
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+    resolve(&mut g1, debug);
     /*
         Grid:
     -------------------------------
@@ -435,17 +388,17 @@ fn test_solving_diabolical(debug: bool) {
     -------------------------------
         Solution not found
     -------------------------------
-    | ?  8  3 | 9  ?  ? | ?  ?  ? |
+    | 4  8  3 | 9  ?  ? | 5  ?  ? |
     | 5  ?  ? | ?  ?  ? | ?  ?  ? |
-    | ?  ?  6 | 1  4  ? | ?  2  ? |
+    | 7  9  6 | 1  4  5 | 8  2  3 |
     -------------------------------
     | 3  ?  9 | ?  ?  8 | 6  ?  ? |
-    | ?  3  7 | ?  ?  ? | 1  ?  ? | <=3 here is incorrect!
+    | ?  ?  7 | ?  ?  ? | 1  ?  ? |
     | ?  ?  4 | 2  ?  ? | 3  ?  7 |
     -------------------------------
-    | ?  4  ? | ?  6  3 | ?  ?  ? |
-    | ?  ?  ? | 4  ?  ? | ?  ?  3 |<=4 here is wrong
-    | ?  ?  ? | ?  ?  4 | 9  3  ? |
+    | 9  4  ? | ?  6  3 | ?  ?  ? |
+    | ?  3  ? | ?  ?  ? | ?  ?  5 |
+    | ?  7  ? | ?  ?  4 | 9  3  ? |
     -------------------------------
     */
 }
@@ -453,18 +406,7 @@ fn test_solving_diabolical(debug: bool) {
 fn test_from_disk(debug: bool) {
     let fic = read_string("Filename?".to_string());
     let mut g1 = read(&fic);
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
-    let r = resolve(&mut g1, debug);
-    if r {
-        println!("Grid resolved!!!!!");
-    }
-    if !debug {
-        g1.display();
-        //g1.debug();
-    }
+    resolve(&mut g1, debug);
 }
 
 fn main() {
@@ -481,7 +423,6 @@ fn main() {
         println!("8:test a grid read from disk");
         println!("9:fill manualy");
         println!("99:quit");
-        //TODO => add read from file
         match read_u8("Your choice?".to_string()) {
             None => {
                 continue;

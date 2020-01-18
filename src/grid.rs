@@ -230,7 +230,6 @@ impl Grid {
         //get resolved cells positions
         let mut resolved = self.get_resolved();
         let prev_count = resolved.len();
-        //println!("Lvl1-resolved = {:?}",resolved);
         //for each resolved cell call lvl1
         for p in resolved {
             self.resolve_lvl1_val(p);
@@ -254,11 +253,9 @@ impl Grid {
         };
         //get other cells
         let clean = self.get_to_clean(p);
-        //println!("Lvl1-to clean = {:?}/val = {}",clean,val);
         let val: usize = val.try_into().unwrap();
         //remove the value to all the others
         for c in clean {
-            //println!("removing value {} from possibles of cell {}",val,c);
             let cc: usize = c.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[cc]);
             if cell.remove_a_possible_and_verify(val) {
@@ -267,6 +264,7 @@ impl Grid {
                 if let Some(x) = cell.get_answer() {
                     let col = cell.get_column();
                     let line = cell.get_line();
+                    println!("Lvl1- found {} in {}", x, cc);
                     self.set_val(line, col, x);
                 }
             }
@@ -337,13 +335,17 @@ impl Grid {
     }
 
     fn resolve_lvl3_line(&mut self, line: u8, val: usize) -> bool {
+        if self.check_value_in_line(line, val.try_into().unwrap()) {
+            //if val already solved in the line 
+            return false;
+        }
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_line(line) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_a_possible(val) {
-                if p != 255 {
+                if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;
                 }
@@ -356,19 +358,24 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
+            println!("Lvl3- found {} in  {:?}", val, coord);
             return true;
         }
         false
     }
 
     fn resolve_lvl3_column(&mut self, column: u8, val: usize) -> bool {
+        if self.check_value_in_column(column, val.try_into().unwrap()) {
+            //if val already solved in the column
+            return false;
+        }
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_column(column) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_a_possible(val) {
-                if p != 255 {
+                if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;
                 }
@@ -381,19 +388,24 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
+            println!("Lvl3- found {} in  {:?}", val, coord);
             return true;
         }
         false
     }
 
     fn resolve_lvl3_square(&mut self, square: Cardinal, val: usize) -> bool {
+        if self.check_value_in_square(square, val.try_into().unwrap()) {
+            //if val already solved in the square
+            return false;
+        }
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_square(square) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_a_possible(val) {
-                if p != 255 {
+                if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;
                 }
@@ -406,6 +418,7 @@ impl Grid {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             self.set_val(coord.0, coord.1, v);
+            println!("Lvl3- found {} in  {:?}", val, coord);
             return true;
         }
         false
