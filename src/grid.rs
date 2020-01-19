@@ -67,6 +67,16 @@ impl Grid {
         squ.add_a_known_value(val);
     }
 
+    pub fn remove_a_possible(&mut self, line: u8, column: u8, val: u8) {
+        let pos = coord_to_pos(line, column);
+        let cell: &mut Cell = &mut (self.cells[pos]);
+        let v: usize = val.try_into().unwrap();
+        let ok = cell.remove_a_possible_and_verify(v);
+        if ok {
+            self.set_val(line, column, val)
+        }
+    }
+
     /**
      * check if resolved
      */
@@ -211,10 +221,32 @@ impl Grid {
     }
 
     pub fn resolve(&mut self) -> bool {
+        //try 3 first type of resolution
         let res1 = self.resolve_lvl1();
         let res2 = self.resolve_lvl2();
         let res3 = self.resolve_lvl3();
         res1 || res2 || res3
+    }
+
+    /**
+     * get first unsolved cell
+     * return a tuple containing (line,column,value) in an Option
+     */
+    pub fn get_first_unsolved(&mut self) -> Option<(u8, u8, u8)> {
+        //find a cell not resolved
+        for pos in 0..=GRIDSIZE {
+            let p: usize = pos.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[p]);
+            if !cell.is_resolved() {
+                //and return first of its possibles
+                let poss = cell.get_possibles();
+                match poss.get(0) {
+                    None => continue, //seems strange that an unsolved cell has no possibles values...
+                    Some(x) => return Some((cell.get_line(), cell.get_column(), *x)),
+                }
+            }
+        }
+        None
     }
 
     /*

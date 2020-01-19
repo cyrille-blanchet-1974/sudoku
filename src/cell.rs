@@ -4,7 +4,7 @@ use std::convert::TryInto;
 
 //State of the cell Resolved or unknown
 //we probably will add some hypothesis state when we will have to try some values
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 enum State {
     Resolved,
     //TODO:   Hypothesis,
@@ -145,7 +145,7 @@ impl Cell {
         self.square
     }
 
-    fn get_possibles(&mut self) -> Vec<u8> {
+    pub fn get_possibles(&mut self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 1..=MAX {
             if self.is_a_possible(i.try_into().unwrap()) {

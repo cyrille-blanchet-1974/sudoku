@@ -73,11 +73,11 @@ fn manual() {
     }
 }
 
-pub fn resolve(g: &mut Grid, debug: bool) {
+pub fn resolve(g: &mut Grid, start: u32, debug: bool) -> bool {
     g.display();
+    let mut step = start;
     //if already resolved...
     if !g.is_resolved() {
-        let mut step = 0;
         //loop until no more to solve
         loop {
             if debug {
@@ -93,15 +93,44 @@ pub fn resolve(g: &mut Grid, debug: bool) {
         }
     }
     g.display();
-    if g.is_resolved() {
-        println!("Grid resolved!!!!!");
+    let res = g.is_resolved();
+    if !res {
+        //let run level 4 -> tries
+        //first made a copy of
+        let mut sav = g.clone();
+        //second find a unsolved cell
+        match g.get_first_unsolved() {
+            None => {
+                println!("strange error: gris not solved by with no unsolved cell (or unsoved cell with no possibles values)");
+                return false;
+            }
+            Some(val) => {
+                //on the saved grid, let try this value on the cell
+                println!(
+                    "Lvl 4-> try value {} on cell l:{}/c:{}",
+                    val.2, val.0, val.1
+                );
+                sav.set_val(val.0, val.1, val.2);
+                if resolve(&mut sav, step, debug) {
+                    //we found the solution
+                    return true;
+                } else {
+                    //wrong guess -> remove this value from the possibles of the original grid and continue
+                    g.remove_a_possible(val.0, val.1, val.2);
+                    return resolve(g, step, debug);
+                }
+            }
+        }
     }
-    if debug {
+    if res {
+        println!("Grid resolved!!!!!");
+    } else if debug {
         g.debug();
     }
+    res
 }
 
-fn test_solving(debug: bool) {
+fn test_solving(debug: bool) -> bool {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(2, 4, 2);
@@ -115,10 +144,38 @@ fn test_solving(debug: bool) {
     g1.set_val(2, 5, 1);
     g1.set_val(5, 8, 1);
     g1.set_val(9, 7, 1);
-    resolve(&mut g1, debug);
+    resolve(&mut g1, 0, debug)
+    /*  
+    -------------------------------
+    | 1  ?  ? | ?  ?  ? | ?  ?  ? |
+    | ?  ?  ? | 2  1  ? | ?  ?  ? |
+    | ?  ?  ? | ?  ?  ? | 3  ?  ? |
+    -------------------------------
+    | ?  4  ? | ?  ?  ? | ?  ?  ? |
+    | ?  ?  ? | ?  5  ? | ?  1  ? |
+    | ?  ?  ? | ?  ?  ? | ?  6  ? |
+    -------------------------------
+    | ?  ?  7 | ?  ?  ? | ?  ?  ? |
+    | ?  ?  ? | ?  ?  8 | ?  ?  ? |
+    | ?  ?  ? | ?  ?  ? | 1  ?  9 |
+    -------------------------------
+    Solved in 20 steps
+    -------------------------------
+    | 1  2  3 | 4  6  5 | 7  9  8 |
+    | 4  7  8 | 2  1  3 | 6  5  6 |
+    | 5  6  9 | 8  8  7 | 3  2  1 |
+    -------------------------------
+    | 2  4  1 | 3  7  6 | 9  8  5 |
+    | 7  3  6 | 9  5  2 | 4  1  7 |
+    | 7  9  5 | 1  4  4 | 2  6  3 |
+    -------------------------------
+    | 6  1  7 | 5  2  9 | 8  3  4 |
+    | 9  1  4 | 6  2  8 | 5  3  2 |
+    | 8  5  2 | 6  3  4 | 1  7  9 |
+    -------------------------------*/
 }
 
-fn test_solving_easy(debug: bool) {
+fn test_solving_easy(debug: bool) -> bool {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(1, 3, 7);
@@ -162,9 +219,8 @@ fn test_solving_easy(debug: bool) {
     g1.set_val(9, 7, 9);
     g1.set_val(9, 9, 5);
 
-    resolve(&mut g1, debug);
-    /*
-        Grid:
+    resolve(&mut g1, 0, debug)
+    /* 
     -------------------------------
     | 1  ?  7 | ?  ?  ? | ?  ?  ? |
     | ?  ?  4 | 2  9  ? | ?  ?  6 |
@@ -178,7 +234,7 @@ fn test_solving_easy(debug: bool) {
     | 7  ?  ? | ?  2  4 | 6  ?  ? |
     | ?  ?  ? | ?  ?  ? | 9  ?  5 |
     -------------------------------
-        Solution found
+    Solved 2 steps
     -------------------------------
     | 1  2  7 | 4  5  6 | 3  9  8 |
     | 8  3  4 | 2  9  1 | 7  5  6 |
@@ -191,11 +247,10 @@ fn test_solving_easy(debug: bool) {
     | 3  4  9 | 8  6  5 | 2  1  7 |
     | 7  5  1 | 9  2  4 | 6  8  3 |
     | 6  8  2 | 7  1  3 | 9  4  5 |
-    -------------------------------
-        */
+    -------------------------------*/
 }
 
-fn test_solving_medium(debug: bool) {
+fn test_solving_medium(debug: bool) -> bool {
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 5);
     g1.set_val(1, 5, 4);
@@ -233,9 +288,8 @@ fn test_solving_medium(debug: bool) {
 
     g1.set_val(9, 5, 9);
     g1.set_val(9, 9, 2);
-    resolve(&mut g1, debug);
-    /*
-        Grid:
+    resolve(&mut g1, 0, debug)
+    /*  
     -------------------------------
     | 5  ?  ? | ?  4  ? | ?  ?  ? |
     | ?  8  ? | ?  ?  ? | ?  2  3 |
@@ -249,24 +303,23 @@ fn test_solving_medium(debug: bool) {
     | 8  ?  3 | ?  ?  ? | ?  1  ? |
     | ?  ?  ? | ?  9  ? | ?  ?  2 |
     -------------------------------
-        Solution not found
+    Solved in 6 steps
     -------------------------------
-    | 5  3  ? | 2  4  ? | 1  8  6 |
-    | 4  8  ? | ?  1  6 | 5  2  3 |
+    | 5  3  7 | 2  4  9 | 1  8  6 |
+    | 4  8  9 | 7  1  6 | 5  2  3 |
     | 1  6  2 | 8  5  3 | 7  9  4 |
     -------------------------------
-    | 2  1  5 | ?  3  ? | 6  4  8 |
-    | 6  9  8 | ?  2  ? | 3  7  1 |
+    | 2  1  5 | 9  3  7 | 6  4  8 |
+    | 6  9  8 | 4  2  5 | 3  7  1 |
     | 3  7  4 | 6  8  1 | 2  5  9 |
     -------------------------------
     | 9  4  1 | 3  7  2 | 8  6  5 |
-    | 8  2  3 | ?  6  ? | 9  1  7 |
+    | 8  2  3 | 5  6  4 | 9  1  7 |
     | 7  5  6 | 1  9  8 | 4  3  2 |
-    -------------------------------
-    */
+    -------------------------------*/
 }
 
-fn test_solving_difficult(debug: bool) {
+fn test_solving_difficult(debug: bool) -> bool {
     let mut g1 = Grid::default();
 
     g1.set_val(2, 1, 5);
@@ -301,9 +354,8 @@ fn test_solving_difficult(debug: bool) {
     g1.set_val(8, 7, 8);
     g1.set_val(8, 9, 1);
 
-    resolve(&mut g1, debug);
-    /*
-        Grid:
+    resolve(&mut g1, 0, debug)
+    /*  
     -------------------------------
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     | 5  ?  2 | 9  ?  8 | ?  ?  ? |
@@ -317,7 +369,7 @@ fn test_solving_difficult(debug: bool) {
     | ?  ?  ? | 6  ?  7 | 8  ?  1 |
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     -------------------------------
-        Solution found (17 steps)
+    Solved in 8 steps
     -------------------------------
     | 9  8  3 | 5  7  6 | 1  4  2 |
     | 5  4  2 | 9  1  8 | 6  7  3 |
@@ -334,7 +386,7 @@ fn test_solving_difficult(debug: bool) {
     */
 }
 
-fn test_solving_diabolical(debug: bool) {
+fn test_solving_diabolical(debug: bool) -> bool {
     let mut g1 = Grid::default();
 
     g1.set_val(1, 2, 8);
@@ -370,9 +422,8 @@ fn test_solving_diabolical(debug: bool) {
     g1.set_val(9, 7, 9);
     g1.set_val(9, 8, 3);
 
-    resolve(&mut g1, debug);
-    /*
-        Grid:
+    resolve(&mut g1, 0, debug)
+    /*  
     -------------------------------
     | ?  8  3 | 9  ?  ? | ?  ?  ? |
     | 5  ?  ? | ?  ?  ? | ?  ?  ? |
@@ -386,27 +437,26 @@ fn test_solving_diabolical(debug: bool) {
     | ?  ?  ? | ?  ?  ? | ?  ?  5 |
     | ?  ?  ? | ?  ?  4 | 9  3  ? |
     -------------------------------
-        Solution not found
+    Solved in 8 steps
     -------------------------------
-    | 4  8  3 | 9  ?  ? | 5  ?  ? |
-    | 5  ?  ? | ?  ?  ? | ?  ?  ? |
+    | 4  8  3 | 9  2  7 | 5  1  6 |
+    | 5  2  1 | 3  8  6 | 7  4  9 |
     | 7  9  6 | 1  4  5 | 8  2  3 |
     -------------------------------
-    | 3  ?  9 | ?  ?  8 | 6  ?  ? |
-    | ?  ?  7 | ?  ?  ? | 1  ?  ? |
-    | ?  ?  4 | 2  ?  ? | 3  ?  7 |
+    | 3  1  9 | 4  7  8 | 6  5  2 |
+    | 2  5  7 | 6  3  9 | 1  8  4 |
+    | 8  6  4 | 2  5  1 | 3  9  7 |
     -------------------------------
-    | 9  4  ? | ?  6  3 | ?  ?  ? |
-    | ?  3  ? | ?  ?  ? | ?  ?  5 |
-    | ?  7  ? | ?  ?  4 | 9  3  ? |
-    -------------------------------
-    */
+    | 9  4  5 | 8  6  3 | 2  7  1 |
+    | 1  3  8 | 7  9  2 | 4  6  5 |
+    | 6  7  2 | 5  1  4 | 9  3  8 |
+    -------------------------------*/
 }
 
-fn test_from_disk(debug: bool) {
+fn test_from_disk(debug: bool) -> bool {
     let fic = read_string("Filename?".to_string());
     let mut g1 = read(&fic);
-    resolve(&mut g1, debug);
+    resolve(&mut g1, 0, debug)
 }
 
 fn main() {
@@ -459,4 +509,13 @@ fn main() {
             }
         }
     }
+}
+
+#[test]
+fn resolve_test() {
+    assert_eq!(true, test_solving(false));
+    assert_eq!(true, test_solving_easy(false));
+    assert_eq!(true, test_solving_medium(false));
+    assert_eq!(true, test_solving_difficult(false));
+    assert_eq!(true, test_solving_diabolical(false));
 }
