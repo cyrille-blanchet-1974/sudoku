@@ -107,3 +107,13 @@ fn get_unknown_test() {
     c.add_a_known_value(3);
     assert_eq!(vec!(2, 4, 5, 6, 7, 8, 9), c._get_unknown());
 }
+
+impl Clone for Line {
+    fn clone(&self) -> Line {
+        let mut p = Vec::new();
+        for v in &self.known_values {
+            p.push(*v);
+        }
+        Line { known_values: p }
+    }
+}

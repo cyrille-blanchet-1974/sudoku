@@ -107,3 +107,13 @@ fn get_unknown_test() {
     c.add_a_known_value(3);
     assert_eq!(vec!(2, 4, 5, 6, 7, 8, 9), c._get_unknown());
 }
+
+impl Clone for Square {
+    fn clone(&self) -> Square {
+        let mut p = Vec::new();
+        for v in &self.known_values {
+            p.push(*v);
+        }
+        Square { known_values: p }
+    }
+}

@@ -4,6 +4,7 @@ use std::convert::TryInto;
 
 //State of the cell Resolved or unknown
 //we probably will add some hypothesis state when we will have to try some values
+#[derive(Copy, Clone)]
 enum State {
     Resolved,
     //TODO:   Hypothesis,
@@ -220,4 +221,26 @@ fn resolution_test() {
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());
+}
+
+/*impl Copy for Cell {
+
+}*/
+
+impl Clone for Cell {
+    fn clone(&self) -> Cell {
+        let mut p = Vec::new();
+        for v in &self.possibles {
+            p.push(*v);
+        }
+        Cell {
+            state: self.state,
+            position: self.position,
+            column: self.column,
+            line: self.line,
+            square: self.square,
+            possibles: p,
+            answer: self.answer,
+        }
+    }
 }

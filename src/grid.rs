@@ -751,3 +751,31 @@ fn check_test() {
     g.display();
     assert_eq!(true, g.check_puzzle());
 }
+impl Clone for Grid {
+    fn clone(&self) -> Grid {
+        let mut ce = Vec::new();
+        for v in &self.cells {
+            ce.push(v.clone());
+        }
+        let mut li = Vec::new();
+        for v in &self.lines {
+            li.push(v.clone());
+        }
+        let mut co = Vec::new();
+        for v in &self.columns {
+            co.push(v.clone());
+        }
+        let mut sq = Vec::new();
+        for v in &self.squares {
+            sq.push(v.clone());
+        }
+        Grid {
+            cells: ce,
+            acc: Accessor::new(), //Accessor always contains sames datas
+            lines: li,
+            columns: co,
+            squares: sq,
+            resolved: self.resolved,
+        }
+    }
+}
