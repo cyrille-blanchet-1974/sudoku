@@ -1,0 +1,1 @@
+cargo run < testall.input > testall.txt

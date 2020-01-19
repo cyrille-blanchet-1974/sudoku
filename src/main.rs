@@ -131,6 +131,7 @@ pub fn resolve(g: &mut Grid, start: u32, debug: bool) -> bool {
 }
 
 fn test_solving(debug: bool) -> bool {
+    println!("1->resolution test!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(2, 4, 2);
@@ -145,7 +146,7 @@ fn test_solving(debug: bool) -> bool {
     g1.set_val(5, 8, 1);
     g1.set_val(9, 7, 1);
     resolve(&mut g1, 0, debug)
-    /*  
+    /*
     -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  ? |
     | ?  ?  ? | 2  1  ? | ?  ?  ? |
@@ -176,6 +177,7 @@ fn test_solving(debug: bool) -> bool {
 }
 
 fn test_solving_easy(debug: bool) -> bool {
+    println!("2->resolution easy!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1);
     g1.set_val(1, 3, 7);
@@ -220,7 +222,7 @@ fn test_solving_easy(debug: bool) -> bool {
     g1.set_val(9, 9, 5);
 
     resolve(&mut g1, 0, debug)
-    /* 
+    /*
     -------------------------------
     | 1  ?  7 | ?  ?  ? | ?  ?  ? |
     | ?  ?  4 | 2  9  ? | ?  ?  6 |
@@ -251,6 +253,7 @@ fn test_solving_easy(debug: bool) -> bool {
 }
 
 fn test_solving_medium(debug: bool) -> bool {
+    println!("3->resolution medium!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 5);
     g1.set_val(1, 5, 4);
@@ -289,7 +292,7 @@ fn test_solving_medium(debug: bool) -> bool {
     g1.set_val(9, 5, 9);
     g1.set_val(9, 9, 2);
     resolve(&mut g1, 0, debug)
-    /*  
+    /*
     -------------------------------
     | 5  ?  ? | ?  4  ? | ?  ?  ? |
     | ?  8  ? | ?  ?  ? | ?  2  3 |
@@ -320,6 +323,7 @@ fn test_solving_medium(debug: bool) -> bool {
 }
 
 fn test_solving_difficult(debug: bool) -> bool {
+    println!("4->resolution difficult!");
     let mut g1 = Grid::default();
 
     g1.set_val(2, 1, 5);
@@ -355,7 +359,7 @@ fn test_solving_difficult(debug: bool) -> bool {
     g1.set_val(8, 9, 1);
 
     resolve(&mut g1, 0, debug)
-    /*  
+    /*
     -------------------------------
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     | 5  ?  2 | 9  ?  8 | ?  ?  ? |
@@ -387,6 +391,7 @@ fn test_solving_difficult(debug: bool) -> bool {
 }
 
 fn test_solving_diabolical(debug: bool) -> bool {
+    println!("5->resolution diabolic!");
     let mut g1 = Grid::default();
 
     g1.set_val(1, 2, 8);
@@ -423,7 +428,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
     g1.set_val(9, 8, 3);
 
     resolve(&mut g1, 0, debug)
-    /*  
+    /*
     -------------------------------
     | ?  8  3 | 9  ?  ? | ?  ?  ? |
     | 5  ?  ? | ?  ?  ? | ?  ?  ? |
@@ -455,6 +460,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
 
 fn test_from_disk(debug: bool) -> bool {
     let fic = read_string("Filename?".to_string());
+    println!("8->resolution from file {}!", fic);
     let mut g1 = read(&fic);
     resolve(&mut g1, 0, debug)
 }
@@ -502,6 +508,7 @@ fn main() {
                 manual();
             } //->
             Some(99) => {
+                println!("Sudoku resolution End!");
                 return;
             } //->
             _ => {
