@@ -526,3 +526,10 @@ fn resolve_test() {
     assert_eq!(true, test_solving_difficult(false));
     assert_eq!(true, test_solving_diabolical(false));
 }
+
+#[test]
+fn resolve_pascal() {
+    let fic = "test/pascal.txt";
+    let mut g1 = read(&fic);
+    assert_eq!(true,resolve(&mut g1, 0, true));
+}
