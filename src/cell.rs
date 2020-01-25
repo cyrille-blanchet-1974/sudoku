@@ -9,7 +9,7 @@ pub struct Cell {
     line: u8,             //line in the grid 1..9
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
-    answer: u8, //value of the cell when solved
+    answer: u8,           //value of the cell when solved
 }
 
 impl Cell {
@@ -48,8 +48,7 @@ impl Cell {
     pub fn get_answer(&self) -> Option<u8> {
         if self.answer == 0 {
             None
-        }
-        else{
+        } else {
             Some(self.answer)
         }
     }
@@ -89,10 +88,9 @@ impl Cell {
      * and return true if the cell is resolve
      */
     pub fn remove_a_possible_and_verify(&mut self, val: usize) -> bool {
-        if self.answer !=0 {
+        if self.answer != 0 {
             true
-        }
-        else{
+        } else {
             self.remove_a_possible(val);
             self.verify_resolution()
         }
@@ -231,15 +229,15 @@ impl Clone for Cell {
 #[test]
 fn clone_cell_test() {
     let mut ori = Cell::new(1);
-    ori.remove_a_possible(5);    
+    ori.remove_a_possible(5);
     ori.debug();
     let mut copy = ori.clone();
     copy.debug();
-    assert_eq!(ori.get_possibles(),copy.get_possibles());    
-    assert_eq!(ori.get_answer(),copy.get_answer());
-    assert_eq!(ori.get_column(),copy.get_column());
-    assert_eq!(ori.get_line(),copy.get_line());
-    assert_eq!(ori.get_square(),copy.get_square());
+    assert_eq!(ori.get_possibles(), copy.get_possibles());
+    assert_eq!(ori.get_answer(), copy.get_answer());
+    assert_eq!(ori.get_column(), copy.get_column());
+    assert_eq!(ori.get_line(), copy.get_line());
+    assert_eq!(ori.get_square(), copy.get_square());
     ori.set_val(8);
-    assert_ne!(ori.get_possibles(),copy.get_possibles());    
+    assert_ne!(ori.get_possibles(), copy.get_possibles());
 }

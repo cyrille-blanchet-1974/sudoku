@@ -127,10 +127,10 @@ fn clone_column_test() {
     ori.add_a_known_value(7);
     ori.add_a_known_value(9);
     let mut copy = ori.clone();
-    for i in 1..=9{
-        assert_eq!(ori.is_known(i),copy.is_known(i));    
+    for i in 1..=9 {
+        assert_eq!(ori.is_known(i), copy.is_known(i));
     }
     copy.add_a_known_value(2);
-    assert_ne!(ori.is_known(2),copy.is_known(2));    
-    assert_ne!(ori._get_unknown(),copy._get_unknown());    
+    assert_ne!(ori.is_known(2), copy.is_known(2));
+    assert_ne!(ori._get_unknown(), copy._get_unknown());
 }
