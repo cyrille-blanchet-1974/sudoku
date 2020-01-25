@@ -63,7 +63,13 @@ fn manual() {
             continue;
         }
         let v = v.unwrap();
-        g.set_val(l, c, v);
+        if l==0 && c ==0 && v== 0{
+           resolve(&mut g, 0, true);
+        }
+        else
+        {
+           g.set_val(l, c, v);
+        }
         println!();
         g.display();
         if g.check_puzzle() {
