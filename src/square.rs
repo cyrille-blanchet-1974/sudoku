@@ -37,7 +37,7 @@ impl Square {
     /**
      * is the value already solved in the square
      */
-    pub fn _is_known(&self, val: u8) -> bool {
+    pub fn is_known(&self, val: u8) -> bool {
         if val < 1 {
             return false;
         }
@@ -87,17 +87,17 @@ fn is_known_test() {
     let mut c = Square::default();
     c.add_a_known_value(1);
     c.add_a_known_value(3);
-    assert_eq!(true, c._is_known(1));
-    assert_eq!(true, c._is_known(3));
-    assert_eq!(false, c._is_known(0));
-    assert_eq!(false, c._is_known(2));
-    assert_eq!(false, c._is_known(4));
-    assert_eq!(false, c._is_known(5));
-    assert_eq!(false, c._is_known(6));
-    assert_eq!(false, c._is_known(7));
-    assert_eq!(false, c._is_known(8));
-    assert_eq!(false, c._is_known(9));
-    assert_eq!(false, c._is_known(11));
+    assert_eq!(true, c.is_known(1));
+    assert_eq!(true, c.is_known(3));
+    assert_eq!(false, c.is_known(0));
+    assert_eq!(false, c.is_known(2));
+    assert_eq!(false, c.is_known(4));
+    assert_eq!(false, c.is_known(5));
+    assert_eq!(false, c.is_known(6));
+    assert_eq!(false, c.is_known(7));
+    assert_eq!(false, c.is_known(8));
+    assert_eq!(false, c.is_known(9));
+    assert_eq!(false, c.is_known(11));
 }
 
 #[test]
@@ -116,4 +116,21 @@ impl Clone for Square {
         }
         Square { known_values: p }
     }
+}
+
+#[test]
+fn clone_line_test() {
+    let mut ori = Square::default();
+    ori.add_a_known_value(1);
+    ori.add_a_known_value(3);
+    ori.add_a_known_value(5);
+    ori.add_a_known_value(7);
+    ori.add_a_known_value(9);
+    let mut copy = ori.clone();
+    for i in 1..=9{
+        assert_eq!(ori.is_known(i),copy.is_known(i));    
+    }
+    copy.add_a_known_value(2);
+    assert_ne!(ori.is_known(2),copy.is_known(2));    
+    assert_ne!(ori._get_unknown(),copy._get_unknown());    
 }

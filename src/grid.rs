@@ -199,7 +199,7 @@ impl Grid {
         //check if value is resolve
         let pos: usize = (s.get_value() - 1).try_into().unwrap();
         let squ: &mut Square = &mut (self.squares[pos]);
-        squ._is_known(val)
+        squ.is_known(val)
     }
     /**
      * check if value is solved in a line
@@ -783,6 +783,7 @@ fn check_test() {
     g.display();
     assert_eq!(true, g.check_puzzle());
 }
+
 impl Clone for Grid {
     fn clone(&self) -> Grid {
         let mut ce = Vec::new();
@@ -810,4 +811,20 @@ impl Clone for Grid {
             resolved: self.resolved,
         }
     }
+}
+
+#[test]
+fn clone_grid_test() {
+    let mut ori = Grid::default();
+    ori.set_val(1, 1, 1);
+    ori.set_val(2, 4, 1);
+    ori.set_val(3, 7, 1);
+    ori.set_val(4, 2, 1);
+    ori.set_val(5, 5, 1);
+    ori.set_val(6, 8, 1);
+    ori.set_val(7, 3, 1);
+    let mut copy = ori.clone();
+    assert_eq!(ori.get_resolved(),copy.get_resolved());    
+    ori.set_val(8, 6, 1);
+    assert_ne!(ori.get_resolved(),copy.get_resolved());    
 }

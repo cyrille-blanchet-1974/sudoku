@@ -117,3 +117,20 @@ impl Clone for Line {
         Line { known_values: p }
     }
 }
+
+#[test]
+fn clone_line_test() {
+    let mut ori = Line::default();
+    ori.add_a_known_value(1);
+    ori.add_a_known_value(3);
+    ori.add_a_known_value(5);
+    ori.add_a_known_value(7);
+    ori.add_a_known_value(9);
+    let mut copy = ori.clone();
+    for i in 1..=9{
+        assert_eq!(ori.is_known(i),copy.is_known(i));    
+    }
+    copy.add_a_known_value(2);
+    assert_ne!(ori.is_known(2),copy.is_known(2));    
+    assert_ne!(ori._get_unknown(),copy._get_unknown());    
+}
