@@ -2,24 +2,13 @@ use super::accessor::*;
 use super::constant::*;
 use std::convert::TryInto;
 
-//State of the cell Resolved or unknown
-//we probably will add some hypothesis state when we will have to try some values
-#[derive(Debug, Copy, Clone)]
-enum State {
-    Resolved,
-    //TODO:   Hypothesis,
-    Unknown,
-}
-
 //the cell
 pub struct Cell {
-    state: State,         //its state
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
     column: u8,           //column in the grid 1..9
     line: u8,             //line in the grid 1..9
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
-    //TODO   hypothesis : u8, // for the future
     answer: u8, //value of the cell when solved
 }
 
@@ -36,7 +25,6 @@ impl Cell {
         //then square
         let square = pos_to_square(pos);
         Cell {
-            state: State::Unknown,
             position: pos,
             column: coord.1,
             line: coord.0,
@@ -51,19 +39,18 @@ impl Cell {
      * check if resolved
      */
     pub fn is_resolved(&mut self) -> bool {
-        match self.state {
-            State::Resolved => true,
-            _ => false,
-        }
+        self.answer != 0
     }
 
     /**
-     * get final answer  is resolved
+     * get final answer if is resolved
      */
     pub fn get_answer(&self) -> Option<u8> {
-        match &self.state {
-            State::Resolved => Some(self.answer),
-            _ => None,
+        if self.answer == 0 {
+            None
+        }
+        else{
+            Some(self.answer)
         }
     }
 
@@ -72,7 +59,7 @@ impl Cell {
      * return true if resolved
      */
     fn verify_resolution(&mut self) -> bool {
-        if let State::Resolved = self.state {
+        if self.answer != 0 {
             return true;
         }
         let mut count = 0; //count of possible left
@@ -91,7 +78,6 @@ impl Cell {
                 val, self.position, self.line, self.column
             );*/
             //if only one possible left
-            self.state = State::Resolved; //then cell is resolved
             self.answer = val; //and we got our answer
             return true;
         }
@@ -103,12 +89,12 @@ impl Cell {
      * and return true if the cell is resolve
      */
     pub fn remove_a_possible_and_verify(&mut self, val: usize) -> bool {
-        match &self.state {
-            State::Resolved => true, //println!("cell {} is already solved", self.position),
-            State::Unknown => {
-                self.remove_a_possible(val);
-                self.verify_resolution()
-            }
+        if self.answer !=0 {
+            true
+        }
+        else{
+            self.remove_a_possible(val);
+            self.verify_resolution()
         }
     }
 
@@ -145,6 +131,9 @@ impl Cell {
         self.square
     }
 
+    /**
+     * return a list of possible values for the cell
+     */
     pub fn get_possibles(&mut self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 1..=MAX {
@@ -174,13 +163,12 @@ impl Cell {
                 self.remove_a_possible(pos);
             }
         }
-        //set the answer and change the state
-        self.state = State::Resolved;
+        //set the answer
         self.answer = val;
     }
 
     /*
-      display data of the cell
+      display data of the cell (only if unresolved)
     */
     pub fn debug(&mut self) -> bool {
         if self.is_resolved() {
@@ -223,10 +211,6 @@ fn resolution_test() {
     assert_eq!(Some(9), c.get_answer());
 }
 
-/*impl Copy for Cell {
-
-}*/
-
 impl Clone for Cell {
     fn clone(&self) -> Cell {
         let mut p = Vec::new();
@@ -234,7 +218,6 @@ impl Clone for Cell {
             p.push(*v);
         }
         Cell {
-            state: self.state,
             position: self.position,
             column: self.column,
             line: self.line,
@@ -243,4 +226,20 @@ impl Clone for Cell {
             answer: self.answer,
         }
     }
+}
+
+#[test]
+fn clone_cell_test() {
+    let mut ori = Cell::new(1);
+    ori.remove_a_possible(5);    
+    ori.debug();
+    let mut copy = ori.clone();
+    copy.debug();
+    assert_eq!(ori.get_possibles(),copy.get_possibles());    
+    assert_eq!(ori.get_answer(),copy.get_answer());
+    assert_eq!(ori.get_column(),copy.get_column());
+    assert_eq!(ori.get_line(),copy.get_line());
+    assert_eq!(ori.get_square(),copy.get_square());
+    ori.set_val(8);
+    assert_ne!(ori.get_possibles(),copy.get_possibles());    
 }
