@@ -72,7 +72,11 @@ fn manual() {
         }
         println!();
         g.display();
-        if g.check_puzzle() {
+        if !g.is_valid() {
+            println!("Sudoku invalid!");
+            return;
+        }
+        if g.is_resolved() {
             println!("Sudoku resolved!");
             return;
         }
