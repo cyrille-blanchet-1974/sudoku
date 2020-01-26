@@ -107,12 +107,13 @@ impl Grid {
     }
 
     /**
-     * get first unsolved cell
+     * get first unsolved cell (in fact fist with the less possible values)
      * return a tuple containing (line,column,value) in an Option
      */
     pub fn get_first_unsolved(&mut self) -> Option<(u8, u8, u8)> {
-        //find a cell not resolved
-        for pos in 0..=GRIDSIZE {
+        let mut potential = (0, 0, 0, 999); //line/column/value/nb possibles
+                                            //find a cell not resolved
+        for pos in 0..GRIDSIZE {
             let p: usize = pos.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() {
@@ -120,11 +121,21 @@ impl Grid {
                 let poss = cell.get_possibles();
                 match poss.get(0) {
                     None => continue, //seems strange that an unsolved cell has no possibles values...
-                    Some(x) => return Some((cell.get_line(), cell.get_column(), *x)),
-                }
+                    Some(x) => {
+                        //if new has less possible than previous we prefer this
+                        if poss.len() < potential.3 {
+                            potential = (cell.get_line(), cell.get_column(), *x, poss.len())
+                        }
+                    }
+                };
             }
         }
-        None
+        //if found ar least one
+        if potential.3 != 999 {
+            Some((potential.0, potential.1, potential.2))
+        } else {
+            None
+        }
     }
 
     /**
@@ -368,8 +379,13 @@ impl Grid {
 
     pub fn resolve(&mut self) -> bool {
         //try 3 first type of resolution
+        //only solution when removing founds of the same line columnand square
         let res1 = self.resolve_lvl1();
+        //value fount in two other line and two other column of a square
         let res2 = self.resolve_lvl2();
+        //value not in the possible of other cells of the same line OR
+        //value not in the possible of other cells of the same column OR
+        //value not in the possible of other cells of the same square
         let res3 = self.resolve_lvl3();
         res1 || res2 || res3
     }
@@ -383,7 +399,6 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!();
         print!("Lvl1->");
         //get resolved cells positions
         let mut resolved = self.get_resolved();
@@ -393,6 +408,7 @@ impl Grid {
             self.resolve_lvl1_val(p);
         }
         resolved = self.get_resolved();
+        println!();
         //if count of solved has change then we found something
         resolved.len() != prev_count
     }
@@ -474,7 +490,6 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!();
         print!("Lvl2->");
         let mut resolve_some = false;
         //iter on squares
@@ -487,6 +502,7 @@ impl Grid {
                 }
             }
         }
+        println!();
         resolve_some
     }
     /**
@@ -563,7 +579,6 @@ impl Grid {
         if self.is_resolved() {
             return false;
         }
-        println!();
         print!("Lvl3->");
         let mut solve_one_at_least = false;
         for v in 1..=MAX {
@@ -585,6 +600,7 @@ impl Grid {
                 }
             }
         }
+        println!();
         solve_one_at_least
     }
 
