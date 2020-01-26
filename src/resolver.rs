@@ -180,7 +180,7 @@ impl Resolver {
         //remove the value to all the others
         for c in clean {
             let cc: usize = c.try_into().unwrap();
-            let cell: &mut Cell = &mut (g.get_cell(pos));
+            let cell: &mut Cell = &mut (g.get_cell(cc));
             if cell.is_resolved() {
                 continue;
             }
