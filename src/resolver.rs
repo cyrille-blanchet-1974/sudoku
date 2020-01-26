@@ -45,7 +45,7 @@ impl Resolver {
                 Some(val) => {
                     //on the saved grid, let try this value on the cell
                     println!(
-                        "Lvl 4-> try value {} on cell l:{}/c:{}",
+                        "Lvl4-> try value {} on cell l:{}/c:{}",
                         val.2, val.0, val.1
                     );
                     sav.set_val(val.0, val.1, val.2);

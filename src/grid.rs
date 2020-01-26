@@ -170,7 +170,6 @@ impl Grid {
      * check if resolved
      */
     pub fn display(&mut self) {
-        println!();
         println!("-------------------------------");
         for line in 1..=LINESIZE {
             print!("|");
