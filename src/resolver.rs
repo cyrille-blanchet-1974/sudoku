@@ -6,6 +6,14 @@ use std::convert::TryInto;
 
 pub struct Resolver {
     step: u32,
+    nblvl1ok:u32,
+    nblvl1ko:u32,
+    nblvl2ok:u32,
+    nblvl2ko:u32,
+    nblvl3ok:u32,
+    nblvl3ko:u32,
+    nblvl4guess:u32,
+    nblvl4wrongguess:u32,
     acc: Accessor, //methods to retreive cells by coordinates
 }
 
@@ -14,8 +22,26 @@ impl Resolver {
         Resolver {
             step: 0,
             acc: Accessor::new(),
+            nblvl1ok:0,
+            nblvl1ko:0,
+            nblvl2ok:0,
+            nblvl2ko:0,
+            nblvl3ok:0,
+            nblvl3ko:0,
+            nblvl4guess:0,
+            nblvl4wrongguess:0,
         }
     }
+
+    fn display_stats(&mut self){
+        println!("found {} times one or more vals with level 1",self.nblvl1ok);
+        println!("Run {} times level 1 without new val",self.nblvl1ko);
+        println!("found {} times one or more vals with level 2",self.nblvl2ok);
+        println!("Run {} times level 2 without new val",self.nblvl2ko);
+        println!("found {} times one or more vals with level 3",self.nblvl2ok);
+        println!("Run {} times level 3 without new val",self.nblvl2ko);
+        println!("Made {} guess at level 4, {} of those were wrong",self.nblvl4guess,self.nblvl4wrongguess);
+}
 
     pub fn go(&mut self, g: &mut Grid, debug: bool) -> bool {
         g.display();
@@ -46,6 +72,7 @@ impl Resolver {
         g.display();
         if res {
             println!("Grid resolved!!!!!");
+            self.display_stats();
         } else if debug {
             g.debug();
         }
@@ -56,6 +83,7 @@ impl Resolver {
         //let run level 4 -> tries
         //first made a copy of
         let mut sav = g.clone();
+        self.nblvl4guess+=1;
         //second find a unsolved cell
         match g.get_first_unsolved() {
             None => {
@@ -74,6 +102,7 @@ impl Resolver {
                         "Lvl 4-> wrong guess so value {} is not possible for on cell l:{}/c:{}",
                         val.2, val.0, val.1
                     );
+                    self.nblvl4wrongguess+=1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
                     g.remove_a_possible(val.0, val.1, val.2);
                     self.go(g, debug)
@@ -86,12 +115,27 @@ impl Resolver {
         //try 3 first type of resolution
         //only solution when removing founds of the same line columnand square
         let res1 = self.resolve_lvl1(g);
+        if res1 {
+            self.nblvl1ok+=1;
+        }else{
+            self.nblvl1ko+=1;
+        }
         //value fount in two other line and two other column of a square
         let res2 = self.resolve_lvl2(g);
+        if res2 {
+            self.nblvl2ok+=1;
+        }else{
+            self.nblvl2ko+=1;
+        }
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
         let res3 = self.resolve_lvl3(g);
+        if res3 {
+            self.nblvl3ok+=1;
+        }else{
+            self.nblvl3ko+=1;
+        }
         res1 || res2 || res3
     }
 
