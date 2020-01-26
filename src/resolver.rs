@@ -6,11 +6,11 @@ use std::convert::TryInto;
 
 pub struct Resolver {
     step: u32,
-    nblvl1ok: u32,
+    nblvl1: u32,
     nblvl1ko: u32,
-    nblvl2ok: u32,
+    nblvl2: u32,
     nblvl2ko: u32,
-    nblvl3ok: u32,
+    nblvl3: u32,
     nblvl3ko: u32,
     nblvl4guess: u32,
     nblvl4wrongguess: u32,
@@ -20,13 +20,13 @@ pub struct Resolver {
 impl Resolver {
     pub fn new() -> Resolver {
         Resolver {
-            step: 0,
+            step: 1,
             acc: Accessor::new(),
-            nblvl1ok: 0,
+            nblvl1: 0,
             nblvl1ko: 0,
-            nblvl2ok: 0,
+            nblvl2: 0,
             nblvl2ko: 0,
-            nblvl3ok: 0,
+            nblvl3: 0,
             nblvl3ko: 0,
             nblvl4guess: 0,
             nblvl4wrongguess: 0,
@@ -35,20 +35,17 @@ impl Resolver {
 
     fn display_stats(&mut self) {
         println!(
-            "found {} times one or more vals with level 1",
-            self.nblvl1ok
+            "Called {} times level 1 ({} times with no new result)",
+            self.nblvl1, self.nblvl1ko
         );
-        println!("Run {} times level 1 without new val", self.nblvl1ko);
         println!(
-            "found {} times one or more vals with level 2",
-            self.nblvl2ok
+            "Called {} times level 2 ({} times with no new result)",
+            self.nblvl2, self.nblvl2ko
         );
-        println!("Run {} times level 2 without new val", self.nblvl2ko);
         println!(
-            "found {} times one or more vals with level 3",
-            self.nblvl2ok
+            "Called {} times level 3 ({} times with no new result)",
+            self.nblvl3, self.nblvl3ko
         );
-        println!("Run {} times level 3 without new val", self.nblvl2ko);
         println!(
             "Made {} guess at level 4, {} of those were wrong",
             self.nblvl4guess, self.nblvl4wrongguess
@@ -74,7 +71,6 @@ impl Resolver {
                         return false;
                     }
                 }
-                self.step += 1;
             }
         }
         let res = g.is_resolved();
@@ -111,7 +107,7 @@ impl Resolver {
                     true
                 } else {
                     println!(
-                        "Lvl 4-> wrong guess so value {} is not possible for on cell l:{}/c:{}",
+                        "Lvl 4-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid",
                         val.2, val.0, val.1
                     );
                     self.nblvl4wrongguess += 1;
@@ -124,28 +120,26 @@ impl Resolver {
     }
 
     pub fn resolve(&mut self, g: &mut Grid) -> bool {
+        self.step += 1;
         //try 3 first type of resolution
         //only solution when removing founds of the same line columnand square
         let res1 = self.resolve_lvl1(g);
-        if res1 {
-            self.nblvl1ok += 1;
-        } else {
+        self.nblvl1 += 1;
+        if !res1 {
             self.nblvl1ko += 1;
         }
         //value fount in two other line and two other column of a square
         let res2 = self.resolve_lvl2(g);
-        if res2 {
-            self.nblvl2ok += 1;
-        } else {
+        self.nblvl2 += 1;
+        if !res2 {
             self.nblvl2ko += 1;
         }
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
         let res3 = self.resolve_lvl3(g);
-        if res3 {
-            self.nblvl3ok += 1;
-        } else {
+        self.nblvl3 += 1;
+        if !res3 {
             self.nblvl3ko += 1;
         }
         res1 || res2 || res3

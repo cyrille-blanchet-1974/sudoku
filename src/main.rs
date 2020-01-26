@@ -118,7 +118,7 @@ fn test_solving(debug: bool) -> bool {
     | ?  ?  ? | ?  ?  8 | ?  ?  ? |
     | ?  ?  ? | ?  ?  ? | 1  ?  9 |
     -------------------------------
-    Solved in 16 steps
+    Solved in 43 steps
     -------------------------------
     | 1  2  3 | 4  6  5 | 7  9  8 |
     | 7  8  9 | 2  1  3 | 4  5  6 |
@@ -195,7 +195,7 @@ fn test_solving_easy(debug: bool) -> bool {
     | 7  ?  ? | ?  2  4 | 6  ?  ? |
     | ?  ?  ? | ?  ?  ? | 9  ?  5 |
     -------------------------------
-    Solved 2 steps
+    Solved 3 steps
     -------------------------------
     | 1  2  7 | 4  5  6 | 3  9  8 |
     | 8  3  4 | 2  9  1 | 7  5  6 |
@@ -266,7 +266,7 @@ fn test_solving_medium(debug: bool) -> bool {
     | 8  ?  3 | ?  ?  ? | ?  1  ? |
     | ?  ?  ? | ?  9  ? | ?  ?  2 |
     -------------------------------
-    Solved in 6 steps
+    Solved in 9 steps
     -------------------------------
     | 5  3  7 | 2  4  9 | 1  8  6 |
     | 4  8  9 | 7  1  6 | 5  2  3 |
@@ -334,7 +334,7 @@ fn test_solving_difficult(debug: bool) -> bool {
     | ?  ?  ? | 6  ?  7 | 8  ?  1 |
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     -------------------------------
-    Solved in 8 steps
+    Solved in 9 steps
     -------------------------------
     | 9  8  3 | 5  7  6 | 1  4  2 |
     | 5  4  2 | 9  1  8 | 6  7  3 |
@@ -403,7 +403,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
     | ?  ?  ? | ?  ?  ? | ?  ?  5 |
     | ?  ?  ? | ?  ?  4 | 9  3  ? |
     -------------------------------
-    Solved in 8 steps
+    Solved in 10 steps
     -------------------------------
     | 4  8  3 | 9  2  7 | 5  1  6 |
     | 5  2  1 | 3  8  6 | 7  4  9 |
@@ -470,7 +470,7 @@ fn test_solving_highest(debug: bool) -> bool {
     | ?  4  ? | ?  ?  ? | ?  ?  7 |
     | ?  ?  7 | ?  ?  ? | 3  ?  ? |
     -------------------------------
-    Solved in 32 steps
+    Solved in 50 steps
     -------------------------------
     | 1  6  2 | 8  5  7 | 4  9  3 |
     | 5  3  4 | 1  2  9 | 6  7  8 |
@@ -524,29 +524,29 @@ fn main() {
             }
             Some(2) => {
                 test_solving_easy(debug);
-            } //-> Ok
+            }
             Some(3) => {
                 test_solving_medium(debug);
-            } //-> not yet
+            }
             Some(4) => {
                 test_solving_difficult(debug);
-            } //-> not solved
+            }
             Some(5) => {
                 test_solving_diabolical(debug);
-            } //->
+            }
             Some(6) => {
                 test_solving_highest(debug);
-            } //->
+            }
             Some(8) => {
                 test_from_disk(debug);
             }
             Some(9) => {
                 manual();
-            } //->
+            }
             Some(99) => {
                 println!("Sudoku resolution End!");
                 return;
-            } //->
+            }
             _ => {
                 continue;
             }

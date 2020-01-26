@@ -319,7 +319,7 @@ impl Grid {
         let gridsize: usize = GRIDSIZE.try_into().unwrap();
         assert!(data.len() == gridsize);
         let mut res = Grid::default();
-        println!("data to import => {:?}", data);
+        //print!("data to import => {:?}", data);
         for i in 0..GRIDSIZE {
             let pos = i.try_into().unwrap();
             match data.get(pos) {
@@ -329,13 +329,14 @@ impl Grid {
                         None => {}
                         Some(v) => {
                             let c = pos_to_coord(pos);
-                            println!("val {} on {}/{}", *v, c.0, c.1);
+                            //print!(" val {} on {}/{}", *v, c.0, c.1);
                             res.set_val(c.0, c.1, *v);
                         }
                     };
                 }
             };
         }
+        println!();
         res
     }
 }
