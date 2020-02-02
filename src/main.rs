@@ -487,6 +487,71 @@ fn test_solving_highest(debug: bool) -> bool {
     */
 }
 
+fn test_solving_mindless(debug: bool) -> bool {
+    println!("7->resolution mindless");
+    let mut g1 = Grid::default();
+    g1.set_val(1, 1, 1);
+    g1.set_val(1, 9, 2);
+
+    g1.set_val(2, 2, 9);
+    g1.set_val(2, 4, 4);
+    g1.set_val(2, 8, 5);
+
+    g1.set_val(3, 3, 6);
+    g1.set_val(3, 7, 7);
+
+    g1.set_val(4, 2, 5);
+    g1.set_val(4, 4, 9);
+    g1.set_val(4, 6, 3);
+
+    g1.set_val(5, 5, 7);
+
+    g1.set_val(6, 4, 8);
+    g1.set_val(6, 5, 5);
+    g1.set_val(6, 8, 4);
+
+    g1.set_val(7, 1, 7);
+    g1.set_val(7, 7, 6);
+
+    g1.set_val(8, 2, 3);
+    g1.set_val(8, 6, 9);
+    g1.set_val(8, 8, 8);
+
+    g1.set_val(9, 3, 2);
+    g1.set_val(9, 9, 1);
+
+    resolve(&mut g1, debug)
+    /*
+    -------------------------------
+    | 1  ?  ? | ?  ?  ? | ?  ?  2 |
+    | ?  9  ? | 4  ?  ? | ?  5  ? |
+    | ?  ?  6 | ?  ?  ? | 7  ?  ? |
+    -------------------------------
+    | ?  5  ? | 9  ?  3 | ?  ?  ? |
+    | ?  ?  ? | ?  7  ? | ?  ?  ? |
+    | ?  ?  ? | 8  5  ? | ?  4  ? |
+    -------------------------------
+    | 7  ?  ? | ?  ?  ? | 6  ?  ? |
+    | ?  3  ? | ?  ?  9 | ?  8  ? |
+    | ?  ?  2 | ?  ?  ? | ?  ?  1 |
+    -------------------------------
+    Solved in 526 steps
+    -------------------------------
+    | 1  7  4 | 3  8  5 | 9  6  2 |
+    | 2  9  3 | 4  6  7 | 1  5  8 |
+    | 5  8  6 | 1  9  2 | 7  3  4 |
+    -------------------------------
+    | 4  5  1 | 9  2  3 | 8  7  6 |
+    | 9  2  8 | 6  7  4 | 3  1  5 |
+    | 3  6  7 | 8  5  1 | 2  4  9 |
+    -------------------------------
+    | 7  1  9 | 5  4  8 | 6  2  3 |
+    | 6  3  5 | 2  1  9 | 4  8  7 |
+    | 8  4  2 | 7  3  6 | 5  9  1 |
+    -------------------------------
+    */
+}
+
 fn resolve_from_disk(fic: String, debug: bool) -> bool {
     let mut g1 = read(&fic);
     println!("8->resolution from file {}!", fic);
@@ -537,6 +602,9 @@ fn main() {
             Some(6) => {
                 test_solving_highest(debug);
             }
+            Some(7) => {
+                test_solving_mindless(debug);
+            }
             Some(8) => {
                 test_from_disk(debug);
             }
@@ -562,6 +630,7 @@ fn resolve_test() {
     assert_eq!(true, test_solving_difficult(false));
     assert_eq!(true, test_solving_diabolical(false));
     assert_eq!(true, test_solving_highest(false));
+    assert_eq!(true, test_solving_mindless(false));
     assert_eq!(true, resolve_from_disk("test/easy.txt".to_string(), false));
     assert_eq!(
         true,
@@ -582,5 +651,9 @@ fn resolve_test() {
     assert_eq!(
         true,
         resolve_from_disk("test/pascal2.txt".to_string(), false)
+    );
+    assert_eq!(
+        true,
+        resolve_from_disk("test/pascal3.txt".to_string(), false)
     );
 }

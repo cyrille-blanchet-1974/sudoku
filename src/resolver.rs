@@ -91,6 +91,7 @@ impl Resolver {
         //let run level 4 -> tries
         //first made a copy of
         let mut sav = g.clone();
+        let sav_step = self.step;
         self.nblvl4guess += 1;
         //second find a unsolved cell
         match g.get_first_unsolved() {
@@ -107,8 +108,8 @@ impl Resolver {
                     true
                 } else {
                     println!(
-                        "Lvl 4-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid",
-                        val.2, val.0, val.1
+                        "Lvl4-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid (from step {})",
+                        val.2, val.0, val.1,sav_step
                     );
                     self.nblvl4wrongguess += 1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
