@@ -93,7 +93,7 @@ impl Resolver {
         let mut sav = g.clone();
         let sav_step = self.step;
         self.nblvl4guess += 1;
-        //second find a unsolved cell 
+        //second find a unsolved cell
         match g.get_first_unsolved() {
             None => {
                 println!("Strange error: grid not solved by with no unsolved cell (or unsoved cell with no possibles values)");

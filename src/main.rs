@@ -118,7 +118,7 @@ fn test_solving(debug: bool) -> bool {
     | ?  ?  ? | ?  ?  8 | ?  ?  ? |
     | ?  ?  ? | ?  ?  ? | 1  ?  9 |
     -------------------------------
-    Solved in 43 steps
+    Solved in 43 steps (26 guesses all good)
     -------------------------------
     | 1  2  3 | 4  6  5 | 7  9  8 |
     | 7  8  9 | 2  1  3 | 4  5  6 |
@@ -195,7 +195,7 @@ fn test_solving_easy(debug: bool) -> bool {
     | 7  ?  ? | ?  2  4 | 6  ?  ? |
     | ?  ?  ? | ?  ?  ? | 9  ?  5 |
     -------------------------------
-    Solved 3 steps
+    Solved 3 steps (0 guess)
     -------------------------------
     | 1  2  7 | 4  5  6 | 3  9  8 |
     | 8  3  4 | 2  9  1 | 7  5  6 |
@@ -266,7 +266,7 @@ fn test_solving_medium(debug: bool) -> bool {
     | 8  ?  3 | ?  ?  ? | ?  1  ? |
     | ?  ?  ? | ?  9  ? | ?  ?  2 |
     -------------------------------
-    Solved in 9 steps
+    Solved in 9 steps (2 guesses All goods)
     -------------------------------
     | 5  3  7 | 2  4  9 | 1  8  6 |
     | 4  8  9 | 7  1  6 | 5  2  3 |
@@ -334,7 +334,7 @@ fn test_solving_difficult(debug: bool) -> bool {
     | ?  ?  ? | 6  ?  7 | 8  ?  1 |
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
     -------------------------------
-    Solved in 9 steps
+    Solved in 9 steps (0 guess)
     -------------------------------
     | 9  8  3 | 5  7  6 | 1  4  2 |
     | 5  4  2 | 9  1  8 | 6  7  3 |
@@ -403,7 +403,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
     | ?  ?  ? | ?  ?  ? | ?  ?  5 |
     | ?  ?  ? | ?  ?  4 | 9  3  ? |
     -------------------------------
-    Solved in 10 steps
+    Solved in 10 steps (1 good guess)
     -------------------------------
     | 4  8  3 | 9  2  7 | 5  1  6 |
     | 5  2  1 | 3  8  6 | 7  4  9 |
@@ -470,7 +470,7 @@ fn test_solving_highest(debug: bool) -> bool {
     | ?  4  ? | ?  ?  ? | ?  ?  7 |
     | ?  ?  7 | ?  ?  ? | 3  ?  ? |
     -------------------------------
-    Solved in 50 steps
+    Solved in 50 steps (11 guesses, 6 wrongs and 5 goods)
     -------------------------------
     | 1  6  2 | 8  5  7 | 4  9  3 |
     | 5  3  4 | 1  2  9 | 6  7  8 |
@@ -535,7 +535,7 @@ fn test_solving_mindless(debug: bool) -> bool {
     | ?  3  ? | ?  ?  9 | ?  8  ? |
     | ?  ?  2 | ?  ?  ? | ?  ?  1 |
     -------------------------------
-    Solved in 526 steps
+    Solved in 526 steps (96 guesses, 87 wrongs and 9 goods)
     -------------------------------
     | 1  7  4 | 3  8  5 | 9  6  2 |
     | 2  9  3 | 4  6  7 | 1  5  8 |
@@ -574,6 +574,8 @@ fn main() {
         println!("3:test solving medium");
         println!("4:test solving difficult");
         println!("5:test solving diabolical");
+        println!("6:test solving highest");
+        println!("7:test solving mindless");
         println!("8:test a grid read from disk");
         println!("9:fill manualy");
         println!("99:quit");
