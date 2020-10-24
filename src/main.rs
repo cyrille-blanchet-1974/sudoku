@@ -68,7 +68,9 @@ fn manual() {
         if l == 0 && c == 0 && v == 0 {
             resolve(&mut g, true);
         } else {
-            g.set_val(l, c, v);
+            if l>0 && l<=9 && c > 0 && c <=9 {
+                g.set_val(l, c, v);
+            }
         }
         println!();
         g.display();
@@ -657,5 +659,9 @@ fn resolve_test() {
     assert_eq!(
         true,
         resolve_from_disk("test/pascal3.txt".to_string(), false)
+    );
+    assert_eq!(
+        true,
+        resolve_from_disk("test/m.txt".to_string(), false)
     );
 }
