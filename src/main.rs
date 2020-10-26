@@ -50,28 +50,47 @@ fn manual() {
     println!();
     g.display();
     loop {
-        let l = read_u8("line?".to_string());
+        println!("[1-{}] 0 to solve", MAX);
+        let l = read_u8("Line?".to_string());
         if l.is_none() {
             continue;
         }
         let l = l.unwrap();
-        let c = read_u8("column?".to_string());
+        //control >=0 useless ecause type is u8 unsigned 8
+        if l > MAX {
+            continue;
+        }
+        if l == 0 {
+            resolve(&mut g, true);
+            return;
+        }
+        println!("[1-{}] 0 to solve", MAX);
+        let c = read_u8("Column?".to_string());
         if c.is_none() {
             continue;
         }
         let c = c.unwrap();
-        let v = read_u8("value?".to_string());
+        if c > MAX {
+            continue;
+        }
+        if c == 0 {
+            resolve(&mut g, true);
+            return;
+        }
+        println!("[1-{}] 0 to solve", MAX);
+        let v = read_u8("Value?".to_string());
         if v.is_none() {
             continue;
         }
         let v = v.unwrap();
-        if l == 0 && c == 0 && v == 0 {
-            resolve(&mut g, true);
-        } else {
-            if l>0 && l<=9 && c > 0 && c <=9 {
-                g.set_val(l, c, v);
-            }
+        if v > MAX {
+            continue;
         }
+        if v == 0 {
+            resolve(&mut g, true);
+            return;
+        }
+        g.set_val(l, c, v);
         println!();
         g.display();
         if !g.is_valid() {
@@ -660,8 +679,5 @@ fn resolve_test() {
         true,
         resolve_from_disk("test/pascal3.txt".to_string(), false)
     );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/m.txt".to_string(), false)
-    );
+    assert_eq!(true, resolve_from_disk("test/m.txt".to_string(), false));
 }
