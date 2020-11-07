@@ -2,6 +2,22 @@ use super::accessor::*;
 use super::constant::*;
 use std::convert::TryInto;
 
+//type of the cell
+#[derive(Debug, Copy, Clone)]
+pub enum CellType {
+    UNKNOWN,
+    ORIGIN,
+    FOUND,
+    GUESS,
+} 
+/*
+UNKNOWN -> Value not yet  found,
+ORIGIN  -> Value given at start
+FOUND   -> Value found by calculation
+GUESS   -> possible value but not sure yet
+*/
+
+
 //the cell
 pub struct Cell {
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
@@ -10,6 +26,7 @@ pub struct Cell {
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
     answer: u8,           //value of the cell when solved
+    cell_type: CellType,  //type of value
 }
 
 impl Cell {
@@ -32,6 +49,7 @@ impl Cell {
             possibles,
             //TODO           hypothesis : 0,
             answer: 0,
+            cell_type: CellType::UNKNOWN,
         }
     }
 
@@ -52,6 +70,14 @@ impl Cell {
             Some(self.answer)
         }
     }
+
+    pub fn get_type(&self) -> CellType {
+        self.cell_type
+    }
+    pub fn set_type(&mut self, t : CellType)  {
+        self.cell_type = t;
+    }
+
 
     /**
      * check if resolved
@@ -78,6 +104,7 @@ impl Cell {
             );*/
             //if only one possible left
             self.answer = val; //and we got our answer
+            self.cell_type = CellType::FOUND;
             return true;
         }
         false
@@ -142,10 +169,13 @@ impl Cell {
         res
     }
 
+
+    //self.cell_type = CellType::FOUND;
+
     /*
      set the value of the cell
     */
-    pub fn set_val(&mut self, val: u8) {
+    pub fn set_val(&mut self, val: u8, t : CellType) {
         if !self.is_a_possible(val.try_into().unwrap()) {
             println!(
                 "ERROR! {} is not possible on cell {} (l:{}/c:{})",
@@ -163,6 +193,7 @@ impl Cell {
         }
         //set the answer
         self.answer = val;
+        self.cell_type = t;
     }
 
     /*
@@ -222,6 +253,7 @@ impl Clone for Cell {
             square: self.square,
             possibles: p,
             answer: self.answer,
+            cell_type : self.cell_type
         }
     }
 }
@@ -238,6 +270,6 @@ fn clone_cell_test() {
     assert_eq!(ori.get_column(), copy.get_column());
     assert_eq!(ori.get_line(), copy.get_line());
     assert_eq!(ori.get_square(), copy.get_square());
-    ori.set_val(8);
+    ori.set_val(8,CellType::FOUND);
     assert_ne!(ori.get_possibles(), copy.get_possibles());
 }

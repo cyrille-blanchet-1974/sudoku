@@ -5,6 +5,8 @@ use super::constant::*;
 use super::line::*;
 use super::square::*;
 use std::convert::TryInto;
+use std::io::Write;
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 //Grid => 81 cells
 pub struct Grid {
@@ -58,10 +60,10 @@ impl Grid {
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
      **/
-    pub fn set_val(&mut self, line: u8, column: u8, val: u8) {
+    pub fn set_val(&mut self, line: u8, column: u8, val: u8, t : CellType) {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
-        cell.set_val(val);
+        cell.set_val(val,t);
         let c: usize = (column - 1).try_into().unwrap();
         let col: &mut Column = &mut (self.columns[c]);
         col.add_a_known_value(val);
@@ -82,7 +84,7 @@ impl Grid {
         let v: usize = val.try_into().unwrap();
         let ok = cell.remove_a_possible_and_verify(v);
         if ok {
-            self.set_val(line, column, val)
+            self.set_val(line, column, val, CellType::FOUND)
         }
     }
 
@@ -187,29 +189,58 @@ impl Grid {
      * display the actual grid
      */
     pub fn display(&mut self) {
-        println!("-------------------------------");
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
+        //writeln!(&mut stdout, "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗").unwrap();
+        writeln!(&mut stdout, "╔═════════╦═════════╦═════════╗").unwrap();
         for line in 1..=LINESIZE {
-            print!("|");
+            write!(&mut stdout, "║").unwrap();
             for column in 1..=COLUMNSIZE {
                 let pos = coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
                 match cell.get_answer() {
-                    None => print!(" ? "),
-                    Some(x) => print!(" {} ", x),
+                    None => {
+                        stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
+                        write!(&mut stdout, " ? ").unwrap();},
+                    Some(x) =>
+                    {
+                        match cell.get_type() {
+                            CellType::FOUND => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Green)).set_fg(Some(Color::White))).unwrap(),
+                            CellType::GUESS => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Red)).set_fg(Some(Color::White))).unwrap(),
+                            CellType::ORIGIN => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Blue)).set_fg(Some(Color::White))).unwrap(),
+                            CellType::UNKNOWN => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap(),
+                        }
+                        write!(&mut stdout, " {} ", x).unwrap();
+                    }
                 };
+                stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
                 if column % 3 == 0 {
-                    print!("|");
+                    write!(&mut stdout, "║").unwrap();
+                }
+                else
+                {
+                    //write!(&mut stdout, "┃").unwrap();
                 }
             }
             println!();
-            if line % 3 == 0 {
-                println!("-------------------------------");
+
+            if line % 9 == 0 {
+                //writeln!(&mut stdout, "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝").unwrap();
+                writeln!(&mut stdout, "╚═════════╩═════════╩═════════╝").unwrap();
+            }
+            else if line % 3 == 0 {
+                //writeln!(&mut stdout, "╟═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╢").unwrap();
+                writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
+            }
+            else {
+                //writeln!(&mut stdout, "╟───╋───╋───╫───╋───╋───╫───╋───╋───╢").unwrap();
             }
         }
         if self.is_resolved() {
             println!("Puzzle solved!");
         }
     }
+
 
     /**
      * display debug info  (ex remaining possibles of the cells)
@@ -330,7 +361,7 @@ impl Grid {
                         Some(v) => {
                             let c = pos_to_coord(pos);
                             //print!(" val {} on {}/{}", *v, c.0, c.1);
-                            res.set_val(c.0, c.1, *v);
+                            res.set_val(c.0, c.1, *v, CellType::ORIGIN);
                         }
                     };
                 }
@@ -382,87 +413,87 @@ fn resolution_test() {
 fn display_test() {
     let mut g = Grid::default();
     g.display();
-    g.set_val(1, 1, 1);
-    g.set_val(1, 2, 2);
-    g.set_val(1, 3, 3);
-    g.set_val(1, 4, 4);
-    g.set_val(1, 5, 5);
-    g.set_val(1, 6, 6);
-    g.set_val(1, 7, 7);
-    g.set_val(1, 8, 8);
-    g.set_val(1, 9, 9);
-    g.set_val(2, 1, 4);
-    g.set_val(2, 2, 5);
-    g.set_val(2, 3, 6);
-    g.set_val(2, 4, 7);
-    g.set_val(2, 5, 8);
-    g.set_val(2, 6, 9);
-    g.set_val(2, 7, 1);
-    g.set_val(2, 8, 2);
-    g.set_val(2, 9, 3);
-    g.set_val(3, 1, 7);
-    g.set_val(3, 2, 8);
-    g.set_val(3, 3, 9);
-    g.set_val(3, 4, 1);
-    g.set_val(3, 5, 2);
-    g.set_val(3, 6, 3);
-    g.set_val(3, 7, 4);
-    g.set_val(3, 8, 5);
-    g.set_val(3, 9, 6);
-    g.set_val(4, 1, 2);
-    g.set_val(4, 2, 3);
-    g.set_val(4, 3, 4);
-    g.set_val(4, 4, 5);
-    g.set_val(4, 5, 6);
-    g.set_val(4, 6, 7);
-    g.set_val(4, 7, 8);
-    g.set_val(4, 8, 9);
-    g.set_val(4, 9, 1);
-    g.set_val(5, 1, 5);
-    g.set_val(5, 2, 6);
-    g.set_val(5, 3, 7);
-    g.set_val(5, 4, 8);
-    g.set_val(5, 5, 9);
-    g.set_val(5, 6, 1);
-    g.set_val(5, 7, 2);
-    g.set_val(5, 8, 3);
-    g.set_val(5, 9, 4);
-    g.set_val(6, 1, 8);
-    g.set_val(6, 2, 9);
-    g.set_val(6, 3, 1);
-    g.set_val(6, 4, 2);
-    g.set_val(6, 5, 3);
-    g.set_val(6, 6, 4);
-    g.set_val(6, 7, 5);
-    g.set_val(6, 8, 6);
-    g.set_val(6, 9, 7);
-    g.set_val(7, 1, 3);
-    g.set_val(7, 2, 4);
-    g.set_val(7, 3, 5);
-    g.set_val(7, 4, 6);
-    g.set_val(7, 5, 7);
-    g.set_val(7, 6, 8);
-    g.set_val(7, 7, 9);
-    g.set_val(7, 8, 1);
-    g.set_val(7, 9, 2);
-    g.set_val(8, 1, 6);
-    g.set_val(8, 2, 7);
-    g.set_val(8, 3, 8);
-    g.set_val(8, 4, 9);
-    g.set_val(8, 5, 1);
-    g.set_val(8, 6, 2);
-    g.set_val(8, 7, 3);
-    g.set_val(8, 8, 4);
-    g.set_val(8, 9, 5);
-    g.set_val(9, 1, 9);
-    g.set_val(9, 2, 1);
-    g.set_val(9, 3, 2);
-    g.set_val(9, 4, 3);
-    g.set_val(9, 5, 4);
-    g.set_val(9, 6, 5);
-    g.set_val(9, 7, 6);
-    g.set_val(9, 8, 7);
-    g.set_val(9, 9, 8);
+    g.set_val(1, 1, 1, CellType::ORIGIN);
+    g.set_val(1, 2, 2, CellType::ORIGIN);
+    g.set_val(1, 3, 3, CellType::ORIGIN);
+    g.set_val(1, 4, 4, CellType::ORIGIN);
+    g.set_val(1, 5, 5, CellType::ORIGIN);
+    g.set_val(1, 6, 6, CellType::ORIGIN);
+    g.set_val(1, 7, 7, CellType::ORIGIN);
+    g.set_val(1, 8, 8, CellType::ORIGIN);
+    g.set_val(1, 9, 9, CellType::ORIGIN);
+    g.set_val(2, 1, 4, CellType::ORIGIN);
+    g.set_val(2, 2, 5, CellType::ORIGIN);
+    g.set_val(2, 3, 6, CellType::ORIGIN);
+    g.set_val(2, 4, 7, CellType::ORIGIN);
+    g.set_val(2, 5, 8, CellType::ORIGIN);
+    g.set_val(2, 6, 9, CellType::ORIGIN);
+    g.set_val(2, 7, 1, CellType::ORIGIN);
+    g.set_val(2, 8, 2, CellType::ORIGIN);
+    g.set_val(2, 9, 3, CellType::ORIGIN);
+    g.set_val(3, 1, 7, CellType::ORIGIN);
+    g.set_val(3, 2, 8, CellType::ORIGIN);
+    g.set_val(3, 3, 9, CellType::ORIGIN);
+    g.set_val(3, 4, 1, CellType::ORIGIN);
+    g.set_val(3, 5, 2, CellType::ORIGIN);
+    g.set_val(3, 6, 3, CellType::ORIGIN);
+    g.set_val(3, 7, 4, CellType::ORIGIN);
+    g.set_val(3, 8, 5, CellType::ORIGIN);
+    g.set_val(3, 9, 6, CellType::ORIGIN);
+    g.set_val(4, 1, 2, CellType::ORIGIN);
+    g.set_val(4, 2, 3, CellType::ORIGIN);
+    g.set_val(4, 3, 4, CellType::ORIGIN);
+    g.set_val(4, 4, 5, CellType::ORIGIN);
+    g.set_val(4, 5, 6, CellType::ORIGIN);
+    g.set_val(4, 6, 7, CellType::ORIGIN);
+    g.set_val(4, 7, 8, CellType::ORIGIN);
+    g.set_val(4, 8, 9, CellType::ORIGIN);
+    g.set_val(4, 9, 1, CellType::ORIGIN);
+    g.set_val(5, 1, 5, CellType::ORIGIN);
+    g.set_val(5, 2, 6, CellType::ORIGIN);
+    g.set_val(5, 3, 7, CellType::ORIGIN);
+    g.set_val(5, 4, 8, CellType::ORIGIN);
+    g.set_val(5, 5, 9, CellType::ORIGIN);
+    g.set_val(5, 6, 1, CellType::ORIGIN);
+    g.set_val(5, 7, 2, CellType::ORIGIN);
+    g.set_val(5, 8, 3, CellType::ORIGIN);
+    g.set_val(5, 9, 4, CellType::ORIGIN);
+    g.set_val(6, 1, 8, CellType::ORIGIN);
+    g.set_val(6, 2, 9, CellType::ORIGIN);
+    g.set_val(6, 3, 1, CellType::ORIGIN);
+    g.set_val(6, 4, 2, CellType::ORIGIN);
+    g.set_val(6, 5, 3, CellType::ORIGIN);
+    g.set_val(6, 6, 4, CellType::ORIGIN);
+    g.set_val(6, 7, 5, CellType::ORIGIN);
+    g.set_val(6, 8, 6, CellType::ORIGIN);
+    g.set_val(6, 9, 7, CellType::ORIGIN);
+    g.set_val(7, 1, 3, CellType::ORIGIN);
+    g.set_val(7, 2, 4, CellType::ORIGIN);
+    g.set_val(7, 3, 5, CellType::ORIGIN);
+    g.set_val(7, 4, 6, CellType::ORIGIN);
+    g.set_val(7, 5, 7, CellType::ORIGIN);
+    g.set_val(7, 6, 8, CellType::ORIGIN);
+    g.set_val(7, 7, 9, CellType::ORIGIN);
+    g.set_val(7, 8, 1, CellType::ORIGIN);
+    g.set_val(7, 9, 2, CellType::ORIGIN);
+    g.set_val(8, 1, 6, CellType::ORIGIN);
+    g.set_val(8, 2, 7, CellType::ORIGIN);
+    g.set_val(8, 3, 8, CellType::ORIGIN);
+    g.set_val(8, 4, 9, CellType::ORIGIN);
+    g.set_val(8, 5, 1, CellType::ORIGIN);
+    g.set_val(8, 6, 2, CellType::ORIGIN);
+    g.set_val(8, 7, 3, CellType::ORIGIN);
+    g.set_val(8, 8, 4, CellType::ORIGIN);
+    g.set_val(8, 9, 5, CellType::ORIGIN);
+    g.set_val(9, 1, 9, CellType::ORIGIN);
+    g.set_val(9, 2, 1, CellType::ORIGIN);
+    g.set_val(9, 3, 2, CellType::ORIGIN);
+    g.set_val(9, 4, 3, CellType::ORIGIN);
+    g.set_val(9, 5, 4, CellType::ORIGIN);
+    g.set_val(9, 6, 5, CellType::ORIGIN);
+    g.set_val(9, 7, 6, CellType::ORIGIN);
+    g.set_val(9, 8, 7, CellType::ORIGIN);
+    g.set_val(9, 9, 8, CellType::ORIGIN);
     g.display();
 }
 
@@ -470,63 +501,63 @@ fn display_test() {
 fn check_is_valid() {
     let mut g = Grid::default();
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 1, 1);
+    g.set_val(1, 1, 1, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 3, 3);
+    g.set_val(1, 3, 3, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 4, 4);
+    g.set_val(1, 4, 4, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 5, 5);
+    g.set_val(1, 5, 5, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 6, 6);
+    g.set_val(1, 6, 6, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 7, 7);
+    g.set_val(1, 7, 7, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 8, 8);
+    g.set_val(1, 8, 8, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
-    g.set_val(1, 9, 9);
+    g.set_val(1, 9, 9, CellType::ORIGIN);
     assert_eq!(true, g.is_valid());
 
     let mut g2 = g.clone();
-    g2.set_val(2, 1, 1); //two 1 on samae column
+    g2.set_val(2, 1, 1, CellType::ORIGIN); //two 1 on samae column
     assert_eq!(false, g2.is_valid());
 
     let mut g2 = g.clone();
-    g2.set_val(1, 2, 1); //Two 1 on same line
+    g2.set_val(1, 2, 1, CellType::ORIGIN); //Two 1 on same line
     assert_eq!(false, g2.is_valid());
 
     let mut g2 = g.clone();
-    g2.set_val(3, 3, 1); //Two 1 on same square
+    g2.set_val(3, 3, 1, CellType::ORIGIN); //Two 1 on same square
     assert_eq!(false, g2.is_valid());
 }
 
 #[test]
 fn clone_grid_test() {
     let mut ori = Grid::default();
-    ori.set_val(1, 1, 1);
-    ori.set_val(2, 4, 1);
-    ori.set_val(3, 7, 1);
-    ori.set_val(4, 2, 1);
-    ori.set_val(5, 5, 1);
-    ori.set_val(6, 8, 1);
-    ori.set_val(7, 3, 1);
+    ori.set_val(1, 1, 1, CellType::ORIGIN);
+    ori.set_val(2, 4, 1, CellType::ORIGIN);
+    ori.set_val(3, 7, 1, CellType::ORIGIN);
+    ori.set_val(4, 2, 1, CellType::ORIGIN);
+    ori.set_val(5, 5, 1, CellType::ORIGIN);
+    ori.set_val(6, 8, 1, CellType::ORIGIN);
+    ori.set_val(7, 3, 1, CellType::ORIGIN);
     let mut copy = ori.clone();
     assert_eq!(ori.get_resolved(), copy.get_resolved());
-    ori.set_val(8, 6, 1);
+    ori.set_val(8, 6, 1, CellType::ORIGIN);
     assert_ne!(ori.get_resolved(), copy.get_resolved());
 }
 
 #[test]
 fn import_export_grid_test() {
     let mut ori = Grid::default();
-    ori.set_val(1, 1, 1);
-    ori.set_val(2, 4, 1);
-    ori.set_val(3, 7, 1);
-    ori.set_val(4, 2, 1);
-    ori.set_val(5, 5, 1);
-    ori.set_val(6, 8, 1);
-    ori.set_val(7, 3, 1);
-    ori.set_val(8, 6, 1);
+    ori.set_val(1, 1, 1, CellType::ORIGIN);
+    ori.set_val(2, 4, 1, CellType::ORIGIN);
+    ori.set_val(3, 7, 1, CellType::ORIGIN);
+    ori.set_val(4, 2, 1, CellType::ORIGIN);
+    ori.set_val(5, 5, 1, CellType::ORIGIN);
+    ori.set_val(6, 8, 1, CellType::ORIGIN);
+    ori.set_val(7, 3, 1, CellType::ORIGIN);
+    ori.set_val(8, 6, 1, CellType::ORIGIN);
     let mut copy = Grid::import(ori.export());
     ori.display();
     copy.display();

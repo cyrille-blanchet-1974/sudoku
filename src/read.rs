@@ -3,6 +3,7 @@ use std::convert::TryInto;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
+use super::cell::CellType;
 
 pub fn read(fic: &str) -> Grid {
     let mut g = Grid::default();
@@ -34,6 +35,6 @@ fn compute_line(g: &mut Grid, line_number: u8, l: &str) {
             Ok(v) => v,
         };
         let c: u8 = col.try_into().unwrap();
-        g.set_val(line_number, c + 1, r);
+        g.set_val(line_number, c + 1, r, CellType::ORIGIN);
     }
 }

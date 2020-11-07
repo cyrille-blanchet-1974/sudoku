@@ -102,7 +102,7 @@ impl Resolver {
             Some(val) => {
                 //on the saved grid, let try this value on the cell
                 println!("Lvl4-> try value {} on cell l:{}/c:{}", val.2, val.0, val.1);
-                sav.set_val(val.0, val.1, val.2);
+                sav.set_val(val.0, val.1, val.2 , CellType::GUESS);
                 if self.go(&mut sav, debug) {
                     //we found the solution
                     true
@@ -201,7 +201,7 @@ impl Resolver {
                         " -Found a value {} on cell {} (l:{}/c:{})  ",
                         x, cc, line, col
                     );
-                    g.set_val(line, col, x);
+                    g.set_val(line, col, x, CellType::FOUND);
                 }
             }
         }
@@ -317,7 +317,7 @@ impl Resolver {
             return false;
         }
         //at this point only one line and one column unsolved => it is now
-        g.set_val(unsolved_line, unsolved_column, value);
+        g.set_val(unsolved_line, unsolved_column, value, CellType::FOUND);
         print!(
             " -Found a value {} in cell {} of square {:?} (l:{}/c:{})",
             value, pos, squ, unsolved_line, unsolved_column
@@ -383,7 +383,7 @@ impl Resolver {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v);
+            g.set_val(coord.0, coord.1, v, CellType::FOUND);
             print!(
                 " -Found a value {} on cell {} (l:{}/c:{})  ",
                 val, unsolve, coord.0, coord.1
@@ -416,7 +416,7 @@ impl Resolver {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v);
+            g.set_val(coord.0, coord.1, v, CellType::FOUND);
             print!(
                 " -Found a value {} on cell {} (l:{}/c:{})  ",
                 val, unsolve, coord.0, coord.1
@@ -449,7 +449,7 @@ impl Resolver {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v);
+            g.set_val(coord.0, coord.1, v, CellType::FOUND);
             print!(
                 " -Found a value {} on cell {} (l:{}/c:{})  ",
                 val, unsolve, coord.0, coord.1

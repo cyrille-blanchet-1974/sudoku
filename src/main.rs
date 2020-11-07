@@ -8,6 +8,7 @@ mod read;
 mod resolver;
 mod square;
 
+use cell::CellType;
 use constant::*;
 use grid::*;
 use read::*;
@@ -90,7 +91,7 @@ fn manual() {
             resolve(&mut g, true);
             return;
         }
-        g.set_val(l, c, v);
+        g.set_val(l, c, v, CellType::ORIGIN);
         println!();
         g.display();
         if !g.is_valid() {
@@ -112,18 +113,18 @@ pub fn resolve(g: &mut Grid, debug: bool) -> bool {
 fn test_solving(debug: bool) -> bool {
     println!("1->resolution test!");
     let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1);
-    g1.set_val(2, 4, 2);
-    g1.set_val(3, 7, 3);
-    g1.set_val(4, 2, 4);
-    g1.set_val(5, 5, 5);
-    g1.set_val(6, 8, 6);
-    g1.set_val(7, 3, 7);
-    g1.set_val(8, 6, 8);
-    g1.set_val(9, 9, 9);
-    g1.set_val(2, 5, 1);
-    g1.set_val(5, 8, 1);
-    g1.set_val(9, 7, 1);
+    g1.set_val(1, 1, 1, CellType::ORIGIN);
+    g1.set_val(2, 4, 2, CellType::ORIGIN);
+    g1.set_val(3, 7, 3, CellType::ORIGIN);
+    g1.set_val(4, 2, 4, CellType::ORIGIN);
+    g1.set_val(5, 5, 5, CellType::ORIGIN);
+    g1.set_val(6, 8, 6, CellType::ORIGIN);
+    g1.set_val(7, 3, 7, CellType::ORIGIN);
+    g1.set_val(8, 6, 8, CellType::ORIGIN);
+    g1.set_val(9, 9, 9, CellType::ORIGIN);
+    g1.set_val(2, 5, 1, CellType::ORIGIN);
+    g1.set_val(5, 8, 1, CellType::ORIGIN);
+    g1.set_val(9, 7, 1, CellType::ORIGIN);
     resolve(&mut g1, debug)
     /*
     -------------------------------
@@ -159,47 +160,47 @@ fn test_solving(debug: bool) -> bool {
 fn test_solving_easy(debug: bool) -> bool {
     println!("2->resolution easy!");
     let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1);
-    g1.set_val(1, 3, 7);
+    g1.set_val(1, 1, 1, CellType::ORIGIN);
+    g1.set_val(1, 3, 7, CellType::ORIGIN);
 
-    g1.set_val(2, 3, 4);
-    g1.set_val(2, 4, 2);
-    g1.set_val(2, 5, 9);
-    g1.set_val(2, 9, 6);
+    g1.set_val(2, 3, 4, CellType::ORIGIN);
+    g1.set_val(2, 4, 2, CellType::ORIGIN);
+    g1.set_val(2, 5, 9, CellType::ORIGIN);
+    g1.set_val(2, 9, 6, CellType::ORIGIN);
 
-    g1.set_val(3, 2, 9);
-    g1.set_val(3, 5, 8);
-    g1.set_val(3, 6, 7);
-    g1.set_val(3, 8, 2);
-    g1.set_val(3, 9, 4);
+    g1.set_val(3, 2, 9, CellType::ORIGIN);
+    g1.set_val(3, 5, 8, CellType::ORIGIN);
+    g1.set_val(3, 6, 7, CellType::ORIGIN);
+    g1.set_val(3, 8, 2, CellType::ORIGIN);
+    g1.set_val(3, 9, 4, CellType::ORIGIN);
 
-    g1.set_val(4, 1, 4);
-    g1.set_val(4, 2, 7);
-    g1.set_val(4, 3, 5);
-    g1.set_val(4, 4, 1);
-    g1.set_val(4, 7, 8);
-    g1.set_val(4, 8, 6);
+    g1.set_val(4, 1, 4, CellType::ORIGIN);
+    g1.set_val(4, 2, 7, CellType::ORIGIN);
+    g1.set_val(4, 3, 5, CellType::ORIGIN);
+    g1.set_val(4, 4, 1, CellType::ORIGIN);
+    g1.set_val(4, 7, 8, CellType::ORIGIN);
+    g1.set_val(4, 8, 6, CellType::ORIGIN);
 
-    g1.set_val(6, 2, 1);
-    g1.set_val(6, 3, 3);
-    g1.set_val(6, 6, 8);
-    g1.set_val(6, 7, 5);
-    g1.set_val(6, 8, 7);
-    g1.set_val(6, 9, 9);
+    g1.set_val(6, 2, 1, CellType::ORIGIN);
+    g1.set_val(6, 3, 3, CellType::ORIGIN);
+    g1.set_val(6, 6, 8, CellType::ORIGIN);
+    g1.set_val(6, 7, 5, CellType::ORIGIN);
+    g1.set_val(6, 8, 7, CellType::ORIGIN);
+    g1.set_val(6, 9, 9, CellType::ORIGIN);
 
-    g1.set_val(7, 1, 3);
-    g1.set_val(7, 2, 4);
-    g1.set_val(7, 4, 8);
-    g1.set_val(7, 5, 6);
-    g1.set_val(7, 8, 1);
+    g1.set_val(7, 1, 3, CellType::ORIGIN);
+    g1.set_val(7, 2, 4, CellType::ORIGIN);
+    g1.set_val(7, 4, 8, CellType::ORIGIN);
+    g1.set_val(7, 5, 6, CellType::ORIGIN);
+    g1.set_val(7, 8, 1, CellType::ORIGIN);
 
-    g1.set_val(8, 1, 7);
-    g1.set_val(8, 5, 2);
-    g1.set_val(8, 6, 4);
-    g1.set_val(8, 7, 6);
+    g1.set_val(8, 1, 7, CellType::ORIGIN);
+    g1.set_val(8, 5, 2, CellType::ORIGIN);
+    g1.set_val(8, 6, 4, CellType::ORIGIN);
+    g1.set_val(8, 7, 6, CellType::ORIGIN);
 
-    g1.set_val(9, 7, 9);
-    g1.set_val(9, 9, 5);
+    g1.set_val(9, 7, 9, CellType::ORIGIN);
+    g1.set_val(9, 9, 5, CellType::ORIGIN);
 
     resolve(&mut g1, debug)
     /*
@@ -236,42 +237,42 @@ fn test_solving_easy(debug: bool) -> bool {
 fn test_solving_medium(debug: bool) -> bool {
     println!("3->resolution medium!");
     let mut g1 = Grid::default();
-    g1.set_val(1, 1, 5);
-    g1.set_val(1, 5, 4);
+    g1.set_val(1, 1, 5, CellType::ORIGIN);
+    g1.set_val(1, 5, 4, CellType::ORIGIN);
 
-    g1.set_val(2, 2, 8);
-    g1.set_val(2, 8, 2);
-    g1.set_val(2, 9, 3);
+    g1.set_val(2, 2, 8, CellType::ORIGIN);
+    g1.set_val(2, 8, 2, CellType::ORIGIN);
+    g1.set_val(2, 9, 3, CellType::ORIGIN);
 
-    g1.set_val(3, 4, 8);
-    g1.set_val(3, 5, 5);
-    g1.set_val(3, 6, 3);
-    g1.set_val(3, 7, 7);
+    g1.set_val(3, 4, 8, CellType::ORIGIN);
+    g1.set_val(3, 5, 5, CellType::ORIGIN);
+    g1.set_val(3, 6, 3, CellType::ORIGIN);
+    g1.set_val(3, 7, 7, CellType::ORIGIN);
 
-    g1.set_val(4, 1, 2);
-    g1.set_val(4, 7, 6);
-    g1.set_val(4, 8, 4);
+    g1.set_val(4, 1, 2, CellType::ORIGIN);
+    g1.set_val(4, 7, 6, CellType::ORIGIN);
+    g1.set_val(4, 8, 4, CellType::ORIGIN);
 
-    g1.set_val(5, 1, 6);
-    g1.set_val(5, 3, 8);
-    g1.set_val(5, 7, 3);
-    g1.set_val(5, 9, 1);
+    g1.set_val(5, 1, 6, CellType::ORIGIN);
+    g1.set_val(5, 3, 8, CellType::ORIGIN);
+    g1.set_val(5, 7, 3, CellType::ORIGIN);
+    g1.set_val(5, 9, 1, CellType::ORIGIN);
 
-    g1.set_val(6, 2, 7);
-    g1.set_val(6, 3, 4);
-    g1.set_val(6, 9, 9);
+    g1.set_val(6, 2, 7, CellType::ORIGIN);
+    g1.set_val(6, 3, 4, CellType::ORIGIN);
+    g1.set_val(6, 9, 9, CellType::ORIGIN);
 
-    g1.set_val(7, 3, 1);
-    g1.set_val(7, 4, 3);
-    g1.set_val(7, 5, 7);
-    g1.set_val(7, 6, 2);
+    g1.set_val(7, 3, 1, CellType::ORIGIN);
+    g1.set_val(7, 4, 3, CellType::ORIGIN);
+    g1.set_val(7, 5, 7, CellType::ORIGIN);
+    g1.set_val(7, 6, 2, CellType::ORIGIN);
 
-    g1.set_val(8, 1, 8);
-    g1.set_val(8, 3, 3);
-    g1.set_val(8, 8, 1);
+    g1.set_val(8, 1, 8, CellType::ORIGIN);
+    g1.set_val(8, 3, 3, CellType::ORIGIN);
+    g1.set_val(8, 8, 1, CellType::ORIGIN);
 
-    g1.set_val(9, 5, 9);
-    g1.set_val(9, 9, 2);
+    g1.set_val(9, 5, 9, CellType::ORIGIN);
+    g1.set_val(9, 9, 2, CellType::ORIGIN);
     resolve(&mut g1, debug)
     /*
     -------------------------------
@@ -308,37 +309,37 @@ fn test_solving_difficult(debug: bool) -> bool {
     println!("4->resolution difficult!");
     let mut g1 = Grid::default();
 
-    g1.set_val(2, 1, 5);
-    g1.set_val(2, 3, 2);
-    g1.set_val(2, 4, 9);
-    g1.set_val(2, 6, 8);
+    g1.set_val(2, 1, 5, CellType::ORIGIN);
+    g1.set_val(2, 3, 2, CellType::ORIGIN);
+    g1.set_val(2, 4, 9, CellType::ORIGIN);
+    g1.set_val(2, 6, 8, CellType::ORIGIN);
 
-    g1.set_val(3, 1, 1);
-    g1.set_val(3, 2, 6);
-    g1.set_val(3, 4, 2);
-    g1.set_val(3, 5, 3);
+    g1.set_val(3, 1, 1, CellType::ORIGIN);
+    g1.set_val(3, 2, 6, CellType::ORIGIN);
+    g1.set_val(3, 4, 2, CellType::ORIGIN);
+    g1.set_val(3, 5, 3, CellType::ORIGIN);
 
-    g1.set_val(4, 3, 1);
-    g1.set_val(4, 7, 7);
-    g1.set_val(4, 9, 4);
+    g1.set_val(4, 3, 1, CellType::ORIGIN);
+    g1.set_val(4, 7, 7, CellType::ORIGIN);
+    g1.set_val(4, 9, 4, CellType::ORIGIN);
 
-    g1.set_val(5, 3, 4);
-    g1.set_val(5, 5, 9);
-    g1.set_val(5, 7, 3);
+    g1.set_val(5, 3, 4, CellType::ORIGIN);
+    g1.set_val(5, 5, 9, CellType::ORIGIN);
+    g1.set_val(5, 7, 3, CellType::ORIGIN);
 
-    g1.set_val(6, 1, 7);
-    g1.set_val(6, 3, 8);
-    g1.set_val(6, 7, 5);
+    g1.set_val(6, 1, 7, CellType::ORIGIN);
+    g1.set_val(6, 3, 8, CellType::ORIGIN);
+    g1.set_val(6, 7, 5, CellType::ORIGIN);
 
-    g1.set_val(7, 5, 8);
-    g1.set_val(7, 6, 5);
-    g1.set_val(7, 8, 6);
-    g1.set_val(7, 9, 7);
+    g1.set_val(7, 5, 8, CellType::ORIGIN);
+    g1.set_val(7, 6, 5, CellType::ORIGIN);
+    g1.set_val(7, 8, 6, CellType::ORIGIN);
+    g1.set_val(7, 9, 7, CellType::ORIGIN);
 
-    g1.set_val(8, 4, 6);
-    g1.set_val(8, 6, 7);
-    g1.set_val(8, 7, 8);
-    g1.set_val(8, 9, 1);
+    g1.set_val(8, 4, 6, CellType::ORIGIN);
+    g1.set_val(8, 6, 7, CellType::ORIGIN);
+    g1.set_val(8, 7, 8, CellType::ORIGIN);
+    g1.set_val(8, 9, 1, CellType::ORIGIN);
 
     resolve(&mut g1, debug)
     /*
@@ -376,38 +377,38 @@ fn test_solving_diabolical(debug: bool) -> bool {
     println!("5->resolution diabolic!");
     let mut g1 = Grid::default();
 
-    g1.set_val(1, 2, 8);
-    g1.set_val(1, 3, 3);
-    g1.set_val(1, 4, 9);
+    g1.set_val(1, 2, 8, CellType::ORIGIN);
+    g1.set_val(1, 3, 3, CellType::ORIGIN);
+    g1.set_val(1, 4, 9, CellType::ORIGIN);
 
-    g1.set_val(2, 1, 5);
+    g1.set_val(2, 1, 5, CellType::ORIGIN);
 
-    g1.set_val(3, 4, 1);
-    g1.set_val(3, 5, 4);
-    g1.set_val(3, 8, 2);
+    g1.set_val(3, 4, 1, CellType::ORIGIN);
+    g1.set_val(3, 5, 4, CellType::ORIGIN);
+    g1.set_val(3, 8, 2, CellType::ORIGIN);
 
-    g1.set_val(4, 1, 3);
-    g1.set_val(4, 3, 9);
-    g1.set_val(4, 6, 8);
-    g1.set_val(4, 7, 6);
+    g1.set_val(4, 1, 3, CellType::ORIGIN);
+    g1.set_val(4, 3, 9, CellType::ORIGIN);
+    g1.set_val(4, 6, 8, CellType::ORIGIN);
+    g1.set_val(4, 7, 6, CellType::ORIGIN);
 
-    g1.set_val(5, 3, 7);
-    g1.set_val(5, 7, 1);
+    g1.set_val(5, 3, 7, CellType::ORIGIN);
+    g1.set_val(5, 7, 1, CellType::ORIGIN);
 
-    g1.set_val(6, 3, 4);
-    g1.set_val(6, 4, 2);
-    g1.set_val(6, 7, 3);
-    g1.set_val(6, 9, 7);
+    g1.set_val(6, 3, 4, CellType::ORIGIN);
+    g1.set_val(6, 4, 2, CellType::ORIGIN);
+    g1.set_val(6, 7, 3, CellType::ORIGIN);
+    g1.set_val(6, 9, 7, CellType::ORIGIN);
 
-    g1.set_val(7, 2, 4);
-    g1.set_val(7, 5, 6);
-    g1.set_val(7, 6, 3);
+    g1.set_val(7, 2, 4, CellType::ORIGIN);
+    g1.set_val(7, 5, 6, CellType::ORIGIN);
+    g1.set_val(7, 6, 3, CellType::ORIGIN);
 
-    g1.set_val(8, 9, 5);
+    g1.set_val(8, 9, 5, CellType::ORIGIN);
 
-    g1.set_val(9, 6, 4);
-    g1.set_val(9, 7, 9);
-    g1.set_val(9, 8, 3);
+    g1.set_val(9, 6, 4, CellType::ORIGIN);
+    g1.set_val(9, 7, 9, CellType::ORIGIN);
+    g1.set_val(9, 8, 3, CellType::ORIGIN);
 
     resolve(&mut g1, debug)
     /*
@@ -444,37 +445,37 @@ fn test_solving_diabolical(debug: bool) -> bool {
 fn test_solving_highest(debug: bool) -> bool {
     println!("6->resolution highest");
     let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1);
-    g1.set_val(1, 6, 7);
-    g1.set_val(1, 8, 9);
+    g1.set_val(1, 1, 1, CellType::ORIGIN);
+    g1.set_val(1, 6, 7, CellType::ORIGIN);
+    g1.set_val(1, 8, 9, CellType::ORIGIN);
 
-    g1.set_val(2, 2, 3);
-    g1.set_val(2, 5, 2);
-    g1.set_val(2, 9, 8);
+    g1.set_val(2, 2, 3, CellType::ORIGIN);
+    g1.set_val(2, 5, 2, CellType::ORIGIN);
+    g1.set_val(2, 9, 8, CellType::ORIGIN);
 
-    g1.set_val(3, 3, 9);
-    g1.set_val(3, 4, 6);
-    g1.set_val(3, 7, 5);
+    g1.set_val(3, 3, 9, CellType::ORIGIN);
+    g1.set_val(3, 4, 6, CellType::ORIGIN);
+    g1.set_val(3, 7, 5, CellType::ORIGIN);
 
-    g1.set_val(4, 3, 5);
-    g1.set_val(4, 4, 3);
-    g1.set_val(4, 7, 9);
+    g1.set_val(4, 3, 5, CellType::ORIGIN);
+    g1.set_val(4, 4, 3, CellType::ORIGIN);
+    g1.set_val(4, 7, 9, CellType::ORIGIN);
 
-    g1.set_val(5, 2, 1);
-    g1.set_val(5, 5, 8);
-    g1.set_val(5, 9, 2);
+    g1.set_val(5, 2, 1, CellType::ORIGIN);
+    g1.set_val(5, 5, 8, CellType::ORIGIN);
+    g1.set_val(5, 9, 2, CellType::ORIGIN);
 
-    g1.set_val(6, 1, 6);
-    g1.set_val(6, 6, 4);
+    g1.set_val(6, 1, 6, CellType::ORIGIN);
+    g1.set_val(6, 6, 4, CellType::ORIGIN);
 
-    g1.set_val(7, 1, 3);
-    g1.set_val(7, 8, 1);
+    g1.set_val(7, 1, 3, CellType::ORIGIN);
+    g1.set_val(7, 8, 1, CellType::ORIGIN);
 
-    g1.set_val(8, 2, 4);
-    g1.set_val(8, 9, 7);
+    g1.set_val(8, 2, 4, CellType::ORIGIN);
+    g1.set_val(8, 9, 7, CellType::ORIGIN);
 
-    g1.set_val(9, 3, 7);
-    g1.set_val(9, 7, 3);
+    g1.set_val(9, 3, 7, CellType::ORIGIN);
+    g1.set_val(9, 7, 3, CellType::ORIGIN);
 
     resolve(&mut g1, debug)
     /*
@@ -511,35 +512,35 @@ fn test_solving_highest(debug: bool) -> bool {
 fn test_solving_mindless(debug: bool) -> bool {
     println!("7->resolution mindless");
     let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1);
-    g1.set_val(1, 9, 2);
+    g1.set_val(1, 1, 1, CellType::ORIGIN);
+    g1.set_val(1, 9, 2, CellType::ORIGIN);
 
-    g1.set_val(2, 2, 9);
-    g1.set_val(2, 4, 4);
-    g1.set_val(2, 8, 5);
+    g1.set_val(2, 2, 9, CellType::ORIGIN);
+    g1.set_val(2, 4, 4, CellType::ORIGIN);
+    g1.set_val(2, 8, 5, CellType::ORIGIN);
 
-    g1.set_val(3, 3, 6);
-    g1.set_val(3, 7, 7);
+    g1.set_val(3, 3, 6, CellType::ORIGIN);
+    g1.set_val(3, 7, 7, CellType::ORIGIN);
 
-    g1.set_val(4, 2, 5);
-    g1.set_val(4, 4, 9);
-    g1.set_val(4, 6, 3);
+    g1.set_val(4, 2, 5, CellType::ORIGIN);
+    g1.set_val(4, 4, 9, CellType::ORIGIN);
+    g1.set_val(4, 6, 3, CellType::ORIGIN);
 
-    g1.set_val(5, 5, 7);
+    g1.set_val(5, 5, 7, CellType::ORIGIN);
 
-    g1.set_val(6, 4, 8);
-    g1.set_val(6, 5, 5);
-    g1.set_val(6, 8, 4);
+    g1.set_val(6, 4, 8, CellType::ORIGIN);
+    g1.set_val(6, 5, 5, CellType::ORIGIN);
+    g1.set_val(6, 8, 4, CellType::ORIGIN);
 
-    g1.set_val(7, 1, 7);
-    g1.set_val(7, 7, 6);
+    g1.set_val(7, 1, 7, CellType::ORIGIN);
+    g1.set_val(7, 7, 6, CellType::ORIGIN);
 
-    g1.set_val(8, 2, 3);
-    g1.set_val(8, 6, 9);
-    g1.set_val(8, 8, 8);
+    g1.set_val(8, 2, 3, CellType::ORIGIN);
+    g1.set_val(8, 6, 9, CellType::ORIGIN);
+    g1.set_val(8, 8, 8, CellType::ORIGIN);
 
-    g1.set_val(9, 3, 2);
-    g1.set_val(9, 9, 1);
+    g1.set_val(9, 3, 2, CellType::ORIGIN);
+    g1.set_val(9, 9, 1, CellType::ORIGIN);
 
     resolve(&mut g1, debug)
     /*
