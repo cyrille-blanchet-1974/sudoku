@@ -1,1 +1,4 @@
-$Env:RUST_BACKTRACE=1
+@echo off
+set RUST_BACKTRACE=1
+cargo run
+pause
