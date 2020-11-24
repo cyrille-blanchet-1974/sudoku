@@ -100,11 +100,18 @@ Resolution lvl 0:
   a cell is resolved when there only one possible left (At start there is 9 possible values for each cell)
 
 Resolution lvl 1:
-  If a cell is resolved then his value is in no other cells of the same Row, in no other cells of the same column and in no other cells of the same square
+  If a cell is resolved then his value is in no other cells of the same Row, in no other cells of the same 
+  column and in no other cells of the same square
+exemple 
+   cell 0 is 1
+   value 1 can't be in others cells of line 1 (1,2,3,4,5,6,7,8)
+   value 1 can't be in others cells of column 1 (9,18,27,36,45,54,63,72)
+   value 1 can't be in others cells of square NW (1,2,9,10,11,18,19,20)
+
 
 Resolution lvl 2:
   if the same value is resolve in left, right, up and down square of ours we can identify where it should be
-exemple:
+example:
 ------------------------------- 
 | 1  0  0 | 0  0  0 | 0  0  0 |
 | 0  0  0 | 1  0  0 | 0  0  0 |
@@ -120,7 +127,47 @@ exemple:
 -------------------------------
 we know were is 1 in squares NW & N -> it is in row 1 and 2 so in square NE it must be in row 3
 we know were is 1 in squares E & SE -> it is in column 1 and 3 so in square NE it must be in column 2
--> in square NE 1 is in the cell at line 3 and column 2 -> Cel N° 25
+-> in square NE the cell at line 3 and column 2 has the value 1 -> Cel N° 25
+
+lvl 3:
+
+lvl4: x wing to dow
+if a value is present in two columns in only two same lines 
+then it can't be elsewhere in the same lines
+example
+------------------------------- 
+| 6  7  9 | 4  1  8 | 3  5  2 |
+| 2  4  8 | 3  9  5 | 7  6  1 |
+| 1  5  3 | 7  6  2 | 9  8  4 |
+------------------------------- 
+| x  0  0 | 0  0  0 | 4  2  x |
+| 7  0  0 | 0  8  0 | 5  3  6 |
+| x  0  0 | 0  0  0 | 1  7  x |
+-------------------------------
+| 5  8  7 | 1  2  9 | 6  4  3 |
+| 4  6  1 | 8  0  7 | 2  0  5 |
+| 3  0  2 | 0  5  4 | 8  1  7 |
+-------------------------------
+in column 0, 9 can be in line 4 or 6
+in column 8, 9 can be in line 4 or 6
+So 9 can't be in columns 1,2,3,4,5 of line 4 and in columns 1,2,3,4,5 of line 6
+
+by symetry:
+if a value is present in two lines in only two same columns 
+then it can't be elsewhere in the same columns
+-> TODO
+
+
+lvl 9: try a guess
+when nothing more can be found with levels 0,1,2,3,4
+then we choose a cell with minimum number of possible values
+We try a guess for this cell
+then we run again other levels of resolution
+if at some point we get an error then the guess is bad so we eliminate this value 
+of the possibles for this cell
+Obviously this is a recursive way of resolution
+
+
 
 other lvl to find...
 

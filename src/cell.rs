@@ -9,14 +9,13 @@ pub enum CellType {
     ORIGIN,
     FOUND,
     GUESS,
-} 
+}
 /*
 UNKNOWN -> Value not yet  found,
 ORIGIN  -> Value given at start
 FOUND   -> Value found by calculation
 GUESS   -> possible value but not sure yet
 */
-
 
 //the cell
 pub struct Cell {
@@ -74,10 +73,9 @@ impl Cell {
     pub fn get_type(&self) -> CellType {
         self.cell_type
     }
-    pub fn set_type(&mut self, t : CellType)  {
+    pub fn set_type(&mut self, t: CellType) {
         self.cell_type = t;
     }
-
 
     /**
      * check if resolved
@@ -169,13 +167,12 @@ impl Cell {
         res
     }
 
-
     //self.cell_type = CellType::FOUND;
 
     /*
      set the value of the cell
     */
-    pub fn set_val(&mut self, val: u8, t : CellType) {
+    pub fn set_val(&mut self, val: u8, t: CellType) {
         if !self.is_a_possible(val.try_into().unwrap()) {
             println!(
                 "ERROR! {} is not possible on cell {} (l:{}/c:{})",
@@ -253,7 +250,7 @@ impl Clone for Cell {
             square: self.square,
             possibles: p,
             answer: self.answer,
-            cell_type : self.cell_type
+            cell_type: self.cell_type,
         }
     }
 }
@@ -270,6 +267,6 @@ fn clone_cell_test() {
     assert_eq!(ori.get_column(), copy.get_column());
     assert_eq!(ori.get_line(), copy.get_line());
     assert_eq!(ori.get_square(), copy.get_square());
-    ori.set_val(8,CellType::FOUND);
+    ori.set_val(8, CellType::FOUND);
     assert_ne!(ori.get_possibles(), copy.get_possibles());
 }

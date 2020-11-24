@@ -1,9 +1,9 @@
+use super::cell::CellType;
 use super::grid::*;
 use std::convert::TryInto;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use super::cell::CellType;
 
 pub fn read(fic: &str) -> Grid {
     let mut g = Grid::default();

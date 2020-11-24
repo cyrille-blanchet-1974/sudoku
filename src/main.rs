@@ -6,6 +6,10 @@ mod grid;
 mod line;
 mod read;
 mod resolver;
+mod resolver_lvl1;
+mod resolver_lvl2;
+mod resolver_lvl3;
+mod resolver_lvl4;
 mod square;
 
 use cell::CellType;

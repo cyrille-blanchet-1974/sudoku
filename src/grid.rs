@@ -60,10 +60,10 @@ impl Grid {
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
      **/
-    pub fn set_val(&mut self, line: u8, column: u8, val: u8, t : CellType) {
+    pub fn set_val(&mut self, line: u8, column: u8, val: u8, t: CellType) {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
-        cell.set_val(val,t);
+        cell.set_val(val, t);
         let c: usize = (column - 1).try_into().unwrap();
         let col: &mut Column = &mut (self.columns[c]);
         col.add_a_known_value(val);
@@ -190,7 +190,13 @@ impl Grid {
      */
     pub fn display(&mut self) {
         let mut stdout = StandardStream::stdout(ColorChoice::Always);
-        stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
+        stdout
+            .set_color(
+                ColorSpec::new()
+                    .set_bg(Some(Color::Black))
+                    .set_fg(Some(Color::White)),
+            )
+            .unwrap();
         //writeln!(&mut stdout, "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗").unwrap();
         writeln!(&mut stdout, "╔═════════╦═════════╦═════════╗").unwrap();
         for line in 1..=LINESIZE {
@@ -200,25 +206,59 @@ impl Grid {
                 let cell: &Cell = &self.cells[pos];
                 match cell.get_answer() {
                     None => {
-                        stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
-                        write!(&mut stdout, " ? ").unwrap();},
-                    Some(x) =>
-                    {
+                        stdout
+                            .set_color(
+                                ColorSpec::new()
+                                    .set_bg(Some(Color::Black))
+                                    .set_fg(Some(Color::White)),
+                            )
+                            .unwrap();
+                        write!(&mut stdout, " ? ").unwrap();
+                    }
+                    Some(x) => {
                         match cell.get_type() {
-                            CellType::FOUND => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Green)).set_fg(Some(Color::White))).unwrap(),
-                            CellType::GUESS => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Red)).set_fg(Some(Color::White))).unwrap(),
-                            CellType::ORIGIN => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Blue)).set_fg(Some(Color::White))).unwrap(),
-                            CellType::UNKNOWN => stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap(),
+                            CellType::FOUND => stdout
+                                .set_color(
+                                    ColorSpec::new()
+                                        .set_bg(Some(Color::Green))
+                                        .set_fg(Some(Color::White)),
+                                )
+                                .unwrap(),
+                            CellType::GUESS => stdout
+                                .set_color(
+                                    ColorSpec::new()
+                                        .set_bg(Some(Color::Red))
+                                        .set_fg(Some(Color::White)),
+                                )
+                                .unwrap(),
+                            CellType::ORIGIN => stdout
+                                .set_color(
+                                    ColorSpec::new()
+                                        .set_bg(Some(Color::Blue))
+                                        .set_fg(Some(Color::White)),
+                                )
+                                .unwrap(),
+                            CellType::UNKNOWN => stdout
+                                .set_color(
+                                    ColorSpec::new()
+                                        .set_bg(Some(Color::Black))
+                                        .set_fg(Some(Color::White)),
+                                )
+                                .unwrap(),
                         }
                         write!(&mut stdout, " {} ", x).unwrap();
                     }
                 };
-                stdout.set_color(ColorSpec::new().set_bg(Some(Color::Black)).set_fg(Some(Color::White))).unwrap();
+                stdout
+                    .set_color(
+                        ColorSpec::new()
+                            .set_bg(Some(Color::Black))
+                            .set_fg(Some(Color::White)),
+                    )
+                    .unwrap();
                 if column % 3 == 0 {
                     write!(&mut stdout, "║").unwrap();
-                }
-                else
-                {
+                } else {
                     //write!(&mut stdout, "┃").unwrap();
                 }
             }
@@ -227,12 +267,10 @@ impl Grid {
             if line % 9 == 0 {
                 //writeln!(&mut stdout, "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝").unwrap();
                 writeln!(&mut stdout, "╚═════════╩═════════╩═════════╝").unwrap();
-            }
-            else if line % 3 == 0 {
+            } else if line % 3 == 0 {
                 //writeln!(&mut stdout, "╟═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╢").unwrap();
                 writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
-            }
-            else {
+            } else {
                 //writeln!(&mut stdout, "╟───╋───╋───╫───╋───╋───╫───╋───╋───╢").unwrap();
             }
         }
@@ -240,7 +278,6 @@ impl Grid {
             println!("Puzzle solved!");
         }
     }
-
 
     /**
      * display debug info  (ex remaining possibles of the cells)
