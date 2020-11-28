@@ -326,5 +326,5 @@ fn test_resolve() {
     g.set_val(9, 9, 7, CellType::ORIGIN);
 
     let mut l4 = ResolverLvl4::new(false);
-    assert_eq!(true,l4.resolve(&mut g));
+    assert_eq!(false,l4.resolve(&mut g));
 }
