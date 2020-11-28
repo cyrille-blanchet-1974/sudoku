@@ -5,14 +5,12 @@ use super::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl4 {
-    acc: Accessor, //methods to retreive cells by coordinates
     debug : bool,
 }
 
 impl ResolverLvl4 {
     pub fn new(debug : bool) -> ResolverLvl4 {
         ResolverLvl4 {
-            acc: Accessor::new(),
             debug ,
         }
     }
@@ -29,13 +27,9 @@ impl ResolverLvl4 {
         let mut solve_one_at_least = false;
         if self.resolve_line(g){
             solve_one_at_least=true;
-            //while not finish
-            solve_one_at_least=false;
         }
         if self.resolve_column(g){
             solve_one_at_least=true;
-            //while not finish
-            solve_one_at_least=false;
         }
         println!();
         
@@ -43,16 +37,95 @@ impl ResolverLvl4 {
     }
 
     fn resolve_line(&mut self, g: &mut Grid) -> bool {
+        let mut trouve=false;
         //loop values
-        false
+        for v in 1..=MAX {
+            let val: usize = v.try_into().unwrap();            
+            let mut tab = Vec::new();
+            //loop lines
+            'lines: for line in 1..=LINESIZE {
+                let mut t = (0,0);// count   and positions
+                //count is nb of cell with val in possibles
+                //positions is 'binairy' positions of column with val possible 
+                let mut p : u32=100_000_000;
+                for column in 1..=COLUMNSIZE {
+                    let pos = coord_to_pos(line,column);
+                    let cell: &mut Cell = &mut (g.get_cell(pos));
+                    if cell.is_resolved() {
+                        match cell.get_answer() {
+                            None => {}
+                            Some(x) => {
+                                if x == v {
+                                    tab.push((0,0));
+                                    //ignore this column
+                                    continue 'lines;
+                                }
+                            }
+                        };        
+                    }
+                    if cell.is_a_possible(val) {
+                        t.0 += 1;
+                        t.1 += p;
+                    }
+                    //col 1  => 100 000 000
+                    //col 2  =>  10 000 000
+                    //...
+                    //col 8  =>        10
+                    //col 9  =>         1
+                    p/=10;
+                }
+                tab.push(t);
+                //check columns with value resolved if only 2 columns keep
+                //if 2 lines (and only two) with same two columns remove val off possible for other columns of the two lines
+            }
+            //check if we find 2 lines with only 2 count and the same position
+            //loop on tab
+            for line in 1..=LINESIZE {
+                let l: usize = line.try_into().unwrap();
+                let t = tab[l-1];
+                //find a cell with count = 2
+                if t.0 == 2{                    
+                    //then search another one
+                    for line2 in line+1..=LINESIZE {
+                        let l2: usize = line2.try_into().unwrap();
+                        let t2 = tab[l2-1];
+                        //find a cell with count = 2
+                        if t2.0 == 2 && t.1==t2.1 {                            
+                            //found 2 lines each of them has value v possible in the sames columns
+                            let c = self.decode(t2.1);
+                            if self.debug{
+                                println!("xwing found for val {} in lines {} and {}  and columns {} and {}",val,l,l2,c.0,c.1);
+                            }
+                            //So we can remove value v of all other cells of this two columns
+                            for l in 1..=LINESIZE {
+                                if l == line{
+                                    continue;
+                                }
+                                if l == line2{
+                                    continue;
+                                }
+                                let pos = coord_to_pos(l,c.0.try_into().unwrap());
+                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val){
+                                    trouve=true;
+                                }
+                                let pos = coord_to_pos(l,c.1.try_into().unwrap());
+                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val){
+                                    trouve=true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        trouve
     }
     fn resolve_column(&mut self, g: &mut Grid) -> bool {
         let mut trouve=false;
         //loop values
         for v in 1..=MAX {
-            if self.debug{
-                println!("try value {} ",v);
-            }
             let val: usize = v.try_into().unwrap();            
             let mut tab = Vec::new();
             //loop columns
@@ -69,9 +142,7 @@ impl ResolverLvl4 {
                             None => {}
                             Some(x) => {
                                 if x == v {
-                                    //println!("val {} already resolved in {} {}",val,line,column);
                                     tab.push((0,0));
-                                    //println!("val {} col {} -> {:?}",val,column,(0,0));
                                     //ignore this column
                                     continue 'cols;
                                 }
@@ -79,22 +150,20 @@ impl ResolverLvl4 {
                         };        
                     }
                     if cell.is_a_possible(val) {
-                        t.0 = t.0+1;
-                        t.1 = t.1+ p;
+                        t.0 += 1;
+                        t.1 += p;
                     }
-                    //line 1  => 1 000 000
-                    //line 2  =>   100 000
+                    //line 1  => 100 000 000
+                    //line 2  =>  10 000 000
                     //...
                     //line 8  =>        10
                     //line 9  =>         1
-                    p=p/10;
+                    p/=10;
                 }
                 tab.push(t);
-                //println!("val {} col {} -> {:?}",val,column,t);                
                 //check lines with value resolved if only 2 lines keep
                 //if 2 columns (and only two) with same two lines remove val off possible for other lines of the two cols
             }
-            //println!("part 2");
             //check if we find 2 cols with only 2 count and the same position
             //loop on tab
             for column in 1..=COLUMNSIZE {
@@ -102,38 +171,77 @@ impl ResolverLvl4 {
                 let t = tab[c-1];
                 //find a cell with count = 2
                 if t.0 == 2{                    
-                    if self.debug{
-                        print!("count 2 -> col {} -> {:?}",column,t);
-                    }
                     //then search another one
                     for column2 in column+1..=COLUMNSIZE {
                         let c2: usize = column2.try_into().unwrap();
                         let t2 = tab[c2-1];
-                        if self.debug{
-                            print!("col2 {} -> {:?}",column2,t2);
-                        }
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1==t2.1 {                            
                             //found 2 cols each of them has value v possible in the sames lines
+                            let l = self.decode(t2.1);
+                            if self.debug{
+                                println!("xwing found for val {} in columns {} and {}  and lines {} and {}",val,c,c2,l.0,l.1);
+                            }
                             //So we can remove value v of all other cells of this two lines
-                            println!("xwing found for val {} in columns {}({:?}) and {}({:?}) ",val,c,t,c2,t2);
-                            trouve=true;
+                            for c in 1..=COLUMNSIZE {
+                                if c == column{
+                                    continue;
+                                }
+                                if c == column2{
+                                    continue;
+                                }
+                                let pos = coord_to_pos(l.0.try_into().unwrap(),c);
+                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val){
+                                    trouve=true;
+                                }
+                                let pos = coord_to_pos(l.1.try_into().unwrap(),c);
+                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val){
+                                    trouve=true;
+                                }
+                            }
                         }
-                    }
-                    if self.debug{
-                        println!("");
                     }
                 }
             }
         }
         trouve
     }
+    
+    fn decode(&mut self, d:u32) -> (usize,usize) {
+        let mut p : u32=100_000_000;
+        let mut u1=0;
+        let mut u2=0;
+        let mut d32 = d;
+        for line in 1..=LINESIZE {
+            if d32 >= p {
+                d32-=p;
+                if u1==0 {
+                    u1=line.try_into().unwrap();
+                }else{
+                    u2=line.try_into().unwrap();
+                    return (u1,u2);
+                }
+            }
+            p/=10;
+        }
+        (u1,u2)
+    }
 
+}
+
+#[test]
+fn test_decode() {
+    let mut l4 = ResolverLvl4::new(false);
+    assert_eq!((1,2),l4.decode(110000000));
+    assert_eq!((1,9),l4.decode(100000001));
+    assert_eq!((3,6),l4.decode(001006000));
 }
 
 
 #[test]
-fn test() {
+fn test_resolve() {
     let mut g = Grid::default();
     g.set_val(1, 1, 6, CellType::ORIGIN);
     g.set_val(1, 2, 7, CellType::ORIGIN);
@@ -218,6 +326,5 @@ fn test() {
     g.set_val(9, 9, 7, CellType::ORIGIN);
 
     let mut l4 = ResolverLvl4::new(false);
-    //while not finish we resolve nothing
-    assert_eq!(false,l4.resolve(&mut g));
+    assert_eq!(true,l4.resolve(&mut g));
 }

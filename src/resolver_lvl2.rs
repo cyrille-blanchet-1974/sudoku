@@ -4,12 +4,12 @@ use super::constant::*;
 use super::grid::*;
 
 pub struct ResolverLvl2 {
-    debug : bool,
+    _debug : bool,
 }
 
 impl ResolverLvl2 {
     pub fn new(debug : bool) -> ResolverLvl2 {
-        ResolverLvl2 {debug}
+        ResolverLvl2 {_debug:debug}
     }
 
     /*

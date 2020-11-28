@@ -497,6 +497,7 @@ fn test_solving_highest(debug: bool, display: bool) -> bool {
     | ?  ?  7 | ?  ?  ? | 3  ?  ? |
     -------------------------------
     Solved in 50 steps (11 guesses, 6 wrongs and 5 goods)
+    Solved in 47 steps (11 guesses, 6 wrongs and 5 goods) (better with x-wing)
     -------------------------------
     | 1  6  2 | 8  5  7 | 4  9  3 |
     | 5  3  4 | 1  2  9 | 6  7  8 |
@@ -562,6 +563,7 @@ fn test_solving_mindless(debug: bool, display: bool) -> bool {
     | ?  ?  2 | ?  ?  ? | ?  ?  1 |
     -------------------------------
     Solved in 526 steps (96 guesses, 87 wrongs and 9 goods)
+    Solved in 484 steps (95 guesses, 87 wrongs and 9 goods)
     -------------------------------
     | 1  7  4 | 3  8  5 | 9  6  2 |
     | 2  9  3 | 4  6  7 | 1  5  8 |

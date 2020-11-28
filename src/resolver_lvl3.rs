@@ -6,14 +6,14 @@ use std::convert::TryInto;
 
 pub struct ResolverLvl3 {
     acc: Accessor, //methods to retreive cells by coordinates
-    debug : bool,    
+    _debug : bool,    
 }
 
 impl ResolverLvl3 {
     pub fn new(debug : bool) -> ResolverLvl3 {
         ResolverLvl3 {
             acc: Accessor::new(),
-            debug,
+            _debug:debug,
         }
     }
 
