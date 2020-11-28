@@ -59,8 +59,10 @@ impl Resolver {
         );
     }
 
-    pub fn go(&mut self, g: &mut Grid, debug: bool) -> bool {
-        g.display();
+    pub fn go(&mut self, g: &mut Grid, debug: bool, display: bool) -> bool {
+        if display {
+            g.display();
+        }
         //if already resolved...
         if !g.is_resolved() {
             //loop until no more to solve
@@ -68,7 +70,7 @@ impl Resolver {
                 if debug {
                     println!("--------------------step {}--------------------", self.step);
                 }
-                if !self.resolve(g) {
+                if !self.resolve(g,debug) {
                     break;
                 }
                 if debug {
@@ -82,9 +84,11 @@ impl Resolver {
         }
         let res = g.is_resolved();
         if !res {
-            return self.resolve_lvl9(g, debug);
+            return self.resolve_lvl9(g, debug, display);
         }
-        g.display();
+        if display {
+            g.display();
+        }
         if res {
             println!("Grid resolved!!!!!");
             self.display_stats();
@@ -94,7 +98,7 @@ impl Resolver {
         res
     }
 
-    fn resolve_lvl9(&mut self, g: &mut Grid, debug: bool) -> bool {
+    fn resolve_lvl9(&mut self, g: &mut Grid, debug: bool, display: bool) -> bool {
         //let run level 9 -> guesses
         //first made a copy of
         let mut sav = g.clone();
@@ -110,7 +114,7 @@ impl Resolver {
                 //on the saved grid, let try this value on the cell
                 println!("Lvl9-> try value {} on cell l:{}/c:{}", val.2, val.0, val.1);
                 sav.set_val(val.0, val.1, val.2, CellType::GUESS);
-                if self.go(&mut sav, debug) {
+                if self.go(&mut sav, debug, display) {
                     //we found the solution
                     true
                 } else {
@@ -121,24 +125,24 @@ impl Resolver {
                     self.nblvl9wrongguess += 1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
                     g.remove_a_possible(val.0, val.1, val.2);
-                    self.go(g, debug)
+                    self.go(g, debug, display)
                 }
             }
         }
     }
 
-    pub fn resolve(&mut self, g: &mut Grid) -> bool {
+    pub fn resolve(&mut self, g: &mut Grid, debug: bool) -> bool {
         self.step += 1;
         //try 3 first type of resolution
         //only solution when removing founds of the same line columnand square
-        let mut l1 = ResolverLvl1::new();
+        let mut l1 = ResolverLvl1::new(debug);
         let res1 = l1.resolve(g);
         self.nblvl1 += 1;
         if !res1 {
             self.nblvl1ko += 1;
         }
         //value fount in two other line and two other column of a square
-        let mut l2 = ResolverLvl2::new();
+        let mut l2 = ResolverLvl2::new(debug);
         let res2 = l2.resolve(g);
         self.nblvl2 += 1;
         if !res2 {
@@ -147,14 +151,14 @@ impl Resolver {
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
-        let mut l3 = ResolverLvl3::new();
+        let mut l3 = ResolverLvl3::new(debug);
         let res3 = l3.resolve(g);
         self.nblvl3 += 1;
         if !res3 {
             self.nblvl3ko += 1;
         }
         //x-wing
-        let mut l4 = ResolverLvl4::new();
+        let mut l4 = ResolverLvl4::new(debug);
         let res4 = l4.resolve(g);
         self.nblvl4 += 1;
         if !res4 {

@@ -49,7 +49,7 @@ fn read_string(mess: String) -> String {
     res.to_string()
 }
 
-fn manual() {
+fn manual(debug: bool,display: bool) {
     let mut g = Grid::default();
     println!("resolved = {}", g.is_resolved());
     println!();
@@ -66,7 +66,7 @@ fn manual() {
             continue;
         }
         if l == 0 {
-            resolve(&mut g, true);
+            resolve(&mut g, debug,display);
             return;
         }
         println!("[1-{}] 0 to solve", MAX);
@@ -79,7 +79,7 @@ fn manual() {
             continue;
         }
         if c == 0 {
-            resolve(&mut g, true);
+            resolve(&mut g, debug,display);
             return;
         }
         println!("[1-{}] 0 to solve", MAX);
@@ -92,7 +92,7 @@ fn manual() {
             continue;
         }
         if v == 0 {
-            resolve(&mut g, true);
+            resolve(&mut g, debug, display);
             return;
         }
         g.set_val(l, c, v, CellType::ORIGIN);
@@ -109,12 +109,12 @@ fn manual() {
     }
 }
 
-pub fn resolve(g: &mut Grid, debug: bool) -> bool {
+pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
     let mut r = Resolver::new();
-    r.go(g, debug)
+    r.go(g, debug, display)
 }
 
-fn test_solving(debug: bool) -> bool {
+fn test_solving(debug: bool, display: bool) -> bool {
     println!("1->resolution test!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1, CellType::ORIGIN);
@@ -129,7 +129,7 @@ fn test_solving(debug: bool) -> bool {
     g1.set_val(2, 5, 1, CellType::ORIGIN);
     g1.set_val(5, 8, 1, CellType::ORIGIN);
     g1.set_val(9, 7, 1, CellType::ORIGIN);
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  ? |
@@ -161,7 +161,7 @@ fn test_solving(debug: bool) -> bool {
     */
 }
 
-fn test_solving_easy(debug: bool) -> bool {
+fn test_solving_easy(debug: bool, display: bool) -> bool {
     println!("2->resolution easy!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1, CellType::ORIGIN);
@@ -206,7 +206,7 @@ fn test_solving_easy(debug: bool) -> bool {
     g1.set_val(9, 7, 9, CellType::ORIGIN);
     g1.set_val(9, 9, 5, CellType::ORIGIN);
 
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | 1  ?  7 | ?  ?  ? | ?  ?  ? |
@@ -238,7 +238,7 @@ fn test_solving_easy(debug: bool) -> bool {
     */
 }
 
-fn test_solving_medium(debug: bool) -> bool {
+fn test_solving_medium(debug: bool, display: bool) -> bool {
     println!("3->resolution medium!");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 5, CellType::ORIGIN);
@@ -277,7 +277,7 @@ fn test_solving_medium(debug: bool) -> bool {
 
     g1.set_val(9, 5, 9, CellType::ORIGIN);
     g1.set_val(9, 9, 2, CellType::ORIGIN);
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | 5  ?  ? | ?  4  ? | ?  ?  ? |
@@ -309,7 +309,7 @@ fn test_solving_medium(debug: bool) -> bool {
     */
 }
 
-fn test_solving_difficult(debug: bool) -> bool {
+fn test_solving_difficult(debug: bool, display: bool) -> bool {
     println!("4->resolution difficult!");
     let mut g1 = Grid::default();
 
@@ -345,7 +345,7 @@ fn test_solving_difficult(debug: bool) -> bool {
     g1.set_val(8, 7, 8, CellType::ORIGIN);
     g1.set_val(8, 9, 1, CellType::ORIGIN);
 
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |
@@ -377,7 +377,7 @@ fn test_solving_difficult(debug: bool) -> bool {
     */
 }
 
-fn test_solving_diabolical(debug: bool) -> bool {
+fn test_solving_diabolical(debug: bool, display: bool) -> bool {
     println!("5->resolution diabolic!");
     let mut g1 = Grid::default();
 
@@ -414,7 +414,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
     g1.set_val(9, 7, 9, CellType::ORIGIN);
     g1.set_val(9, 8, 3, CellType::ORIGIN);
 
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | ?  8  3 | 9  ?  ? | ?  ?  ? |
@@ -446,7 +446,7 @@ fn test_solving_diabolical(debug: bool) -> bool {
     */
 }
 
-fn test_solving_highest(debug: bool) -> bool {
+fn test_solving_highest(debug: bool, display: bool) -> bool {
     println!("6->resolution highest");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1, CellType::ORIGIN);
@@ -481,7 +481,7 @@ fn test_solving_highest(debug: bool) -> bool {
     g1.set_val(9, 3, 7, CellType::ORIGIN);
     g1.set_val(9, 7, 3, CellType::ORIGIN);
 
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | 1  ?  ? | ?  ?  7 | ?  9  ? |
@@ -513,7 +513,7 @@ fn test_solving_highest(debug: bool) -> bool {
     */
 }
 
-fn test_solving_mindless(debug: bool) -> bool {
+fn test_solving_mindless(debug: bool, display: bool) -> bool {
     println!("7->resolution mindless");
     let mut g1 = Grid::default();
     g1.set_val(1, 1, 1, CellType::ORIGIN);
@@ -546,7 +546,7 @@ fn test_solving_mindless(debug: bool) -> bool {
     g1.set_val(9, 3, 2, CellType::ORIGIN);
     g1.set_val(9, 9, 1, CellType::ORIGIN);
 
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
     /*
     -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  2 |
@@ -578,23 +578,23 @@ fn test_solving_mindless(debug: bool) -> bool {
     */
 }
 
-fn resolve_from_disk(fic: String, debug: bool) -> bool {
+fn resolve_from_disk(fic: String, debug: bool, display: bool) -> bool {
     let mut g1 = read(&fic);
     println!("8->resolution from file {}!", fic);
-    resolve(&mut g1, debug)
+    resolve(&mut g1, debug, display)
 }
 
-fn test_from_disk(debug: bool) -> bool {
+fn test_from_disk(debug: bool, display: bool) -> bool {
     let fic = read_string("Filename?".to_string());
-    resolve_from_disk(fic, debug)
+    resolve_from_disk(fic, debug, display)
 }
 
 fn main() {
     println!("Sudoku resolution!");
     println!("size = {}x{}", LINESIZE, COLUMNSIZE);
-    let mut debug = true;
+    let mut debug = false;
+    let mut display = false;
     loop {
-        println!("0:toggle debugging (actual:{})", debug);
         println!("1:test solving");
         println!("2:test solving easy");
         println!("3:test solving medium");
@@ -604,40 +604,45 @@ fn main() {
         println!("7:test solving mindless");
         println!("8:test a grid read from disk");
         println!("9:fill manualy");
+        println!("97:toggle debugging (actual:{})", debug);
+        println!("98:toggle display (actual:{})", display);
         println!("99:quit");
         match read_u8("Your choice?".to_string()) {
             None => {
                 continue;
             }
-            Some(0) => {
+            Some(97) => {
                 debug = !debug;
             }
+            Some(98) => {
+                display = !display;
+            }
             Some(1) => {
-                test_solving(debug);
+                test_solving(debug,display);
             }
             Some(2) => {
-                test_solving_easy(debug);
+                test_solving_easy(debug,display);
             }
             Some(3) => {
-                test_solving_medium(debug);
+                test_solving_medium(debug,display);
             }
             Some(4) => {
-                test_solving_difficult(debug);
+                test_solving_difficult(debug,display);
             }
             Some(5) => {
-                test_solving_diabolical(debug);
+                test_solving_diabolical(debug,display);
             }
             Some(6) => {
-                test_solving_highest(debug);
+                test_solving_highest(debug,display);
             }
             Some(7) => {
-                test_solving_mindless(debug);
+                test_solving_mindless(debug,display);
             }
             Some(8) => {
-                test_from_disk(debug);
+                test_from_disk(debug,display);
             }
             Some(9) => {
-                manual();
+                manual(debug,display);
             }
             Some(99) => {
                 println!("Sudoku resolution End!");
@@ -652,37 +657,19 @@ fn main() {
 
 #[test]
 fn resolve_test() {
-    assert_eq!(true, test_solving(false));
-    assert_eq!(true, test_solving_easy(false));
-    assert_eq!(true, test_solving_medium(false));
-    assert_eq!(true, test_solving_difficult(false));
-    assert_eq!(true, test_solving_diabolical(false));
-    assert_eq!(true, test_solving_highest(false));
-    assert_eq!(true, test_solving_mindless(false));
-    assert_eq!(true, resolve_from_disk("test/easy.txt".to_string(), false));
-    assert_eq!(
-        true,
-        resolve_from_disk("test/medium.txt".to_string(), false)
-    );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/difficult.txt".to_string(), false)
-    );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/diabolic.txt".to_string(), false)
-    );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/pascal.txt".to_string(), false)
-    );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/pascal2.txt".to_string(), false)
-    );
-    assert_eq!(
-        true,
-        resolve_from_disk("test/pascal3.txt".to_string(), false)
-    );
-    assert_eq!(true, resolve_from_disk("test/m.txt".to_string(), false));
+    assert_eq!(true, test_solving(false,false));
+    assert_eq!(true, test_solving_easy(false,false));
+    assert_eq!(true, test_solving_medium(false,false));
+    assert_eq!(true, test_solving_difficult(false,false));
+    assert_eq!(true, test_solving_diabolical(false,false));
+    assert_eq!(true, test_solving_highest(false,false));
+    assert_eq!(true, test_solving_mindless(false,false));
+    assert_eq!(true, resolve_from_disk("test/easy.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/medium.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/difficult.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/diabolic.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/pascal.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/pascal2.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/pascal3.txt".to_string(), false,false));
+    assert_eq!(true, resolve_from_disk("test/m.txt".to_string(), false,false));
 }

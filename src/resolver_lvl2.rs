@@ -3,11 +3,13 @@ use super::cell::*;
 use super::constant::*;
 use super::grid::*;
 
-pub struct ResolverLvl2 {}
+pub struct ResolverLvl2 {
+    debug : bool,
+}
 
 impl ResolverLvl2 {
-    pub fn new() -> ResolverLvl2 {
-        ResolverLvl2 {}
+    pub fn new(debug : bool) -> ResolverLvl2 {
+        ResolverLvl2 {debug}
     }
 
     /*
