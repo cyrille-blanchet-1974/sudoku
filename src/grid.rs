@@ -16,6 +16,7 @@ pub struct Grid {
     columns: Vec<Column>,
     squares: Vec<Square>,
     resolved: bool,
+    debug : bool,
 }
 
 impl Default for Grid {
@@ -26,7 +27,7 @@ impl Default for Grid {
         let mut cells = Vec::new();
         //construct all cells
         for i in 0..GRIDSIZE {
-            cells.push(Cell::new(i.try_into().unwrap()));
+            cells.push(Cell::new(i.try_into().unwrap(),false));
         }
         let acc = Accessor::new();
         let mut lines = Vec::new();
@@ -52,11 +53,16 @@ impl Default for Grid {
             columns,
             squares,
             resolved: false,
+            debug:false,
         }
     }
 }
 
+//methods to update Grid struct
 impl Grid {
+    pub fn set_debug(&mut self,debug :bool){
+        self.debug=debug;
+    }
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
      **/
@@ -109,6 +115,40 @@ impl Grid {
         self.resolved
     }
 
+    /**
+     * Verify the grid
+     * return false if two cell of the same line, column or square have the same value
+     * */
+    pub fn is_valid(&self) -> bool {
+        let mut mess;
+        for line in 1..=COLUMNSIZE {
+            mess = format!("line {}", line);
+            let res = self.is_valid_set(self.acc.get_line(line), mess);
+            if !res {
+                return false;
+            }
+        }
+        for column in 1..=LINESIZE {
+            mess = format!("column {}", column);
+            let res = self.is_valid_set(self.acc.get_column(column), mess);
+            if !res {
+                return false;
+            }
+        }
+        let c = Cardinal::C;
+        for square in c.get_all() {
+            mess = format!("square {:?}", square);
+            let res = self.is_valid_set(self.acc.get_square(square), mess);
+            if !res {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+//resolve helping methods
+impl Grid {
     /**
      * get the list of the resolved cells of the grid
      *
@@ -175,6 +215,7 @@ impl Grid {
         let lin: &mut Line = &mut (self.lines[pos]);
         lin.is_known(val)
     }
+
     /**
      * check if value is solved in a column
      */
@@ -185,6 +226,45 @@ impl Grid {
         col.is_known(val)
     }
 
+    /**
+     * Check in a set of cells if a value is present more than one time
+     * */
+     pub fn is_valid_set(&self, set: Vec<u8>, text: String) -> bool {
+        let mut count = Vec::new();
+        for _i in 0..MAX {
+            count.push(0);
+        }
+        for v in set {
+            let pos: usize = v.try_into().unwrap();
+            let cell: &Cell = &self.cells[pos];
+            match cell.get_answer() {
+                None => {}
+                Some(a) => {
+                    let pos: usize = (a - 1).try_into().unwrap();
+                    count[pos] += 1;
+                }
+            };
+        }
+        for i in 0..MAX {
+            let pos: usize = i.try_into().unwrap();
+            match count.get(pos) {
+                None => {}
+                Some(val) => {
+                    if *val > 1 {
+                        if self.debug {
+                            println!("Value {} found more than once in {}!", i + 1, text);
+                        }
+                        return false;
+                    }
+                }
+            };
+        }
+        true
+    }
+}
+
+//display and debug methods
+impl Grid {
     /**
      * display the actual grid
      */
@@ -197,7 +277,6 @@ impl Grid {
                     .set_fg(Some(Color::White)),
             )
             .unwrap();
-        //writeln!(&mut stdout, "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗").unwrap();
         writeln!(&mut stdout, "╔═════════╦═════════╦═════════╗").unwrap();
         for line in 1..=LINESIZE {
             write!(&mut stdout, "║").unwrap();
@@ -258,20 +337,14 @@ impl Grid {
                     .unwrap();
                 if column % 3 == 0 {
                     write!(&mut stdout, "║").unwrap();
-                } else {
-                    //write!(&mut stdout, "┃").unwrap();
                 }
             }
             println!();
 
             if line % 9 == 0 {
-                //writeln!(&mut stdout, "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝").unwrap();
                 writeln!(&mut stdout, "╚═════════╩═════════╩═════════╝").unwrap();
             } else if line % 3 == 0 {
-                //writeln!(&mut stdout, "╟═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╢").unwrap();
                 writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
-            } else {
-                //writeln!(&mut stdout, "╟───╋───╋───╫───╋───╋───╫───╋───╋───╢").unwrap();
             }
         }
         if self.is_resolved() {
@@ -301,142 +374,56 @@ impl Grid {
         }
         println!("-------------------------------DEBUG-------------------------------");
     }
+}
 
-    /**
-     * Verify the grid
-     * return false if two cell of the same line, column or square have the same value
-     * */
-    pub fn is_valid(&self) -> bool {
-        let mut mess;
-        for line in 1..=COLUMNSIZE {
-            mess = format!("line {}", line);
-            let res = self.is_valid_set(self.acc.get_line(line), mess);
-            if !res {
-                return false;
-            }
+impl Grid {
+    pub fn copy_from(&mut self,g :Grid) {
+        self.cells.clear();
+        for v in g.cells {
+            self.cells.push(v.clone());
         }
-        for column in 1..=LINESIZE {
-            mess = format!("column {}", column);
-            let res = self.is_valid_set(self.acc.get_column(column), mess);
-            if !res {
-                return false;
-            }
+        self.lines.clear();
+        for v in g.lines {
+            self.lines.push(v.clone());
         }
-        let c = Cardinal::C;
-        for square in c.get_all() {
-            mess = format!("square {:?}", square);
-            let res = self.is_valid_set(self.acc.get_square(square), mess);
-            if !res {
-                return false;
-            }
+        self.columns.clear();
+        for v in g.columns {
+            self.columns.push(v.clone());
         }
-        true
-    }
-
-    /**
-     * Check in a set of cells if a value is present more than one time
-     * */
-    pub fn is_valid_set(&self, set: Vec<u8>, text: String) -> bool {
-        let mut count = Vec::new();
-        for _i in 0..MAX {
-            count.push(0);
+        self.squares.clear();
+        for v in g.squares {
+            self.squares.push(v.clone());
         }
-        for v in set {
-            let pos: usize = v.try_into().unwrap();
-            let cell: &Cell = &self.cells[pos];
-            match cell.get_answer() {
-                None => {}
-                Some(a) => {
-                    let pos: usize = (a - 1).try_into().unwrap();
-                    count[pos] += 1;
-                }
-            };
-        }
-        for i in 0..MAX {
-            let pos: usize = i.try_into().unwrap();
-            match count.get(pos) {
-                None => {}
-                Some(val) => {
-                    if *val > 1 {
-                        println!("Value {} found more than once in {}!", i + 1, text);
-                        return false;
-                    }
-                }
-            };
-        }
-        true
-    }
-
-    /**
-     * Export the grid to a vector
-     */
-    pub fn export(&self) -> Vec<Option<u8>> {
-        let mut res = Vec::new();
-        for i in 0..GRIDSIZE {
-            let pos: usize = i.try_into().unwrap();
-            let cell: &Cell = &(self.cells[pos]);
-            res.push(cell.get_answer());
-        }
-        res
-    }
-
-    /**
-     * create a grid from an exported vector
-     * */
-    pub fn import(data: Vec<Option<u8>>) -> Grid {
-        let gridsize: usize = GRIDSIZE.try_into().unwrap();
-        assert!(data.len() == gridsize);
-        let mut res = Grid::default();
-        //print!("data to import => {:?}", data);
-        for i in 0..GRIDSIZE {
-            let pos = i.try_into().unwrap();
-            match data.get(pos) {
-                None => {}
-                Some(x) => {
-                    match x {
-                        None => {}
-                        Some(v) => {
-                            let c = pos_to_coord(pos);
-                            //print!(" val {} on {}/{}", *v, c.0, c.1);
-                            res.set_val(c.0, c.1, *v, CellType::ORIGIN);
-                        }
-                    };
-                }
-            };
-        }
-        println!();
-        res
     }
 }
 
 impl Clone for Grid {
     fn clone(&self) -> Grid {
-        /*let mut ce = Vec::new();
+        let mut cells = Vec::new();
         for v in &self.cells {
-            ce.push(v.clone());
+            cells.push(v.clone());
         }
-        let mut li = Vec::new();
+        let mut lines = Vec::new();
         for v in &self.lines {
-            li.push(v.clone());
+            lines.push(v.clone());
         }
-        let mut co = Vec::new();
+        let mut columns = Vec::new();
         for v in &self.columns {
-            co.push(v.clone());
+            columns.push(v.clone());
         }
-        let mut sq = Vec::new();
+        let mut squares = Vec::new();
         for v in &self.squares {
-            sq.push(v.clone());
+            squares.push(v.clone());
         }
         Grid {
-            cells: ce,
+            cells,
             acc: Accessor::new(), //Accessor always contains sames datas
-            lines: li,
-            columns: co,
-            squares: sq,
+            lines,
+            columns,
+            squares,
             resolved: self.resolved,
-        }
-        */
-        Grid::import(self.export())
+            debug:self.debug,
+        }        
     }
 }
 
@@ -582,21 +569,4 @@ fn clone_grid_test() {
     assert_eq!(ori.get_resolved(), copy.get_resolved());
     ori.set_val(8, 6, 1, CellType::ORIGIN);
     assert_ne!(ori.get_resolved(), copy.get_resolved());
-}
-
-#[test]
-fn import_export_grid_test() {
-    let mut ori = Grid::default();
-    ori.set_val(1, 1, 1, CellType::ORIGIN);
-    ori.set_val(2, 4, 1, CellType::ORIGIN);
-    ori.set_val(3, 7, 1, CellType::ORIGIN);
-    ori.set_val(4, 2, 1, CellType::ORIGIN);
-    ori.set_val(5, 5, 1, CellType::ORIGIN);
-    ori.set_val(6, 8, 1, CellType::ORIGIN);
-    ori.set_val(7, 3, 1, CellType::ORIGIN);
-    ori.set_val(8, 6, 1, CellType::ORIGIN);
-    let mut copy = Grid::import(ori.export());
-    ori.display();
-    copy.display();
-    assert_eq!(ori.get_resolved(), copy.get_resolved());
 }

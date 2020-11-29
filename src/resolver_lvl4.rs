@@ -6,12 +6,14 @@ use std::convert::TryInto;
 
 pub struct ResolverLvl4 {
     debug : bool,
+    trace : String,
 }
 
 impl ResolverLvl4 {
     pub fn new(debug : bool) -> ResolverLvl4 {
         ResolverLvl4 {
             debug ,
+            trace : String::new(),
         }
     }
 
@@ -23,7 +25,7 @@ impl ResolverLvl4 {
         if g.is_resolved() {
             return false;
         }
-        print!("Lvl4->");
+        self.trace = "".to_string();        
         let mut solve_one_at_least = false;
         if self.resolve_line(g){
             solve_one_at_least=true;
@@ -31,7 +33,9 @@ impl ResolverLvl4 {
         if self.resolve_column(g){
             solve_one_at_least=true;
         }
-        println!();
+        if self.debug && self.trace != "" {
+            println!("{}",self.trace);
+        }
         
         solve_one_at_least
     }
@@ -93,9 +97,11 @@ impl ResolverLvl4 {
                         if t2.0 == 2 && t.1==t2.1 {                            
                             //found 2 lines each of them has value v possible in the sames columns
                             let c = self.decode(t2.1);
-                            if self.debug{
-                                println!("xwing found for val {} in lines {} and {}  and columns {} and {}",val,l,l2,c.0,c.1);
+                            if self.trace == "" {
+                                self.trace = "Lvl4->".to_string();
                             }
+                            let trc = format!("xwing found for val {} in lines {} and {}  and columns {} and {}",val,l,l2,c.0,c.1);
+                            self.trace.push_str(&trc);               
                             //So we can remove value v of all other cells of this two columns
                             for l in 1..=LINESIZE {
                                 if l == line{
@@ -179,9 +185,11 @@ impl ResolverLvl4 {
                         if t2.0 == 2 && t.1==t2.1 {                            
                             //found 2 cols each of them has value v possible in the sames lines
                             let l = self.decode(t2.1);
-                            if self.debug{
-                                println!("xwing found for val {} in columns {} and {}  and lines {} and {}",val,c,c2,l.0,l.1);
+                            if self.trace == "" {
+                                self.trace = "Lvl4->".to_string();
                             }
+                            let trc = format!("xwing found for val {} in columns {} and {}  and lines {} and {}",val,c,c2,l.0,l.1);
+                            self.trace.push_str(&trc);
                             //So we can remove value v of all other cells of this two lines
                             for c in 1..=COLUMNSIZE {
                                 if c == column{

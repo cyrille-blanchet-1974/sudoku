@@ -26,11 +26,15 @@ pub struct Cell {
     possibles: Vec<bool>, //possibles values of the cell
     answer: u8,           //value of the cell when solved
     cell_type: CellType,  //type of value
+    debug : bool,
 }
 
 impl Cell {
+    pub fn set_debug(&mut self,debug :bool){
+        self.debug=debug;
+    }    
     //construct a cell giving his position in the grid
-    pub fn new(pos: usize) -> Cell {
+    pub fn new(pos: usize,debug : bool) -> Cell {
         //add all possibles
         let mut possibles = Vec::new();
         for _i in 0..MAX {
@@ -49,6 +53,7 @@ impl Cell {
             //TODO           hypothesis : 0,
             answer: 0,
             cell_type: CellType::UNKNOWN,
+            debug,
         }
     }
 
@@ -174,11 +179,13 @@ impl Cell {
     */
     pub fn set_val(&mut self, val: u8, t: CellType) {
         if !self.is_a_possible(val.try_into().unwrap()) {
-            println!(
-                "ERROR! {} is not possible on cell {} (l:{}/c:{})",
-                val, self.position, self.line, self.column
-            );
-            println!("ERROR! remaining possibles: {:?}", self.get_possibles());
+            if self.debug {
+                println!(
+                    "ERROR! {} is not possible on cell {} (l:{}/c:{})",
+                    val, self.position, self.line, self.column
+                );
+                println!("ERROR! remaining possibles: {:?}", self.get_possibles());
+            }
             return;
         }
         //remove other possibles
@@ -198,6 +205,7 @@ impl Cell {
     */
     pub fn debug(&mut self) -> bool {
         if self.is_resolved() {
+            print!("  Cell:{} is resolves. Value:{}", self.position, self.answer);
             return false;
         }
         let mut poss = Vec::new();
@@ -215,7 +223,7 @@ impl Cell {
 
 #[test]
 fn possible_test() {
-    let mut c = Cell::new(1);
+    let mut c = Cell::new(1,false);
     for i in 1..MAX + 1 {
         let pos = i.try_into().unwrap();
         assert_eq!(true, c.is_a_possible(pos));
@@ -226,7 +234,7 @@ fn possible_test() {
 
 #[test]
 fn resolution_test() {
-    let mut c = Cell::new(1);
+    let mut c = Cell::new(1,false);
     assert_eq!(false, c.is_resolved());
     assert_eq!(None, c.get_answer());
     for v in 1..MAX {
@@ -251,13 +259,14 @@ impl Clone for Cell {
             possibles: p,
             answer: self.answer,
             cell_type: self.cell_type,
+            debug : self.debug,
         }
     }
 }
 
 #[test]
 fn clone_cell_test() {
-    let mut ori = Cell::new(1);
+    let mut ori = Cell::new(1,false);
     ori.remove_a_possible(5);
     ori.debug();
     let mut copy = ori.clone();

@@ -5,14 +5,16 @@ use std::convert::TryInto;
 
 pub struct ResolverLvl1 {
     acc: Accessor, //methods to retreive cells by coordinates
-    _debug : bool,
+    debug : bool,
+    trace : String,
 }
 
 impl ResolverLvl1 {
     pub fn new(debug : bool) -> ResolverLvl1 {
         ResolverLvl1 {
             acc: Accessor::new(),
-            _debug:debug
+            debug,
+            trace : String::new(),
         }
     }
 
@@ -25,7 +27,7 @@ impl ResolverLvl1 {
         if g.is_resolved() {
             return false;
         }
-        print!("Lvl1->");
+        self.trace = "".to_string();
         //get resolved cells positions
         let mut resolved = g.get_resolved();
         let prev_count = resolved.len();
@@ -34,7 +36,9 @@ impl ResolverLvl1 {
             self.resolve_val(g, p);
         }
         resolved = g.get_resolved();
-        println!();
+        if self.debug && self.trace != "" {
+            println!("{}",self.trace);
+        }
         //if count of solved has change then we found something
         resolved.len() != prev_count
     }
@@ -67,10 +71,11 @@ impl ResolverLvl1 {
                 if let Some(x) = cell.get_answer() {
                     let col = cell.get_column();
                     let line = cell.get_line();
-                    print!(
-                        " -Found a value {} on cell {} (l:{}/c:{})  ",
-                        x, cc, line, col
-                    );
+                    if self.trace == "" {
+                        self.trace = "Lvl1->".to_string();
+                    }
+                    let trc = format!(" -Found a value {} on cell {} (l:{}/c:{})  ", x, cc, line, col);
+                    self.trace.push_str(&trc);
                     g.set_val(line, col, x, CellType::FOUND);
                 }
             }

@@ -6,14 +6,16 @@ use std::convert::TryInto;
 
 pub struct ResolverLvl3 {
     acc: Accessor, //methods to retreive cells by coordinates
-    _debug : bool,    
+    debug : bool,    
+    trace : String,
 }
 
 impl ResolverLvl3 {
     pub fn new(debug : bool) -> ResolverLvl3 {
         ResolverLvl3 {
             acc: Accessor::new(),
-            _debug:debug,
+            debug,
+            trace : String::new(),
         }
     }
 
@@ -27,7 +29,7 @@ impl ResolverLvl3 {
         if g.is_resolved() {
             return false;
         }
-        print!("Lvl3->");
+        self.trace = "".to_string();
         let mut solve_one_at_least = false;
         for v in 1..=MAX {
             let val: usize = v.try_into().unwrap();
@@ -48,7 +50,9 @@ impl ResolverLvl3 {
                 }
             }
         }
-        println!();
+        if self.debug && self.trace != "" {
+            println!("{}",self.trace);
+        }
         solve_one_at_least
     }
 
@@ -76,10 +80,11 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::FOUND);
-            print!(
-                " -Found a value {} on cell {} (l:{}/c:{})  ",
-                val, unsolve, coord.0, coord.1
-            );
+            if self.trace == "" {
+                self.trace = "Lvl3->".to_string();
+            }
+            let trc = format!(" -Found a value {} on cell {} (l:{}/c:{})  ", val, unsolve, coord.0, coord.1);
+            self.trace.push_str(&trc);
             return true;
         }
         false
@@ -109,10 +114,11 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::FOUND);
-            print!(
-                " -Found a value {} on cell {} (l:{}/c:{})  ",
-                val, unsolve, coord.0, coord.1
-            );
+            if self.trace == "" {
+                self.trace = "Lvl3->".to_string();
+            }
+            let trc = format!(" -Found a value {} on cell {} (l:{}/c:{})  ", val, unsolve, coord.0, coord.1);
+            self.trace.push_str(&trc);
             return true;
         }
         false
@@ -142,10 +148,11 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::FOUND);
-            print!(
-                " -Found a value {} on cell {} (l:{}/c:{})  ",
-                val, unsolve, coord.0, coord.1
-            );
+            if self.trace == "" {
+                self.trace = "Lvl3->".to_string();
+            }
+            let trc = format!(" -Found a value {} on cell {} (l:{}/c:{})  ", val, unsolve, coord.0, coord.1);
+            self.trace.push_str(&trc);
             return true;
         }
         false

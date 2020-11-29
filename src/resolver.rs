@@ -36,7 +36,7 @@ impl Resolver {
         }
     }
 
-    fn display_stats(&mut self) {
+    pub fn display_stats(&mut self) {
         println!(
             "Called {} times level 1 ({} times with no new result)",
             self.nblvl1, self.nblvl1ko
@@ -73,11 +73,13 @@ impl Resolver {
                 if !self.resolve(g,debug) {
                     break;
                 }
-                if debug {
+                if display {
                     g.display();
                 }
                 if !g.is_valid() {
-                    println!("Error in the grid!");
+                    if debug {
+                        println!("Error in the grid!");
+                    }
                     return false;
                 }
             }
@@ -89,10 +91,7 @@ impl Resolver {
         if display {
             g.display();
         }
-        if res {
-            println!("Grid resolved!!!!!");
-            self.display_stats();
-        } else if debug {
+        if !res {
             g.debug();
         }
         res
@@ -105,23 +104,34 @@ impl Resolver {
         let sav_step = self.step;
         self.nblvl9guess += 1;
         //second find a unsolved cell
-        match g.get_first_unsolved() {
+        match sav.get_first_unsolved() {
             None => {
                 println!("Strange error: grid not solved by with no unsolved cell (or unsoved cell with no possibles values)");
                 false
             }
             Some(val) => {
                 //on the saved grid, let try this value on the cell
-                println!("Lvl9-> try value {} on cell l:{}/c:{}", val.2, val.0, val.1);
+                if debug {
+                    println!("Lvl9-> try value {} on cell l:{}/c:{}", val.2, val.0, val.1);
+                }
+                /*if display && debug {
+                    g.debug();
+                }
+                if display && debug {
+                    sav.debug();
+                }*/
                 sav.set_val(val.0, val.1, val.2, CellType::GUESS);
                 if self.go(&mut sav, debug, display) {
                     //we found the solution
+                    g.copy_from(sav);
                     true
                 } else {
-                    println!(
-                        "Lvl9-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid (from step {})",
-                        val.2, val.0, val.1,sav_step
-                    );
+                    if debug {
+                        println!(
+                            "Lvl9-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid (from step {})",
+                            val.2, val.0, val.1,sav_step
+                        );
+                    }
                     self.nblvl9wrongguess += 1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
                     g.remove_a_possible(val.0, val.1, val.2);
