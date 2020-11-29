@@ -119,7 +119,7 @@ impl Clone for Square {
 }
 
 #[test]
-fn clone_line_test() {
+fn clone_square_test() {
     let mut ori = Square::default();
     ori.add_a_known_value(1);
     ori.add_a_known_value(3);
