@@ -7,6 +7,7 @@ use super::square::*;
 use std::convert::TryInto;
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use super::cell::CellType;
 
 //Grid => 81 cells
 pub struct Grid {
@@ -60,8 +61,28 @@ impl Default for Grid {
 
 //methods to update Grid struct
 impl Grid {
+    /**
+     * return trus if we solve the cell or removed at least a possible valur since last call
+     */
+    pub fn something_has_some_change(&mut self)->bool{
+        let mut res = false;
+        for i in 0..GRIDSIZE {
+            let pos:usize = i.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            if cell.something_has_some_change(){
+                res = true;
+            }
+            //continue to all cells to reset bools
+        }        
+        res
+    }
     pub fn set_debug(&mut self,debug :bool){
         self.debug=debug;
+        for i in 0..GRIDSIZE {
+            let pos:usize = i.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            cell.set_debug(debug);
+        }        
     }
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
@@ -265,6 +286,62 @@ impl Grid {
 
 //display and debug methods
 impl Grid {
+    fn colorwrite(&self, ct : CellType, st: String){
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        //set color for cell type
+        match ct {
+            CellType::FOUND => stdout
+                .set_color(
+                    ColorSpec::new()
+                        .set_bg(Some(Color::Green))
+                        .set_fg(Some(Color::White)),
+                )
+                .unwrap(),
+            CellType::GUESS => stdout
+                .set_color(
+                    ColorSpec::new()
+                        .set_bg(Some(Color::Red))
+                        .set_fg(Some(Color::White)),
+                )
+                .unwrap(),
+            CellType::ORIGIN => stdout
+                .set_color(
+                    ColorSpec::new()
+                        .set_bg(Some(Color::Blue))
+                        .set_fg(Some(Color::White)),
+                )
+                .unwrap(),
+            CellType::UNKNOWN => stdout
+                .set_color(
+                    ColorSpec::new()
+                        .set_bg(Some(Color::Black))
+                        .set_fg(Some(Color::White)),
+                )
+                .unwrap(),
+        }
+        //write
+        write!(&mut stdout, " {} ", st).unwrap();
+        //put back colors to black and white
+        stdout
+        .set_color(
+            ColorSpec::new()
+                .set_bg(Some(Color::Black))
+                .set_fg(Some(Color::White)),
+        )
+        .unwrap();
+    }
+    pub fn legend(&self){
+        print!("Legend: ");
+        self.colorwrite(CellType::FOUND,"Found".to_string());
+        print!(" ");
+        self.colorwrite(CellType::GUESS,"Guess".to_string());
+        print!(" ");
+        self.colorwrite(CellType::ORIGIN,"Origin".to_string());
+        print!(" ");
+        self.colorwrite(CellType::UNKNOWN,"Unknown".to_string());
+        println!();
+    }
+
     /**
      * display the actual grid
      */
@@ -295,37 +372,7 @@ impl Grid {
                         write!(&mut stdout, " ? ").unwrap();
                     }
                     Some(x) => {
-                        match cell.get_type() {
-                            CellType::FOUND => stdout
-                                .set_color(
-                                    ColorSpec::new()
-                                        .set_bg(Some(Color::Green))
-                                        .set_fg(Some(Color::White)),
-                                )
-                                .unwrap(),
-                            CellType::GUESS => stdout
-                                .set_color(
-                                    ColorSpec::new()
-                                        .set_bg(Some(Color::Red))
-                                        .set_fg(Some(Color::White)),
-                                )
-                                .unwrap(),
-                            CellType::ORIGIN => stdout
-                                .set_color(
-                                    ColorSpec::new()
-                                        .set_bg(Some(Color::Blue))
-                                        .set_fg(Some(Color::White)),
-                                )
-                                .unwrap(),
-                            CellType::UNKNOWN => stdout
-                                .set_color(
-                                    ColorSpec::new()
-                                        .set_bg(Some(Color::Black))
-                                        .set_fg(Some(Color::White)),
-                                )
-                                .unwrap(),
-                        }
-                        write!(&mut stdout, " {} ", x).unwrap();
+                        self.colorwrite(cell.get_type(),x.to_string());
                     }
                 };
                 stdout
@@ -346,9 +393,6 @@ impl Grid {
             } else if line % 3 == 0 {
                 writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
             }
-        }
-        if self.is_resolved() {
-            println!("Puzzle solved!");
         }
     }
 
@@ -569,4 +613,20 @@ fn clone_grid_test() {
     assert_eq!(ori.get_resolved(), copy.get_resolved());
     ori.set_val(8, 6, 1, CellType::ORIGIN);
     assert_ne!(ori.get_resolved(), copy.get_resolved());
+}
+
+//methods to fill grid 
+impl Grid {
+    pub fn compute_line(&mut self, line_number: u8, l: &str) {
+        for (col, part) in l.split(',').enumerate() {
+            let r: u8 = match part.parse() {
+                Err(_) => {
+                    continue;
+                }
+                Ok(v) => v,
+            };
+            let c: u8 = col.try_into().unwrap();
+            self.set_val(line_number, c + 1, r, CellType::ORIGIN);
+        }
+    }
 }

@@ -1,12 +1,11 @@
-use super::cell::CellType;
 use super::grid::*;
-use std::convert::TryInto;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 
-pub fn read(fic: &str) -> Grid {
+pub fn read(fic: &str,debug:bool) -> Grid {
     let mut g = Grid::default();
+    g.set_debug(debug);
     let input = File::open(&fic);
     match input {
         Err(e) => {
@@ -17,8 +16,8 @@ pub fn read(fic: &str) -> Grid {
             let mut line_number = 1;
             for line in buffered.lines() {
                 if let Ok(l) = line {
-                    compute_line(&mut g, line_number, &l);
-                } //TODO : else ...
+                    g.compute_line(line_number, &l);
+                } 
                 line_number += 1;
             }
         }
@@ -26,15 +25,13 @@ pub fn read(fic: &str) -> Grid {
     g
 }
 
-fn compute_line(g: &mut Grid, line_number: u8, l: &str) {
-    for (col, part) in l.split(',').enumerate() {
-        let r: u8 = match part.parse() {
-            Err(_) => {
-                continue;
-            }
-            Ok(v) => v,
-        };
-        let c: u8 = col.try_into().unwrap();
-        g.set_val(line_number, c + 1, r, CellType::ORIGIN);
+pub fn from_vec(data: Vec<String>,debug:bool) -> Grid {
+    let mut g = Grid::default();    
+    g.set_debug(debug);
+    let mut line_number = 1;
+    for d in data{
+        g.compute_line(line_number, &d);
+        line_number += 1;
     }
+    g
 }

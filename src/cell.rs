@@ -16,7 +16,21 @@ ORIGIN  -> Value given at start
 FOUND   -> Value found by calculation
 GUESS   -> possible value but not sure yet
 */
-
+impl CellType {
+    pub fn get_value(self) -> u8 {
+        match self {
+            CellType::UNKNOWN=>1,
+            CellType::ORIGIN=>2,
+            CellType::FOUND=>3,
+            CellType::GUESS=>4,
+        }
+    }
+}
+impl PartialEq for CellType {
+    fn eq(&self, other: &Self) -> bool {
+        self.get_value() == other.get_value()
+    }
+}
 //the cell
 pub struct Cell {
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
@@ -27,9 +41,20 @@ pub struct Cell {
     answer: u8,           //value of the cell when solved
     cell_type: CellType,  //type of value
     debug : bool,
+    just_resolved:bool,
+    possible_removed:bool,
 }
 
 impl Cell {
+    /**
+     * return trus if we solve the cell or removed at least a possible valur since last call
+     */
+    pub fn something_has_some_change(&mut self)->bool{
+        let res = self.just_resolved || self.possible_removed;
+        self.just_resolved=false;
+        self.possible_removed=false;
+        res
+    }
     pub fn set_debug(&mut self,debug :bool){
         self.debug=debug;
     }    
@@ -54,6 +79,8 @@ impl Cell {
             answer: 0,
             cell_type: CellType::UNKNOWN,
             debug,
+            just_resolved:false,
+            possible_removed:false,
         }
     }
 
@@ -108,6 +135,7 @@ impl Cell {
             //if only one possible left
             self.answer = val; //and we got our answer
             self.cell_type = CellType::FOUND;
+            self.just_resolved=true;
             return true;
         }
         false
@@ -130,6 +158,9 @@ impl Cell {
      * remove a value from the possibles
      */
     fn remove_a_possible(&mut self, val: usize) {
+        if self.possibles[val - 1]{
+            self.possible_removed=true;
+        }
         self.possibles[val - 1] = false;
     }
 
@@ -198,6 +229,9 @@ impl Cell {
         //set the answer
         self.answer = val;
         self.cell_type = t;
+        if t == CellType::FOUND{
+            self.just_resolved=true;
+        }
     }
 
     /*
@@ -260,6 +294,8 @@ impl Clone for Cell {
             answer: self.answer,
             cell_type: self.cell_type,
             debug : self.debug,
+            just_resolved:self.just_resolved,
+            possible_removed:self.possible_removed,            
         }
     }
 }

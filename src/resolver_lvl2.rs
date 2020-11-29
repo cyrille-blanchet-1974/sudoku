@@ -18,7 +18,7 @@ impl ResolverLvl2 {
 
     /*
     for a square and a value, if all lines but one and all columns but one are solved then
-    the cell in the remainig line and column si solved with this value
+    the cell in the remainig line and column is solved with this value
 
     return true if found at least a new value for a cell
     */

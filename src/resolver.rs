@@ -89,7 +89,7 @@ impl Resolver {
             return self.resolve_lvl9(g, debug, display);
         }
         if display {
-            g.display();
+            g.display();            
         }
         if !res {
             g.debug();
@@ -140,7 +140,59 @@ impl Resolver {
             }
         }
     }
-
+/*
+    pub fn resolve(&mut self, g: &mut Grid, debug: bool) -> bool {
+        loop{
+            let mut l1 = ResolverLvl1::new(debug);
+            let res1 = l1.resolve(g);
+            print!("L1");
+            self.nblvl1 += 1;
+            if !res1 {
+                self.nblvl1ko += 1;
+            }
+            if !g.something_has_some_change() {
+                loop{
+                    let mut l2 = ResolverLvl2::new(debug);
+                    let res2 = l2.resolve(g);
+                    print!("L2");
+                    self.nblvl2 += 1;
+                    if !res2 {
+                        self.nblvl2ko += 1;
+                    }
+                    if !g.something_has_some_change() {
+                        loop{  
+                            let mut l3 = ResolverLvl3::new(debug);
+                            let res3 = l3.resolve(g);
+                            print!("L3");
+                            self.nblvl3 += 1;
+                            if !res3 {
+                                self.nblvl3ko += 1;
+                            }
+                            if !g.something_has_some_change() {
+                                let mut l4 = ResolverLvl4::new(debug);
+                                let res4 = l4.resolve(g);
+                                print!("L4");
+                                self.nblvl4 += 1;
+                                if !res4 {
+                                    self.nblvl4ko += 1;
+                                }
+                                if !g.something_has_some_change() {
+                                    break;
+                                }                        
+                            }//l3 found nothing                           
+                        }//loop L3
+                    }//l2 found nothing
+                    if !g.something_has_some_change() {
+                        break;
+                    }                    
+                }//loop L2
+            }//L1 found nothing
+            if !g.something_has_some_change() {
+                break;
+            }                    
+        }//lopp L1
+        false
+    }*/
     pub fn resolve(&mut self, g: &mut Grid, debug: bool) -> bool {
         self.step += 1;
         //try 3 first type of resolution
@@ -151,6 +203,12 @@ impl Resolver {
         if !res1 {
             self.nblvl1ko += 1;
         }
+        /*if g.something_has_some_change() || res1{
+            println!("lvl1 found something");
+            if res1 {
+                println!("lvl1 returned something");
+            }
+        }*/
         //value fount in two other line and two other column of a square
         let mut l2 = ResolverLvl2::new(debug);
         let res2 = l2.resolve(g);
@@ -158,6 +216,12 @@ impl Resolver {
         if !res2 {
             self.nblvl2ko += 1;
         }
+        /*if g.something_has_some_change() || res2{
+            println!("lvl2 found something");
+            if res2 {
+                println!("lvl2 returned something");
+            }
+        }*/
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
@@ -167,6 +231,12 @@ impl Resolver {
         if !res3 {
             self.nblvl3ko += 1;
         }
+        /*if g.something_has_some_change() || res3{
+            println!("lvl3 found something");
+            if res3 {
+                println!("lvl3 returned something");
+            }
+        }*/
         //x-wing
         let mut l4 = ResolverLvl4::new(debug);
         let res4 = l4.resolve(g);
@@ -174,6 +244,13 @@ impl Resolver {
         if !res4 {
             self.nblvl4ko += 1;
         }
-        res1 || res2 || res3 || res4
+        /*if g.something_has_some_change() || res4{
+            println!("lvl4 found something");
+            if res4 {
+                println!("lvl4 returned something");
+            }
+        }
+        res1 || res2 || res3 || res4*/
+        g.something_has_some_change()
     }
 }

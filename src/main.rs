@@ -116,6 +116,7 @@ pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
     let res = r.go(g, debug, display);
     println!("****Final data for the grid****");
     g.display();
+    g.legend();
     println!("Grid resolved!!!!!");
     r.display_stats();
     res
@@ -123,472 +124,217 @@ pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
 
 fn test_solving(debug: bool, display: bool) -> bool {
     println!("1->resolution test!");
-    let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1, CellType::ORIGIN);
-    g1.set_val(2, 4, 2, CellType::ORIGIN);
-    g1.set_val(3, 7, 3, CellType::ORIGIN);
-    g1.set_val(4, 2, 4, CellType::ORIGIN);
-    g1.set_val(5, 5, 5, CellType::ORIGIN);
-    g1.set_val(6, 8, 6, CellType::ORIGIN);
-    g1.set_val(7, 3, 7, CellType::ORIGIN);
-    g1.set_val(8, 6, 8, CellType::ORIGIN);
-    g1.set_val(9, 9, 9, CellType::ORIGIN);
-    g1.set_val(2, 5, 1, CellType::ORIGIN);
-    g1.set_val(5, 8, 1, CellType::ORIGIN);
-    g1.set_val(9, 7, 1, CellType::ORIGIN);
+    let mut v = Vec::new();
+    v.push("1,?,?,?,?,?,?,?,?".to_string());
+    v.push("?,?,?,2,1,?,?,?,?".to_string());
+    v.push("?,?,?,?,?,?,3,?,?".to_string());
+    v.push("?,4,?,?,?,?,?,?,?".to_string());
+    v.push("?,?,?,?,5,?,?,1,?".to_string());
+    v.push("?,?,?,?,?,?,?,6,?".to_string());
+    v.push("?,?,7,?,?,?,?,?,?".to_string());
+    v.push("?,?,?,?,?,8,?,?,?".to_string());
+    v.push("?,?,?,?,?,?,1,?,9".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | 1  ?  ? | ?  ?  ? | ?  ?  ? |
-    | ?  ?  ? | 2  1  ? | ?  ?  ? |
-    | ?  ?  ? | ?  ?  ? | 3  ?  ? |
-    -------------------------------
-    | ?  4  ? | ?  ?  ? | ?  ?  ? |
-    | ?  ?  ? | ?  5  ? | ?  1  ? |
-    | ?  ?  ? | ?  ?  ? | ?  6  ? |
-    -------------------------------
-    | ?  ?  7 | ?  ?  ? | ?  ?  ? |
-    | ?  ?  ? | ?  ?  8 | ?  ?  ? |
-    | ?  ?  ? | ?  ?  ? | 1  ?  9 |
-    -------------------------------
-    Solved in 43 steps (26 guesses all good)
-    -------------------------------
-    | 1  2  3 | 4  6  5 | 7  9  8 |
-    | 7  8  9 | 2  1  3 | 4  5  6 |
-    | 4  5  6 | 7  8  9 | 3  2  1 |
-    -------------------------------
-    | 2  4  1 | 6  9  7 | 5  8  3 |
-    | 6  7  8 | 3  5  2 | 9  1  4 |
-    | 3  9  5 | 8  4  1 | 2  6  7 |
-    -------------------------------
-    | 5  1  7 | 9  3  6 | 8  4  2 |
-    | 9  3  4 | 1  2  8 | 6  7  5 |
-    | 8  6  2 | 5  7  4 | 1  3  9 |
-    -------------------------------
+    /*Solved in 43 steps (26 guesses all good)
+    -------------------------------                       -------------------------------
+    | 1  ?  ? | ?  ?  ? | ?  ?  ? |                       | 1  2  3 | 4  6  5 | 7  9  8 |
+    | ?  ?  ? | 2  1  ? | ?  ?  ? |                       | 7  8  9 | 2  1  3 | 4  5  6 |
+    | ?  ?  ? | ?  ?  ? | 3  ?  ? |                       | 4  5  6 | 7  8  9 | 3  2  1 |
+    -------------------------------                       -------------------------------
+    | ?  4  ? | ?  ?  ? | ?  ?  ? |                       | 2  4  1 | 6  9  7 | 5  8  3 |
+    | ?  ?  ? | ?  5  ? | ?  1  ? |                       | 6  7  8 | 3  5  2 | 9  1  4 |
+    | ?  ?  ? | ?  ?  ? | ?  6  ? |                       | 3  9  5 | 8  4  1 | 2  6  7 |
+    -------------------------------                       -------------------------------
+    | ?  ?  7 | ?  ?  ? | ?  ?  ? |                       | 5  1  7 | 9  3  6 | 8  4  2 |
+    | ?  ?  ? | ?  ?  8 | ?  ?  ? |                       | 9  3  4 | 1  2  8 | 6  7  5 |
+    | ?  ?  ? | ?  ?  ? | 1  ?  9 |                       | 8  6  2 | 5  7  4 | 1  3  9 |
+    -------------------------------                       -------------------------------
     */
 }
 
 fn test_solving_easy(debug: bool, display: bool) -> bool {
     println!("2->resolution easy!");
-    let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1, CellType::ORIGIN);
-    g1.set_val(1, 3, 7, CellType::ORIGIN);
-
-    g1.set_val(2, 3, 4, CellType::ORIGIN);
-    g1.set_val(2, 4, 2, CellType::ORIGIN);
-    g1.set_val(2, 5, 9, CellType::ORIGIN);
-    g1.set_val(2, 9, 6, CellType::ORIGIN);
-
-    g1.set_val(3, 2, 9, CellType::ORIGIN);
-    g1.set_val(3, 5, 8, CellType::ORIGIN);
-    g1.set_val(3, 6, 7, CellType::ORIGIN);
-    g1.set_val(3, 8, 2, CellType::ORIGIN);
-    g1.set_val(3, 9, 4, CellType::ORIGIN);
-
-    g1.set_val(4, 1, 4, CellType::ORIGIN);
-    g1.set_val(4, 2, 7, CellType::ORIGIN);
-    g1.set_val(4, 3, 5, CellType::ORIGIN);
-    g1.set_val(4, 4, 1, CellType::ORIGIN);
-    g1.set_val(4, 7, 8, CellType::ORIGIN);
-    g1.set_val(4, 8, 6, CellType::ORIGIN);
-
-    g1.set_val(6, 2, 1, CellType::ORIGIN);
-    g1.set_val(6, 3, 3, CellType::ORIGIN);
-    g1.set_val(6, 6, 8, CellType::ORIGIN);
-    g1.set_val(6, 7, 5, CellType::ORIGIN);
-    g1.set_val(6, 8, 7, CellType::ORIGIN);
-    g1.set_val(6, 9, 9, CellType::ORIGIN);
-
-    g1.set_val(7, 1, 3, CellType::ORIGIN);
-    g1.set_val(7, 2, 4, CellType::ORIGIN);
-    g1.set_val(7, 4, 8, CellType::ORIGIN);
-    g1.set_val(7, 5, 6, CellType::ORIGIN);
-    g1.set_val(7, 8, 1, CellType::ORIGIN);
-
-    g1.set_val(8, 1, 7, CellType::ORIGIN);
-    g1.set_val(8, 5, 2, CellType::ORIGIN);
-    g1.set_val(8, 6, 4, CellType::ORIGIN);
-    g1.set_val(8, 7, 6, CellType::ORIGIN);
-
-    g1.set_val(9, 7, 9, CellType::ORIGIN);
-    g1.set_val(9, 9, 5, CellType::ORIGIN);
-
+    let mut v = Vec::new();
+    v.push("1,?,7,?,?,?,?,?,?".to_string());
+    v.push("?,?,4,2,9,?,?,?,6".to_string());
+    v.push("?,9,?,?,8,7,?,2,4".to_string());
+    v.push("4,7,5,1,?,?,8,6,?".to_string());
+    v.push("?,?,?,?,?,?,?,?,?".to_string());
+    v.push("?,1,3,?,?,8,5,7,9".to_string());
+    v.push("3,4,?,8,6,?,?,1,?".to_string());
+    v.push("7,?,?,?,2,4,6,?,?".to_string());
+    v.push("?,?,?,?,?,?,9,?,5".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | 1  ?  7 | ?  ?  ? | ?  ?  ? |
-    | ?  ?  4 | 2  9  ? | ?  ?  6 |
-    | ?  9  ? | ?  8  7 | ?  2  4 |
-    -------------------------------
-    | 4  7  5 | 1  ?  ? | 8  6  ? |
-    | ?  ?  ? | ?  ?  ? | ?  ?  ? |
-    | ?  1  3 | ?  ?  8 | 5  7  9 |
-    -------------------------------
-    | 3  4  ? | 8  6  ? | ?  1  ? |
-    | 7  ?  ? | ?  2  4 | 6  ?  ? |
-    | ?  ?  ? | ?  ?  ? | 9  ?  5 |
-    -------------------------------
-    Solved 3 steps (0 guess)
-    -------------------------------
-    | 1  2  7 | 4  5  6 | 3  9  8 |
-    | 8  3  4 | 2  9  1 | 7  5  6 |
-    | 5  9  6 | 3  8  7 | 1  2  4 |
-    -------------------------------
-    | 4  7  5 | 1  3  9 | 8  6  2 |
-    | 9  6  8 | 5  7  2 | 4  3  1 |
-    | 2  1  3 | 6  4  8 | 5  7  9 |
-    -------------------------------
-    | 3  4  9 | 8  6  5 | 2  1  7 |
-    | 7  5  1 | 9  2  4 | 6  8  3 |
-    | 6  8  2 | 7  1  3 | 9  4  5 |
-    -------------------------------
-    */
+    /*Solved 3 steps (0 guess)
+    -------------------------------                           -------------------------------
+    | 1  ?  7 | ?  ?  ? | ?  ?  ? |                           | 1  2  7 | 4  5  6 | 3  9  8 |
+    | ?  ?  4 | 2  9  ? | ?  ?  6 |                           | 8  3  4 | 2  9  1 | 7  5  6 |
+    | ?  9  ? | ?  8  7 | ?  2  4 |                           | 5  9  6 | 3  8  7 | 1  2  4 |
+    -------------------------------                           -------------------------------
+    | 4  7  5 | 1  ?  ? | 8  6  ? |                           | 4  7  5 | 1  3  9 | 8  6  2 |
+    | ?  ?  ? | ?  ?  ? | ?  ?  ? |                           | 9  6  8 | 5  7  2 | 4  3  1 |
+    | ?  1  3 | ?  ?  8 | 5  7  9 |                           | 2  1  3 | 6  4  8 | 5  7  9 |
+    -------------------------------                           -------------------------------
+    | 3  4  ? | 8  6  ? | ?  1  ? |                           | 3  4  9 | 8  6  5 | 2  1  7 |
+    | 7  ?  ? | ?  2  4 | 6  ?  ? |                           | 7  5  1 | 9  2  4 | 6  8  3 |
+    | ?  ?  ? | ?  ?  ? | 9  ?  5 |                           | 6  8  2 | 7  1  3 | 9  4  5 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn test_solving_medium(debug: bool, display: bool) -> bool {
     println!("3->resolution medium!");
-    let mut g1 = Grid::default();
-    g1.set_val(1, 1, 5, CellType::ORIGIN);
-    g1.set_val(1, 5, 4, CellType::ORIGIN);
-
-    g1.set_val(2, 2, 8, CellType::ORIGIN);
-    g1.set_val(2, 8, 2, CellType::ORIGIN);
-    g1.set_val(2, 9, 3, CellType::ORIGIN);
-
-    g1.set_val(3, 4, 8, CellType::ORIGIN);
-    g1.set_val(3, 5, 5, CellType::ORIGIN);
-    g1.set_val(3, 6, 3, CellType::ORIGIN);
-    g1.set_val(3, 7, 7, CellType::ORIGIN);
-
-    g1.set_val(4, 1, 2, CellType::ORIGIN);
-    g1.set_val(4, 7, 6, CellType::ORIGIN);
-    g1.set_val(4, 8, 4, CellType::ORIGIN);
-
-    g1.set_val(5, 1, 6, CellType::ORIGIN);
-    g1.set_val(5, 3, 8, CellType::ORIGIN);
-    g1.set_val(5, 7, 3, CellType::ORIGIN);
-    g1.set_val(5, 9, 1, CellType::ORIGIN);
-
-    g1.set_val(6, 2, 7, CellType::ORIGIN);
-    g1.set_val(6, 3, 4, CellType::ORIGIN);
-    g1.set_val(6, 9, 9, CellType::ORIGIN);
-
-    g1.set_val(7, 3, 1, CellType::ORIGIN);
-    g1.set_val(7, 4, 3, CellType::ORIGIN);
-    g1.set_val(7, 5, 7, CellType::ORIGIN);
-    g1.set_val(7, 6, 2, CellType::ORIGIN);
-
-    g1.set_val(8, 1, 8, CellType::ORIGIN);
-    g1.set_val(8, 3, 3, CellType::ORIGIN);
-    g1.set_val(8, 8, 1, CellType::ORIGIN);
-
-    g1.set_val(9, 5, 9, CellType::ORIGIN);
-    g1.set_val(9, 9, 2, CellType::ORIGIN);
+    let mut v = Vec::new();
+    v.push("5,?,?,?,4,?,?,?,?".to_string());
+    v.push("?,8,?,?,?,?,?,2,3".to_string());
+    v.push("?,?,?,8,5,3,7,?,?".to_string());
+    v.push("2,?,?,?,?,?,6,4,?".to_string());
+    v.push("6,?,8,?,?,?,3,?,1".to_string());
+    v.push("?,7,4,?,?,?,?,?,9".to_string());
+    v.push("?,?,1,3,7,2,?,?,?".to_string());
+    v.push("8,?,3,?,?,?,?,1,?".to_string());
+    v.push("?,?,?,?,9,?,?,?,2".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | 5  ?  ? | ?  4  ? | ?  ?  ? |
-    | ?  8  ? | ?  ?  ? | ?  2  3 |
-    | ?  ?  ? | 8  5  3 | 7  ?  ? |
-    -------------------------------
-    | 2  ?  ? | ?  ?  ? | 6  4  ? |
-    | 6  ?  8 | ?  ?  ? | 3  ?  1 |
-    | ?  7  4 | ?  ?  ? | ?  ?  9 |
-    -------------------------------
-    | ?  ?  1 | 3  7  2 | ?  ?  ? |
-    | 8  ?  3 | ?  ?  ? | ?  1  ? |
-    | ?  ?  ? | ?  9  ? | ?  ?  2 |
-    -------------------------------
-    Solved in 9 steps (2 guesses All goods)
-    -------------------------------
-    | 5  3  7 | 2  4  9 | 1  8  6 |
-    | 4  8  9 | 7  1  6 | 5  2  3 |
-    | 1  6  2 | 8  5  3 | 7  9  4 |
-    -------------------------------
-    | 2  1  5 | 9  3  7 | 6  4  8 |
-    | 6  9  8 | 4  2  5 | 3  7  1 |
-    | 3  7  4 | 6  8  1 | 2  5  9 |
-    -------------------------------
-    | 9  4  1 | 3  7  2 | 8  6  5 |
-    | 8  2  3 | 5  6  4 | 9  1  7 |
-    | 7  5  6 | 1  9  8 | 4  3  2 |
-    -------------------------------
-    */
+    /*Solved in 9 steps (2 guesses All goods)
+    -------------------------------                           -------------------------------
+    | 5  ?  ? | ?  4  ? | ?  ?  ? |                           | 5  3  7 | 2  4  9 | 1  8  6 |
+    | ?  8  ? | ?  ?  ? | ?  2  3 |                           | 4  8  9 | 7  1  6 | 5  2  3 |
+    | ?  ?  ? | 8  5  3 | 7  ?  ? |                           | 1  6  2 | 8  5  3 | 7  9  4 |
+    -------------------------------                           -------------------------------
+    | 2  ?  ? | ?  ?  ? | 6  4  ? |                           | 2  1  5 | 9  3  7 | 6  4  8 |
+    | 6  ?  8 | ?  ?  ? | 3  ?  1 |                           | 6  9  8 | 4  2  5 | 3  7  1 |
+    | ?  7  4 | ?  ?  ? | ?  ?  9 |                           | 3  7  4 | 6  8  1 | 2  5  9 |
+    -------------------------------                           -------------------------------
+    | ?  ?  1 | 3  7  2 | ?  ?  ? |                           | 9  4  1 | 3  7  2 | 8  6  5 |
+    | 8  ?  3 | ?  ?  ? | ?  1  ? |                           | 8  2  3 | 5  6  4 | 9  1  7 |
+    | ?  ?  ? | ?  9  ? | ?  ?  2 |                           | 7  5  6 | 1  9  8 | 4  3  2 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn test_solving_difficult(debug: bool, display: bool) -> bool {
     println!("4->resolution difficult!");
-    let mut g1 = Grid::default();
-
-    g1.set_val(2, 1, 5, CellType::ORIGIN);
-    g1.set_val(2, 3, 2, CellType::ORIGIN);
-    g1.set_val(2, 4, 9, CellType::ORIGIN);
-    g1.set_val(2, 6, 8, CellType::ORIGIN);
-
-    g1.set_val(3, 1, 1, CellType::ORIGIN);
-    g1.set_val(3, 2, 6, CellType::ORIGIN);
-    g1.set_val(3, 4, 2, CellType::ORIGIN);
-    g1.set_val(3, 5, 3, CellType::ORIGIN);
-
-    g1.set_val(4, 3, 1, CellType::ORIGIN);
-    g1.set_val(4, 7, 7, CellType::ORIGIN);
-    g1.set_val(4, 9, 4, CellType::ORIGIN);
-
-    g1.set_val(5, 3, 4, CellType::ORIGIN);
-    g1.set_val(5, 5, 9, CellType::ORIGIN);
-    g1.set_val(5, 7, 3, CellType::ORIGIN);
-
-    g1.set_val(6, 1, 7, CellType::ORIGIN);
-    g1.set_val(6, 3, 8, CellType::ORIGIN);
-    g1.set_val(6, 7, 5, CellType::ORIGIN);
-
-    g1.set_val(7, 5, 8, CellType::ORIGIN);
-    g1.set_val(7, 6, 5, CellType::ORIGIN);
-    g1.set_val(7, 8, 6, CellType::ORIGIN);
-    g1.set_val(7, 9, 7, CellType::ORIGIN);
-
-    g1.set_val(8, 4, 6, CellType::ORIGIN);
-    g1.set_val(8, 6, 7, CellType::ORIGIN);
-    g1.set_val(8, 7, 8, CellType::ORIGIN);
-    g1.set_val(8, 9, 1, CellType::ORIGIN);
-
+    let mut v = Vec::new();
+    v.push("?,?,?,?,?,?,?,?,?".to_string());
+    v.push("5,?,2,9,?,8,?,?,?".to_string());
+    v.push("1,6,?,2,3,?,?,?,?".to_string());
+    v.push("?,?,1,?,?,?,7,?,4".to_string());
+    v.push("?,?,4,?,9,?,3,?,?".to_string());
+    v.push("7,?,8,?,?,?,5,?,?".to_string());    
+    v.push("?,?,?,?,8,5,?,6,7".to_string());
+    v.push("?,?,?,6,?,7,8,?,1".to_string());
+    v.push("?,?,?,?,?,?,?,?,?".to_string());  
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | ?  ?  ? | ?  ?  ? | ?  ?  ? |
-    | 5  ?  2 | 9  ?  8 | ?  ?  ? |
-    | 1  6  ? | 2  3  ? | ?  ?  ? |
-    -------------------------------
-    | ?  ?  1 | ?  ?  ? | 7  ?  4 |
-    | ?  ?  4 | ?  9  ? | 3  ?  ? |
-    | 7  ?  8 | ?  ?  ? | 5  ?  ? |
-    -------------------------------
-    | ?  ?  ? | ?  8  5 | ?  6  7 |
-    | ?  ?  ? | 6  ?  7 | 8  ?  1 |
-    | ?  ?  ? | ?  ?  ? | ?  ?  ? |
-    -------------------------------
-    Solved in 9 steps (0 guess)
-    -------------------------------
-    | 9  8  3 | 5  7  6 | 1  4  2 |
-    | 5  4  2 | 9  1  8 | 6  7  3 |
-    | 1  6  7 | 2  3  4 | 9  5  8 |
-    -------------------------------
-    | 6  9  1 | 8  5  3 | 7  2  4 |
-    | 2  5  4 | 7  9  1 | 3  8  6 |
-    | 7  3  8 | 4  6  2 | 5  1  9 |
-    -------------------------------
-    | 4  1  9 | 3  8  5 | 2  6  7 |
-    | 3  2  5 | 6  4  7 | 8  9  1 |
-    | 8  7  6 | 1  2  9 | 4  3  5 |
-    -------------------------------
-    */
+    /*Solved in 9 steps (0 guess)
+    -------------------------------                           -------------------------------
+    | ?  ?  ? | ?  ?  ? | ?  ?  ? |                           | 9  8  3 | 5  7  6 | 1  4  2 |
+    | 5  ?  2 | 9  ?  8 | ?  ?  ? |                           | 5  4  2 | 9  1  8 | 6  7  3 |
+    | 1  6  ? | 2  3  ? | ?  ?  ? |                           | 1  6  7 | 2  3  4 | 9  5  8 |
+    -------------------------------                           -------------------------------
+    | ?  ?  1 | ?  ?  ? | 7  ?  4 |                           | 6  9  1 | 8  5  3 | 7  2  4 |
+    | ?  ?  4 | ?  9  ? | 3  ?  ? |                           | 2  5  4 | 7  9  1 | 3  8  6 |
+    | 7  ?  8 | ?  ?  ? | 5  ?  ? |                           | 7  3  8 | 4  6  2 | 5  1  9 |
+    -------------------------------                           -------------------------------
+    | ?  ?  ? | ?  8  5 | ?  6  7 |                           | 4  1  9 | 3  8  5 | 2  6  7 |
+    | ?  ?  ? | 6  ?  7 | 8  ?  1 |                           | 3  2  5 | 6  4  7 | 8  9  1 |
+    | ?  ?  ? | ?  ?  ? | ?  ?  ? |                           | 8  7  6 | 1  2  9 | 4  3  5 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn test_solving_diabolical(debug: bool, display: bool) -> bool {
     println!("5->resolution diabolic!");
-    let mut g1 = Grid::default();
-
-    g1.set_val(1, 2, 8, CellType::ORIGIN);
-    g1.set_val(1, 3, 3, CellType::ORIGIN);
-    g1.set_val(1, 4, 9, CellType::ORIGIN);
-
-    g1.set_val(2, 1, 5, CellType::ORIGIN);
-
-    g1.set_val(3, 4, 1, CellType::ORIGIN);
-    g1.set_val(3, 5, 4, CellType::ORIGIN);
-    g1.set_val(3, 8, 2, CellType::ORIGIN);
-
-    g1.set_val(4, 1, 3, CellType::ORIGIN);
-    g1.set_val(4, 3, 9, CellType::ORIGIN);
-    g1.set_val(4, 6, 8, CellType::ORIGIN);
-    g1.set_val(4, 7, 6, CellType::ORIGIN);
-
-    g1.set_val(5, 3, 7, CellType::ORIGIN);
-    g1.set_val(5, 7, 1, CellType::ORIGIN);
-
-    g1.set_val(6, 3, 4, CellType::ORIGIN);
-    g1.set_val(6, 4, 2, CellType::ORIGIN);
-    g1.set_val(6, 7, 3, CellType::ORIGIN);
-    g1.set_val(6, 9, 7, CellType::ORIGIN);
-
-    g1.set_val(7, 2, 4, CellType::ORIGIN);
-    g1.set_val(7, 5, 6, CellType::ORIGIN);
-    g1.set_val(7, 6, 3, CellType::ORIGIN);
-
-    g1.set_val(8, 9, 5, CellType::ORIGIN);
-
-    g1.set_val(9, 6, 4, CellType::ORIGIN);
-    g1.set_val(9, 7, 9, CellType::ORIGIN);
-    g1.set_val(9, 8, 3, CellType::ORIGIN);
-
+    let mut v = Vec::new();
+    v.push("?,8,3,9,?,?,?,?,?".to_string());
+    v.push("5,?,?,?,?,?,?,?,?".to_string());
+    v.push("?,?,?,1,4,?,?,2,?".to_string());
+    v.push("3,?,9,?,?,8,6,?,?".to_string());
+    v.push("?,?,7,?,?,?,1,?,?".to_string());
+    v.push("?,?,4,2,?,?,3,?,7".to_string());
+    v.push("?,4,?,?,6,3,?,?,?".to_string());
+    v.push("?,?,?,?,?,?,?,?,5".to_string());
+    v.push("?,?,?,?,?,4,9,3,?".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | ?  8  3 | 9  ?  ? | ?  ?  ? |
-    | 5  ?  ? | ?  ?  ? | ?  ?  ? |
-    | ?  ?  ? | 1  4  ? | ?  2  ? |
-    -------------------------------
-    | 3  ?  9 | ?  ?  8 | 6  ?  ? |
-    | ?  ?  7 | ?  ?  ? | 1  ?  ? |
-    | ?  ?  4 | 2  ?  ? | 3  ?  7 |
-    -------------------------------
-    | ?  4  ? | ?  6  3 | ?  ?  ? |
-    | ?  ?  ? | ?  ?  ? | ?  ?  5 |
-    | ?  ?  ? | ?  ?  4 | 9  3  ? |
-    -------------------------------
-    Solved in 10 steps (1 good guess)
-    -------------------------------
-    | 4  8  3 | 9  2  7 | 5  1  6 |
-    | 5  2  1 | 3  8  6 | 7  4  9 |
-    | 7  9  6 | 1  4  5 | 8  2  3 |
-    -------------------------------
-    | 3  1  9 | 4  7  8 | 6  5  2 |
-    | 2  5  7 | 6  3  9 | 1  8  4 |
-    | 8  6  4 | 2  5  1 | 3  9  7 |
-    -------------------------------
-    | 9  4  5 | 8  6  3 | 2  7  1 |
-    | 1  3  8 | 7  9  2 | 4  6  5 |
-    | 6  7  2 | 5  1  4 | 9  3  8 |
-    -------------------------------
-    */
+    /*Solved in 10 steps (1 good guess)
+    -------------------------------                           -------------------------------
+    | ?  8  3 | 9  ?  ? | ?  ?  ? |                           | 4  8  3 | 9  2  7 | 5  1  6 |
+    | 5  ?  ? | ?  ?  ? | ?  ?  ? |                           | 5  2  1 | 3  8  6 | 7  4  9 |
+    | ?  ?  ? | 1  4  ? | ?  2  ? |                           | 7  9  6 | 1  4  5 | 8  2  3 |
+    -------------------------------                           -------------------------------
+    | 3  ?  9 | ?  ?  8 | 6  ?  ? |                           | 3  1  9 | 4  7  8 | 6  5  2 |
+    | ?  ?  7 | ?  ?  ? | 1  ?  ? |                           | 2  5  7 | 6  3  9 | 1  8  4 |
+    | ?  ?  4 | 2  ?  ? | 3  ?  7 |                           | 8  6  4 | 2  5  1 | 3  9  7 |
+    -------------------------------                           -------------------------------
+    | ?  4  ? | ?  6  3 | ?  ?  ? |                           | 9  4  5 | 8  6  3 | 2  7  1 |
+    | ?  ?  ? | ?  ?  ? | ?  ?  5 |                           | 1  3  8 | 7  9  2 | 4  6  5 |
+    | ?  ?  ? | ?  ?  4 | 9  3  ? |                           | 6  7  2 | 5  1  4 | 9  3  8 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn test_solving_highest(debug: bool, display: bool) -> bool {
     println!("6->resolution highest");
-    let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1, CellType::ORIGIN);
-    g1.set_val(1, 6, 7, CellType::ORIGIN);
-    g1.set_val(1, 8, 9, CellType::ORIGIN);
-
-    g1.set_val(2, 2, 3, CellType::ORIGIN);
-    g1.set_val(2, 5, 2, CellType::ORIGIN);
-    g1.set_val(2, 9, 8, CellType::ORIGIN);
-
-    g1.set_val(3, 3, 9, CellType::ORIGIN);
-    g1.set_val(3, 4, 6, CellType::ORIGIN);
-    g1.set_val(3, 7, 5, CellType::ORIGIN);
-
-    g1.set_val(4, 3, 5, CellType::ORIGIN);
-    g1.set_val(4, 4, 3, CellType::ORIGIN);
-    g1.set_val(4, 7, 9, CellType::ORIGIN);
-
-    g1.set_val(5, 2, 1, CellType::ORIGIN);
-    g1.set_val(5, 5, 8, CellType::ORIGIN);
-    g1.set_val(5, 9, 2, CellType::ORIGIN);
-
-    g1.set_val(6, 1, 6, CellType::ORIGIN);
-    g1.set_val(6, 6, 4, CellType::ORIGIN);
-
-    g1.set_val(7, 1, 3, CellType::ORIGIN);
-    g1.set_val(7, 8, 1, CellType::ORIGIN);
-
-    g1.set_val(8, 2, 4, CellType::ORIGIN);
-    g1.set_val(8, 9, 7, CellType::ORIGIN);
-
-    g1.set_val(9, 3, 7, CellType::ORIGIN);
-    g1.set_val(9, 7, 3, CellType::ORIGIN);
-
+    let mut v = Vec::new();
+    v.push("1,?,?,?,?,7,?,9,?".to_string());
+    v.push("?,3,?,?,2,?,?,?,8".to_string());
+    v.push("?,?,9,6,?,?,5,?,?".to_string());
+    v.push("?,?,5,3,?,?,9,?,?".to_string());
+    v.push("?,1,?,?,8,?,?,?,2".to_string());
+    v.push("6,?,?,?,?,4,?,?,?".to_string());
+    v.push("3,?,?,?,?,?,?,1,?".to_string());
+    v.push("?,4,?,?,?,?,?,?,7".to_string());
+    v.push("?,?,7,?,?,?,3,?,?".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | 1  ?  ? | ?  ?  7 | ?  9  ? |
-    | ?  3  ? | ?  2  ? | ?  ?  8 |
-    | ?  ?  9 | 6  ?  ? | 5  ?  ? |
-    -------------------------------
-    | ?  ?  5 | 3  ?  ? | 9  ?  ? |
-    | ?  1  ? | ?  8  ? | ?  ?  2 |
-    | 6  ?  ? | ?  ?  4 | ?  ?  ? |
-    -------------------------------
-    | 3  ?  ? | ?  ?  ? | ?  1  ? |
-    | ?  4  ? | ?  ?  ? | ?  ?  7 |
-    | ?  ?  7 | ?  ?  ? | 3  ?  ? |
-    -------------------------------
-    Solved in 50 steps (11 guesses, 6 wrongs and 5 goods)
-    Solved in 46 steps (11 guesses, 6 wrongs and 5 goods) (better with x-wing)
-    -------------------------------
-    | 1  6  2 | 8  5  7 | 4  9  3 |
-    | 5  3  4 | 1  2  9 | 6  7  8 |
-    | 7  8  9 | 6  4  3 | 5  2  1 |
-    -------------------------------
-    | 4  7  5 | 3  1  2 | 9  8  6 |
-    | 9  1  3 | 5  8  6 | 7  4  2 |
-    | 6  2  8 | 7  9  4 | 1  3  5 |
-    -------------------------------
-    | 3  5  6 | 4  7  8 | 2  1  9 |
-    | 2  4  1 | 9  3  5 | 8  6  7 |
-    | 8  9  7 | 2  6  1 | 3  5  4 |
-    -------------------------------
-    */
+    /*Solved in 46 steps (11 guesses, 6 wrongs and 5 goods)
+    -------------------------------                           -------------------------------
+    | 1  ?  ? | ?  ?  7 | ?  9  ? |                           | 1  6  2 | 8  5  7 | 4  9  3 |
+    | ?  3  ? | ?  2  ? | ?  ?  8 |                           | 5  3  4 | 1  2  9 | 6  7  8 |
+    | ?  ?  9 | 6  ?  ? | 5  ?  ? |                           | 7  8  9 | 6  4  3 | 5  2  1 |
+    -------------------------------                           -------------------------------
+    | ?  ?  5 | 3  ?  ? | 9  ?  ? |                           | 4  7  5 | 3  1  2 | 9  8  6 |
+    | ?  1  ? | ?  8  ? | ?  ?  2 |                           | 9  1  3 | 5  8  6 | 7  4  2 |
+    | 6  ?  ? | ?  ?  4 | ?  ?  ? |                           | 6  2  8 | 7  9  4 | 1  3  5 |
+    -------------------------------                           -------------------------------
+    | 3  ?  ? | ?  ?  ? | ?  1  ? |                           | 3  5  6 | 4  7  8 | 2  1  9 |
+    | ?  4  ? | ?  ?  ? | ?  ?  7 |                           | 2  4  1 | 9  3  5 | 8  6  7 |
+    | ?  ?  7 | ?  ?  ? | 3  ?  ? |                           | 8  9  7 | 2  6  1 | 3  5  4 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn test_solving_mindless(debug: bool, display: bool) -> bool {
     println!("7->resolution mindless");
-    let mut g1 = Grid::default();
-    g1.set_val(1, 1, 1, CellType::ORIGIN);
-    g1.set_val(1, 9, 2, CellType::ORIGIN);
-
-    g1.set_val(2, 2, 9, CellType::ORIGIN);
-    g1.set_val(2, 4, 4, CellType::ORIGIN);
-    g1.set_val(2, 8, 5, CellType::ORIGIN);
-
-    g1.set_val(3, 3, 6, CellType::ORIGIN);
-    g1.set_val(3, 7, 7, CellType::ORIGIN);
-
-    g1.set_val(4, 2, 5, CellType::ORIGIN);
-    g1.set_val(4, 4, 9, CellType::ORIGIN);
-    g1.set_val(4, 6, 3, CellType::ORIGIN);
-
-    g1.set_val(5, 5, 7, CellType::ORIGIN);
-
-    g1.set_val(6, 4, 8, CellType::ORIGIN);
-    g1.set_val(6, 5, 5, CellType::ORIGIN);
-    g1.set_val(6, 8, 4, CellType::ORIGIN);
-
-    g1.set_val(7, 1, 7, CellType::ORIGIN);
-    g1.set_val(7, 7, 6, CellType::ORIGIN);
-
-    g1.set_val(8, 2, 3, CellType::ORIGIN);
-    g1.set_val(8, 6, 9, CellType::ORIGIN);
-    g1.set_val(8, 8, 8, CellType::ORIGIN);
-
-    g1.set_val(9, 3, 2, CellType::ORIGIN);
-    g1.set_val(9, 9, 1, CellType::ORIGIN);
-
+    let mut v = Vec::new();
+    v.push("1,?,?,?,?,?,?,?,2".to_string());
+    v.push("?,9,?,4,?,?,?,5,?".to_string());
+    v.push("?,?,6,?,?,?,7,?,?".to_string());
+    v.push("?,5,?,9,?,3,?,?,?".to_string());
+    v.push("?,?,?,?,7,?,?,?,?".to_string());
+    v.push("?,?,?,8,5,?,?,4,?".to_string());
+    v.push("7,?,?,?,?,?,6,?,?".to_string());
+    v.push("?,3,?,?,?,9,?,8,?".to_string());
+    v.push("?,?,2,?,?,?,?,?,1".to_string());
+    let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
-    /*
-    -------------------------------
-    | 1  ?  ? | ?  ?  ? | ?  ?  2 |
-    | ?  9  ? | 4  ?  ? | ?  5  ? |
-    | ?  ?  6 | ?  ?  ? | 7  ?  ? |
-    -------------------------------
-    | ?  5  ? | 9  ?  3 | ?  ?  ? |
-    | ?  ?  ? | ?  7  ? | ?  ?  ? |
-    | ?  ?  ? | 8  5  ? | ?  4  ? |
-    -------------------------------
-    | 7  ?  ? | ?  ?  ? | 6  ?  ? |
-    | ?  3  ? | ?  ?  9 | ?  8  ? |
-    | ?  ?  2 | ?  ?  ? | ?  ?  1 |
-    -------------------------------
-    Solved in 526 steps (96 guesses, 87 wrongs and 9 goods)
-    Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
-    -------------------------------
-    | 1  7  4 | 3  8  5 | 9  6  2 |
-    | 2  9  3 | 4  6  7 | 1  5  8 |
-    | 5  8  6 | 1  9  2 | 7  3  4 |
-    -------------------------------
-    | 4  5  1 | 9  2  3 | 8  7  6 |
-    | 9  2  8 | 6  7  4 | 3  1  5 |
-    | 3  6  7 | 8  5  1 | 2  4  9 |
-    -------------------------------
-    | 7  1  9 | 5  4  8 | 6  2  3 |
-    | 6  3  5 | 2  1  9 | 4  8  7 |
-    | 8  4  2 | 7  3  6 | 5  9  1 |
-    -------------------------------
-    */
+    /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
+    -------------------------------                           -------------------------------
+    | 1  ?  ? | ?  ?  ? | ?  ?  2 |                           | 1  7  4 | 3  8  5 | 9  6  2 |
+    | ?  9  ? | 4  ?  ? | ?  5  ? |                           | 2  9  3 | 4  6  7 | 1  5  8 |
+    | ?  ?  6 | ?  ?  ? | 7  ?  ? |                           | 5  8  6 | 1  9  2 | 7  3  4 |
+    -------------------------------                           -------------------------------
+    | ?  5  ? | 9  ?  3 | ?  ?  ? |                           | 4  5  1 | 9  2  3 | 8  7  6 |
+    | ?  ?  ? | ?  7  ? | ?  ?  ? |                           | 9  2  8 | 6  7  4 | 3  1  5 |
+    | ?  ?  ? | 8  5  ? | ?  4  ? |                           | 3  6  7 | 8  5  1 | 2  4  9 |
+    -------------------------------                           -------------------------------
+    | 7  ?  ? | ?  ?  ? | 6  ?  ? |                           | 7  1  9 | 5  4  8 | 6  2  3 |
+    | ?  3  ? | ?  ?  9 | ?  8  ? |                           | 6  3  5 | 2  1  9 | 4  8  7 |
+    | ?  ?  2 | ?  ?  ? | ?  ?  1 |                           | 8  4  2 | 7  3  6 | 5  9  1 |
+    -------------------------------                           -------------------------------*/
 }
 
 fn resolve_from_disk(fic: String, debug: bool, display: bool) -> bool {
-    let mut g1 = read(&fic);
+    let mut g1 = read(&fic,debug);
     println!("8->resolution from file {}!", fic);
     resolve(&mut g1, debug, display)
 }
