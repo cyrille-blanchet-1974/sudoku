@@ -18,6 +18,7 @@ use grid::*;
 use read::*;
 use resolver::*;
 use std::io;
+use std::time::SystemTime;
 
 //ask the user and read his answer
 fn read_u8(mess: String) -> Option<u8> {
@@ -113,7 +114,13 @@ pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
     let mut r = Resolver::new();    
     println!("****Initial data for the grid****");
     g.display();
+    let start_elapse = SystemTime::now();
+    //let mut tps = Duration::new(0, 0);
     let res = r.go(g, debug, display);
+    let end = SystemTime::now();
+    let tps = end.duration_since(start_elapse).expect("ERROR computing duration!");
+    println!("Duration={:?}",tps);
+
     println!("****Final data for the grid****");
     g.display();
     g.legend();
@@ -318,6 +325,7 @@ fn test_solving_mindless(debug: bool, display: bool) -> bool {
     let mut g1 = from_vec(v,debug);
     resolve(&mut g1, debug, display)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
+    chomebook:Duration=904.471428ms
     -------------------------------                           -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  2 |                           | 1  7  4 | 3  8  5 | 9  6  2 |
     | ?  9  ? | 4  ?  ? | ?  5  ? |                           | 2  9  3 | 4  6  7 | 1  5  8 |
