@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 
-pub fn read(fic: &str,debug:bool) -> Grid {
+pub fn read(fic: &str, debug: bool) -> Grid {
     let mut g = Grid::default();
     g.set_debug(debug);
     let input = File::open(&fic);
@@ -17,7 +17,7 @@ pub fn read(fic: &str,debug:bool) -> Grid {
             for line in buffered.lines() {
                 if let Ok(l) = line {
                     g.compute_line(line_number, &l);
-                } 
+                }
                 line_number += 1;
             }
         }
@@ -25,11 +25,11 @@ pub fn read(fic: &str,debug:bool) -> Grid {
     g
 }
 
-pub fn from_vec(data: Vec<String>,debug:bool) -> Grid {
-    let mut g = Grid::default();    
+pub fn from_vec(data: Vec<String>, debug: bool) -> Grid {
+    let mut g = Grid::default();
     g.set_debug(debug);
     let mut line_number = 1;
-    for d in data{
+    for d in data {
         g.compute_line(line_number, &d);
         line_number += 1;
     }

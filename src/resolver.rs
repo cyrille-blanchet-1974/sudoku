@@ -17,10 +17,16 @@ pub struct Resolver {
     nblvl4ko: u32,
     nblvl9guess: u32,
     nblvl9wrongguess: u32,
+    resolver1: ResolverLvl1,
+    resolver2: ResolverLvl2,
+    resolver3: ResolverLvl3,
+    resolver4: ResolverLvl4,
+    debug: bool,
+    display: bool,
 }
 
 impl Resolver {
-    pub fn new() -> Resolver {
+    pub fn new(debug: bool, display: bool) -> Resolver {
         Resolver {
             step: 1,
             nblvl1: 0,
@@ -30,9 +36,15 @@ impl Resolver {
             nblvl3: 0,
             nblvl3ko: 0,
             nblvl4: 0,
-            nblvl4ko: 0,            
+            nblvl4ko: 0,
             nblvl9guess: 0,
             nblvl9wrongguess: 0,
+            resolver1: ResolverLvl1::new(),
+            resolver2: ResolverLvl2::new(),
+            resolver3: ResolverLvl3::new(),
+            resolver4: ResolverLvl4::new(),
+            debug,
+            display,
         }
     }
 
@@ -59,25 +71,31 @@ impl Resolver {
         );
     }
 
-    pub fn go(&mut self, g: &mut Grid, debug: bool, display: bool) -> bool {
-        if display {
+    pub fn go(&mut self, g: &mut Grid) -> bool {
+        self.gos(g, "".to_string())
+    }
+    pub fn gos(&mut self, g: &mut Grid, spacer: String) -> bool {
+        if self.display {
             g.display();
         }
         //if already resolved...
         if !g.is_resolved() {
             //loop until no more to solve
             loop {
-                if debug {
+                if self.debug {
                     println!("--------------------step {}--------------------", self.step);
                 }
-                if !self.resolve(g,debug) {
+                if !self.resolve(g, "".to_string()) {
                     break;
                 }
-                if display {
+                if self.display {
                     g.display();
                 }
+                if self.debug {
+                    g.display_lefts();
+                }
                 if !g.is_valid() {
-                    if debug {
+                    if self.debug {
                         println!("Error in the grid!");
                     }
                     return false;
@@ -86,10 +104,10 @@ impl Resolver {
         }
         let res = g.is_resolved();
         if !res {
-            return self.resolve_lvl9(g, debug, display);
+            return self.resolve_lvl9(g, spacer);
         }
-        if display {
-            g.display();            
+        if self.display {
+            g.display();
         }
         if !res {
             g.debug();
@@ -97,160 +115,101 @@ impl Resolver {
         res
     }
 
-    fn resolve_lvl9(&mut self, g: &mut Grid, debug: bool, display: bool) -> bool {
+    fn resolve_lvl9(&mut self, g: &mut Grid, spacer: String) -> bool {
         //let run level 9 -> guesses
         //first made a copy of
         let mut sav = g.clone();
         let sav_step = self.step;
         self.nblvl9guess += 1;
         //second find a unsolved cell
-        match sav.get_first_unsolved() {
+        match sav.get_a_guess() {
             None => {
                 println!("Strange error: grid not solved by with no unsolved cell (or unsoved cell with no possibles values)");
                 false
             }
             Some(val) => {
+                let cell: &mut Cell = &mut (g.get_cell(val));
+                let guess = sav.less_used(cell.get_possibles());
+                let line = cell.get_line();
+                let column = cell.get_column();
                 //on the saved grid, let try this value on the cell
-                if debug {
-                    println!("Lvl9-> try value {} on cell l:{}/c:{}", val.2, val.0, val.1);
+                if self.debug {
+                    println!(
+                        "{}Lvl9-> try value {} on cell l:{}/c:{}",
+                        spacer, line, column, guess
+                    );
                 }
+                let mut s = String::new();
+                s.push_str(&spacer);
+                s.push_str("___");
                 /*if display && debug {
                     g.debug();
                 }
                 if display && debug {
                     sav.debug();
                 }*/
-                sav.set_val(val.0, val.1, val.2, CellType::GUESS);
-                if self.go(&mut sav, debug, display) {
+                sav.set_val(line, column, guess, CellType::GUESS);
+                if self.gos(&mut sav, s.clone()) {
                     //we found the solution
                     g.copy_from(sav);
                     true
                 } else {
-                    if debug {
+                    if self.debug {
                         println!(
-                            "Lvl9-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid (from step {})",
-                            val.2, val.0, val.1,sav_step
+                            "{}Lvl9-> wrong guess so value {} is not possible for on cell l:{}/c:{} -> restoring previous grid (from step {})",
+                            spacer,guess, line, column,sav_step
                         );
                     }
                     self.nblvl9wrongguess += 1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
-                    g.remove_a_possible(val.0, val.1, val.2);
-                    self.go(g, debug, display)
+                    g.remove_a_possible(line, column, guess);
+                    self.gos(g, s)
                 }
             }
         }
     }
-/*
-    pub fn resolve(&mut self, g: &mut Grid, debug: bool) -> bool {
-        loop{
-            let mut l1 = ResolverLvl1::new(debug);
-            let res1 = l1.resolve(g);
-            print!("L1");
-            self.nblvl1 += 1;
-            if !res1 {
-                self.nblvl1ko += 1;
-            }
-            if !g.something_has_some_change() {
-                loop{
-                    let mut l2 = ResolverLvl2::new(debug);
-                    let res2 = l2.resolve(g);
-                    print!("L2");
-                    self.nblvl2 += 1;
-                    if !res2 {
-                        self.nblvl2ko += 1;
-                    }
-                    if !g.something_has_some_change() {
-                        loop{  
-                            let mut l3 = ResolverLvl3::new(debug);
-                            let res3 = l3.resolve(g);
-                            print!("L3");
-                            self.nblvl3 += 1;
-                            if !res3 {
-                                self.nblvl3ko += 1;
-                            }
-                            if !g.something_has_some_change() {
-                                let mut l4 = ResolverLvl4::new(debug);
-                                let res4 = l4.resolve(g);
-                                print!("L4");
-                                self.nblvl4 += 1;
-                                if !res4 {
-                                    self.nblvl4ko += 1;
-                                }
-                                if !g.something_has_some_change() {
-                                    break;
-                                }                        
-                            }//l3 found nothing                           
-                        }//loop L3
-                    }//l2 found nothing
-                    if !g.something_has_some_change() {
-                        break;
-                    }                    
-                }//loop L2
-            }//L1 found nothing
-            if !g.something_has_some_change() {
-                break;
-            }                    
-        }//lopp L1
-        false
-    }*/
-    pub fn resolve(&mut self, g: &mut Grid, debug: bool) -> bool {
+
+    pub fn resolve(&mut self, g: &mut Grid, space: String) -> bool {
         self.step += 1;
         //try 3 first type of resolution
         //only solution when removing founds of the same line columnand square
-        let mut l1 = ResolverLvl1::new(debug);
-        let res1 = l1.resolve(g);
+        let res1 = self.resolver1.resolve(g);
         self.nblvl1 += 1;
         if !res1 {
             self.nblvl1ko += 1;
+        } else if self.debug {
+            let trc = self.resolver1.get_trace();
+            println!("{}Level1 => {}", space, trc);
         }
-        /*if g.something_has_some_change() || res1{
-            println!("lvl1 found something");
-            if res1 {
-                println!("lvl1 returned something");
-            }
-        }*/
         //value fount in two other line and two other column of a square
-        let mut l2 = ResolverLvl2::new(debug);
-        let res2 = l2.resolve(g);
+        let res2 = self.resolver2.resolve(g);
         self.nblvl2 += 1;
         if !res2 {
             self.nblvl2ko += 1;
+        } else if self.debug {
+            let trc = self.resolver2.get_trace();
+            println!("{}Level2 => {}", space, trc);
         }
-        /*if g.something_has_some_change() || res2{
-            println!("lvl2 found something");
-            if res2 {
-                println!("lvl2 returned something");
-            }
-        }*/
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
-        let mut l3 = ResolverLvl3::new(debug);
-        let res3 = l3.resolve(g);
+        let res3 = self.resolver3.resolve(g);
         self.nblvl3 += 1;
         if !res3 {
             self.nblvl3ko += 1;
+        } else if self.debug {
+            let trc = self.resolver3.get_trace();
+            println!("{}Level3 => {}", space, trc);
         }
-        /*if g.something_has_some_change() || res3{
-            println!("lvl3 found something");
-            if res3 {
-                println!("lvl3 returned something");
-            }
-        }*/
         //x-wing
-        let mut l4 = ResolverLvl4::new(debug);
-        let res4 = l4.resolve(g);
+        let res4 = self.resolver4.resolve(g);
         self.nblvl4 += 1;
         if !res4 {
             self.nblvl4ko += 1;
+        } else if self.debug {
+            let trc = self.resolver4.get_trace();
+            println!("{}Level4 => {}", space, trc);
         }
-        /*if g.something_has_some_change() || res4{
-            println!("lvl4 found something");
-            if res4 {
-                println!("lvl4 returned something");
-            }
-        }
-        res1 || res2 || res3 || res4*/
         g.something_has_some_change()
     }
 }

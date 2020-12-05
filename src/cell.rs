@@ -9,20 +9,23 @@ pub enum CellType {
     ORIGIN,
     FOUND,
     GUESS,
+    XWING,
 }
 /*
 UNKNOWN -> Value not yet  found,
 ORIGIN  -> Value given at start
 FOUND   -> Value found by calculation
 GUESS   -> possible value but not sure yet
+XWING   -> cell member of a X-wing (see lvl4)
 */
 impl CellType {
     pub fn get_value(self) -> u8 {
         match self {
-            CellType::UNKNOWN=>1,
-            CellType::ORIGIN=>2,
-            CellType::FOUND=>3,
-            CellType::GUESS=>4,
+            CellType::UNKNOWN => 1,
+            CellType::ORIGIN => 2,
+            CellType::FOUND => 3,
+            CellType::GUESS => 4,
+            CellType::XWING => 5,
         }
     }
 }
@@ -40,26 +43,26 @@ pub struct Cell {
     possibles: Vec<bool>, //possibles values of the cell
     answer: u8,           //value of the cell when solved
     cell_type: CellType,  //type of value
-    debug : bool,
-    just_resolved:bool,
-    possible_removed:bool,
+    debug: bool,
+    just_resolved: bool,
+    possible_removed: bool,
 }
 
 impl Cell {
     /**
      * return trus if we solve the cell or removed at least a possible valur since last call
      */
-    pub fn something_has_some_change(&mut self)->bool{
+    pub fn something_has_some_change(&mut self) -> bool {
         let res = self.just_resolved || self.possible_removed;
-        self.just_resolved=false;
-        self.possible_removed=false;
+        self.just_resolved = false;
+        self.possible_removed = false;
         res
     }
-    pub fn set_debug(&mut self,debug :bool){
-        self.debug=debug;
-    }    
+    pub fn set_debug(&mut self, debug: bool) {
+        self.debug = debug;
+    }
     //construct a cell giving his position in the grid
-    pub fn new(pos: usize,debug : bool) -> Cell {
+    pub fn new(pos: usize, debug: bool) -> Cell {
         //add all possibles
         let mut possibles = Vec::new();
         for _i in 0..MAX {
@@ -79,8 +82,8 @@ impl Cell {
             answer: 0,
             cell_type: CellType::UNKNOWN,
             debug,
-            just_resolved:false,
-            possible_removed:false,
+            just_resolved: false,
+            possible_removed: false,
         }
     }
 
@@ -135,7 +138,7 @@ impl Cell {
             //if only one possible left
             self.answer = val; //and we got our answer
             self.cell_type = CellType::FOUND;
-            self.just_resolved=true;
+            self.just_resolved = true;
             return true;
         }
         false
@@ -158,8 +161,8 @@ impl Cell {
      * remove a value from the possibles
      */
     fn remove_a_possible(&mut self, val: usize) {
-        if self.possibles[val - 1]{
-            self.possible_removed=true;
+        if self.possibles[val - 1] {
+            self.possible_removed = true;
         }
         self.possibles[val - 1] = false;
     }
@@ -229,8 +232,8 @@ impl Cell {
         //set the answer
         self.answer = val;
         self.cell_type = t;
-        if t == CellType::FOUND{
-            self.just_resolved=true;
+        if t == CellType::FOUND {
+            self.just_resolved = true;
         }
     }
 
@@ -239,7 +242,10 @@ impl Cell {
     */
     pub fn debug(&mut self) -> bool {
         if self.is_resolved() {
-            print!("  Cell:{} is resolves. Value:{}", self.position, self.answer);
+            print!(
+                "  Cell:{} is resolves. Value:{}",
+                self.position, self.answer
+            );
             return false;
         }
         let mut poss = Vec::new();
@@ -257,7 +263,7 @@ impl Cell {
 
 #[test]
 fn possible_test() {
-    let mut c = Cell::new(1,false);
+    let mut c = Cell::new(1, false);
     for i in 1..MAX + 1 {
         let pos = i.try_into().unwrap();
         assert_eq!(true, c.is_a_possible(pos));
@@ -268,7 +274,7 @@ fn possible_test() {
 
 #[test]
 fn resolution_test() {
-    let mut c = Cell::new(1,false);
+    let mut c = Cell::new(1, false);
     assert_eq!(false, c.is_resolved());
     assert_eq!(None, c.get_answer());
     for v in 1..MAX {
@@ -293,16 +299,16 @@ impl Clone for Cell {
             possibles: p,
             answer: self.answer,
             cell_type: self.cell_type,
-            debug : self.debug,
-            just_resolved:self.just_resolved,
-            possible_removed:self.possible_removed,            
+            debug: self.debug,
+            just_resolved: self.just_resolved,
+            possible_removed: self.possible_removed,
         }
     }
 }
 
 #[test]
 fn clone_cell_test() {
-    let mut ori = Cell::new(1,false);
+    let mut ori = Cell::new(1, false);
     ori.remove_a_possible(5);
     ori.debug();
     let mut copy = ori.clone();

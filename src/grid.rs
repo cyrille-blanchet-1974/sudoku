@@ -1,4 +1,5 @@
 use super::accessor::*;
+use super::cell::CellType;
 use super::cell::*;
 use super::column::*;
 use super::constant::*;
@@ -7,7 +8,6 @@ use super::square::*;
 use std::convert::TryInto;
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-use super::cell::CellType;
 
 //Grid => 81 cells
 pub struct Grid {
@@ -17,7 +17,7 @@ pub struct Grid {
     columns: Vec<Column>,
     squares: Vec<Square>,
     resolved: bool,
-    debug : bool,
+    debug: bool,
 }
 
 impl Default for Grid {
@@ -28,7 +28,7 @@ impl Default for Grid {
         let mut cells = Vec::new();
         //construct all cells
         for i in 0..GRIDSIZE {
-            cells.push(Cell::new(i.try_into().unwrap(),false));
+            cells.push(Cell::new(i.try_into().unwrap(), false));
         }
         let acc = Accessor::new();
         let mut lines = Vec::new();
@@ -54,7 +54,7 @@ impl Default for Grid {
             columns,
             squares,
             resolved: false,
-            debug:false,
+            debug: false,
         }
     }
 }
@@ -62,27 +62,67 @@ impl Default for Grid {
 //methods to update Grid struct
 impl Grid {
     /**
+     * how many cells not found for a given value
+     */
+    fn get_lefts(&mut self) -> Vec<u8> {
+        //number of cell lefts for a value
+        let mut lefts = Vec::new();
+        for _i in 0..MAX {
+            lefts.push(MAX);
+        }
+        for i in 0..GRIDSIZE {
+            let pos: usize = i.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.get_cell(pos));
+            match cell.get_answer() {
+                None => {}
+                Some(x) => {
+                    let idx: usize = (x - 1).try_into().unwrap();
+                    lefts[idx] -= 1;
+                }
+            }
+        }
+        lefts
+    }
+
+    /**
+     * for a list of possible values in parameter
+     * return the one with the more positions founds (or less positions not found)
+     */
+    pub fn less_used(&mut self, possibles: Vec<u8>) -> u8 {
+        //val/nb
+        let mut res = (0, 99);
+        let lefts = self.get_lefts();
+        for p in possibles {
+            let idx: usize = (p - 1).try_into().unwrap();
+            if lefts[idx] < res.1 {
+                res = (p, lefts[idx])
+            }
+        }
+        res.0
+    }
+
+    /**
      * return trus if we solve the cell or removed at least a possible valur since last call
      */
-    pub fn something_has_some_change(&mut self)->bool{
+    pub fn something_has_some_change(&mut self) -> bool {
         let mut res = false;
         for i in 0..GRIDSIZE {
-            let pos:usize = i.try_into().unwrap();
+            let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
-            if cell.something_has_some_change(){
+            if cell.something_has_some_change() {
                 res = true;
             }
             //continue to all cells to reset bools
-        }        
+        }
         res
     }
-    pub fn set_debug(&mut self,debug :bool){
-        self.debug=debug;
+    pub fn set_debug(&mut self, debug: bool) {
+        self.debug = debug;
         for i in 0..GRIDSIZE {
-            let pos:usize = i.try_into().unwrap();
+            let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             cell.set_debug(debug);
-        }        
+        }
     }
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
@@ -187,32 +227,56 @@ impl Grid {
     }
 
     /**
-     * get first unsolved cell (in fact fist with the less possible values)
-     * return a tuple containing (line,column,value) in an Option
+     * get a cell candidate to guessing
+     * if posible a cell part of a xing else on with the possibles
+     * return cell position in an Option
      */
-    pub fn get_first_unsolved(&mut self) -> Option<(u8, u8, u8)> {
-        let mut potential = (0, 0, 0, 999); //line/column/value/nb possibles
-                                            //find a cell not resolved
+    pub fn get_a_guess(&mut self) -> Option<usize> {
+        match self.get_first_xwing() {
+            Some(x) => Some(x),
+            None => match self.get_first_unsolved() {
+                Some(x) => Some(x),
+                None => None,
+            },
+        }
+    }
+    /**
+     * get first xwing cell if exists
+     * return cell position in an Option
+     */
+    pub fn get_first_xwing(&mut self) -> Option<usize> {
+        //if a xwing exist return if
+        for pos in 0..GRIDSIZE {
+            let p: usize = pos.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[p]);
+            if !cell.is_resolved() && cell.get_type() == CellType::XWING {
+                return Some(p);
+            }
+        }
+        None
+    }
+
+    /**
+     * get first unsolved cell (in fact first with the less possible values)
+     * return cell position in an Option
+     */
+    pub fn get_first_unsolved(&mut self) -> Option<usize> {
+        let mut potential = (0, 999); //position/nb possibles
+                                      //find a cell not resolved
         for pos in 0..GRIDSIZE {
             let p: usize = pos.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() {
                 //and return first of its possibles
                 let poss = cell.get_possibles();
-                match poss.get(0) {
-                    None => continue, //seems strange that an unsolved cell has no possibles values...
-                    Some(x) => {
-                        //if new has less possible than previous we prefer this
-                        if poss.len() < potential.3 {
-                            potential = (cell.get_line(), cell.get_column(), *x, poss.len())
-                        }
-                    }
-                };
+                if poss.len() < potential.1 {
+                    potential = (p, poss.len())
+                }
             }
         }
         //if found ar least one
-        if potential.3 != 999 {
-            Some((potential.0, potential.1, potential.2))
+        if potential.1 != 999 {
+            Some(potential.0)
         } else {
             None
         }
@@ -250,7 +314,7 @@ impl Grid {
     /**
      * Check in a set of cells if a value is present more than one time
      * */
-     pub fn is_valid_set(&self, set: Vec<u8>, text: String) -> bool {
+    pub fn is_valid_set(&self, set: Vec<u8>, text: String) -> bool {
         let mut count = Vec::new();
         for _i in 0..MAX {
             count.push(0);
@@ -286,7 +350,7 @@ impl Grid {
 
 //display and debug methods
 impl Grid {
-    fn colorwrite(&self, ct : CellType, st: String){
+    fn colorwrite(&self, ct: CellType, st: String) {
         let mut stdout = StandardStream::stdout(ColorChoice::Always);
         //set color for cell type
         match ct {
@@ -318,27 +382,36 @@ impl Grid {
                         .set_fg(Some(Color::White)),
                 )
                 .unwrap(),
+            CellType::XWING => stdout
+                .set_color(
+                    ColorSpec::new()
+                        .set_bg(Some(Color::White))
+                        .set_fg(Some(Color::Black)),
+                )
+                .unwrap(),
         }
         //write
         write!(&mut stdout, " {} ", st).unwrap();
         //put back colors to black and white
         stdout
-        .set_color(
-            ColorSpec::new()
-                .set_bg(Some(Color::Black))
-                .set_fg(Some(Color::White)),
-        )
-        .unwrap();
+            .set_color(
+                ColorSpec::new()
+                    .set_bg(Some(Color::Black))
+                    .set_fg(Some(Color::White)),
+            )
+            .unwrap();
     }
-    pub fn legend(&self){
+    pub fn legend(&self) {
         print!("Legend: ");
-        self.colorwrite(CellType::FOUND,"Found".to_string());
+        self.colorwrite(CellType::FOUND, "Found".to_string());
         print!(" ");
-        self.colorwrite(CellType::GUESS,"Guess".to_string());
+        self.colorwrite(CellType::GUESS, "Guess".to_string());
         print!(" ");
-        self.colorwrite(CellType::ORIGIN,"Origin".to_string());
+        self.colorwrite(CellType::ORIGIN, "Origin".to_string());
         print!(" ");
-        self.colorwrite(CellType::UNKNOWN,"Unknown".to_string());
+        self.colorwrite(CellType::UNKNOWN, "Unknown".to_string());
+        print!(" ");
+        self.colorwrite(CellType::XWING, "Xwing".to_string());
         println!();
     }
 
@@ -372,7 +445,7 @@ impl Grid {
                         write!(&mut stdout, " ? ").unwrap();
                     }
                     Some(x) => {
-                        self.colorwrite(cell.get_type(),x.to_string());
+                        self.colorwrite(cell.get_type(), x.to_string());
                     }
                 };
                 stdout
@@ -394,6 +467,17 @@ impl Grid {
                 writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
             }
         }
+        self.display_lefts();
+    }
+
+    pub fn display_lefts(&mut self) {
+        let lefts = self.get_lefts();
+        print!("Remains:");
+        for i in 0..MAX {
+            let idx: usize = i.try_into().unwrap();
+            print!(" {}=>{}", i + 1, lefts[idx]);
+        }
+        println!();
     }
 
     /**
@@ -421,7 +505,7 @@ impl Grid {
 }
 
 impl Grid {
-    pub fn copy_from(&mut self,g :Grid) {
+    pub fn copy_from(&mut self, g: Grid) {
         self.cells.clear();
         for v in g.cells {
             self.cells.push(v.clone());
@@ -466,8 +550,8 @@ impl Clone for Grid {
             columns,
             squares,
             resolved: self.resolved,
-            debug:self.debug,
-        }        
+            debug: self.debug,
+        }
     }
 }
 
@@ -615,7 +699,7 @@ fn clone_grid_test() {
     assert_ne!(ori.get_resolved(), copy.get_resolved());
 }
 
-//methods to fill grid 
+//methods to fill grid
 impl Grid {
     pub fn compute_line(&mut self, line_number: u8, l: &str) {
         for (col, part) in l.split(',').enumerate() {

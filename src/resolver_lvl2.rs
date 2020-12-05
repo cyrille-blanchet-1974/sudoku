@@ -4,16 +4,23 @@ use super::constant::*;
 use super::grid::*;
 
 pub struct ResolverLvl2 {
-    debug : bool,
-    trace : String,
+    trace: String,
 }
 
 impl ResolverLvl2 {
-    pub fn new(debug : bool) -> ResolverLvl2 {
+    pub fn new() -> ResolverLvl2 {
         ResolverLvl2 {
-            debug,
-            trace : String::new(),
+            trace: String::new(),
         }
+    }
+
+    /*
+        get a string containg what was found
+    */
+    pub fn get_trace(&self) -> String {
+        let mut output = String::new();
+        output.push_str(&self.trace);
+        output
     }
 
     /*
@@ -37,9 +44,6 @@ impl ResolverLvl2 {
                     resolve_some = true
                 }
             }
-        }
-        if self.debug && self.trace != "" {
-            println!("{}",self.trace);
         }
         resolve_some
     }
@@ -98,10 +102,7 @@ impl ResolverLvl2 {
         }
         //at this point only one line and one column unsolved => it is now
         g.set_val(unsolved_line, unsolved_column, value, CellType::FOUND);
-        if self.trace == "" {
-            self.trace = "Lvl2->".to_string();
-        }
-        let trc = format!(" -Found a value {} in cell {} of square {:?} (l:{}/c:{})", value, pos, squ, unsolved_line, unsolved_column);
+        let trc = format!(" {}/{}={}", unsolved_line, unsolved_column, value);
         self.trace.push_str(&trc);
         true
     }
