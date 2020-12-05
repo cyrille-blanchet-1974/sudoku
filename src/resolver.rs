@@ -136,7 +136,7 @@ impl Resolver {
                 if self.debug {
                     println!(
                         "{}Lvl9-> try value {} on cell l:{}/c:{}",
-                        spacer, line, column, guess
+                        spacer, guess, line, column
                     );
                 }
                 let mut s = String::new();

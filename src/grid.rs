@@ -467,7 +467,6 @@ impl Grid {
                 writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
             }
         }
-        self.display_lefts();
     }
 
     pub fn display_lefts(&mut self) {
