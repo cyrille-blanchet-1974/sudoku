@@ -130,6 +130,10 @@ we know were is 1 in squares E & SE -> it is in column 1 and 3 so in square NE i
 -> in square NE the cell at line 3 and column 2 has the value 1 -> Cel N° 25
 
 lvl 3:
+If a value is not in the possible of a line less a cell then the cell has this values
+same for column
+same for square
+
 
 lvl4: x wing to dow
 if a value is present in two columns in only two same lines 
@@ -160,7 +164,9 @@ then it can't be elsewhere in the same columns
 
 lvl 9: try a guess
 when nothing more can be found with levels 0,1,2,3,4
-then we choose a cell with minimum number of possible values
+then we choose a cell and try to guess the value
+if exists Xwing candidates we use them else we use a cell with minimum number of possible values
+from the possibles of this cell we try firts the one which is more present in solved cells
 We try a guess for this cell
 then we run again other levels of resolution
 if at some point we get an error then the guess is bad so we eliminate this value 
@@ -170,10 +176,4 @@ Obviously this is a recursive way of resolution
 
 
 other lvl to find...
-
-We call lvl 0 until ther is no more change
-   Then we call lvl 1 until there is no more change
-then we go back to lvl 0 and 1 until there is no more change
-      Then we call lvl 2 until there is no more change
-then we go back to lvl 0, 1 and 2 until there is no more change
 ....
