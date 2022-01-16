@@ -128,7 +128,7 @@ impl Resolver {
                 false
             }
             Some(val) => {
-                let cell: &mut Cell = &mut (g.get_cell(val));
+                let cell: &mut Cell = g.get_cell(val);
                 let guess = sav.less_used(cell.get_possibles());
                 let line = cell.get_line();
                 let column = cell.get_column();
@@ -148,7 +148,7 @@ impl Resolver {
                 if display && debug {
                     sav.debug();
                 }*/
-                sav.set_val(line, column, guess, CellType::GUESS);
+                sav.set_val(line, column, guess, CellType::Guess);
                 if self.gos(&mut sav, s.clone()) {
                     //we found the solution
                     g.copy_from(sav);

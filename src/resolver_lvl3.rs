@@ -69,7 +69,7 @@ impl ResolverLvl3 {
         //iterate on all cells of the line
         for p in self.acc.get_line(line) {
             let pos: usize = p.try_into().unwrap();
-            let cell: &mut Cell = &mut (g.get_cell(pos));
+            let cell: &mut Cell = g.get_cell(pos);
             if cell.is_a_possible(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
@@ -83,7 +83,7 @@ impl ResolverLvl3 {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v, CellType::FOUND);
+            g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" {}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;
@@ -100,7 +100,7 @@ impl ResolverLvl3 {
         //iterate on all cells of the line
         for p in self.acc.get_column(column) {
             let pos: usize = p.try_into().unwrap();
-            let cell: &mut Cell = &mut (g.get_cell(pos));
+            let cell: &mut Cell = g.get_cell(pos);
             if cell.is_a_possible(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
@@ -114,7 +114,7 @@ impl ResolverLvl3 {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v, CellType::FOUND);
+            g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" {}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;
@@ -131,7 +131,7 @@ impl ResolverLvl3 {
         //iterate on all cells of the line
         for p in self.acc.get_square(square) {
             let pos: usize = p.try_into().unwrap();
-            let cell: &mut Cell = &mut (g.get_cell(pos));
+            let cell: &mut Cell = g.get_cell(pos);
             if cell.is_a_possible(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
@@ -145,7 +145,7 @@ impl ResolverLvl3 {
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
-            g.set_val(coord.0, coord.1, v, CellType::FOUND);
+            g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" {}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;

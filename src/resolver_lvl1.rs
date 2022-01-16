@@ -54,7 +54,7 @@ impl ResolverLvl1 {
     fn resolve_val(&mut self, g: &mut Grid, p: u8) {
         //get value of the received cell
         let pos: usize = p.try_into().unwrap();
-        let cell: &mut Cell = &mut (g.get_cell(pos));
+        let cell: &mut Cell = g.get_cell(pos);
         let val = match cell.get_answer() {
             None => return, //if not solve...nothing to do...but should not have been called
             Some(x) => x,
@@ -65,7 +65,7 @@ impl ResolverLvl1 {
         //remove the value to all the others
         for c in clean {
             let cc: usize = c.try_into().unwrap();
-            let cell: &mut Cell = &mut (g.get_cell(cc));
+            let cell: &mut Cell = g.get_cell(cc);
             if cell.is_resolved() {
                 continue;
             }
@@ -77,7 +77,7 @@ impl ResolverLvl1 {
                     let line = cell.get_line();
                     let trc = format!(" {}/{}={}", line, col, x);
                     self.trace.push_str(&trc);
-                    g.set_val(line, col, x, CellType::FOUND);
+                    g.set_val(line, col, x, CellType::Found);
                 }
             }
         }
@@ -90,7 +90,7 @@ impl ResolverLvl1 {
     fn get_to_clean(&self, g: &mut Grid, p: u8) -> Vec<u8> {
         let mut res = Vec::new();
         let pos: usize = p.try_into().unwrap();
-        let cell: &Cell = &(g.get_cell(pos));
+        let cell: &Cell = g.get_cell(pos);
         let lin = self.acc.get_line(cell.get_line());
         for l in lin {
             if l != p {

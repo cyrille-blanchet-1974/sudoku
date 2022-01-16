@@ -14,7 +14,7 @@ pub enum Cardinal {
     NW,
     SE,
     SW,
-    UNKNOWN,
+    Unknown,
 }
 impl Cardinal {
     pub fn get_value(self) -> u8 {
@@ -28,7 +28,7 @@ impl Cardinal {
             Cardinal::SW => 7,
             Cardinal::S => 8,
             Cardinal::SE => 9,
-            Cardinal::UNKNOWN => 0,
+            Cardinal::Unknown => 0,
         }
     }
 
@@ -43,7 +43,7 @@ impl Cardinal {
             7 => Cardinal::SW,
             8 => Cardinal::S,
             9 => Cardinal::SE,
-            _ => Cardinal::UNKNOWN, //default
+            _ => Cardinal::Unknown, //default
         }
     }
     /*
@@ -60,7 +60,7 @@ impl Cardinal {
             Cardinal::SW => ((1, 7), (3, 9)),
             Cardinal::S => ((4, 7), (6, 9)),
             Cardinal::SE => ((7, 7), (9, 9)),
-            Cardinal::UNKNOWN => ((0, 0), (0, 0)),
+            Cardinal::Unknown => ((0, 0), (0, 0)),
         }
     }
     /*
@@ -77,7 +77,7 @@ impl Cardinal {
             Cardinal::SW => vec![Cardinal::NW, Cardinal::W, Cardinal::S, Cardinal::SE],
             Cardinal::S => vec![Cardinal::SW, Cardinal::SE, Cardinal::C, Cardinal::N],
             Cardinal::SE => vec![Cardinal::SW, Cardinal::S, Cardinal::E, Cardinal::NE],
-            Cardinal::UNKNOWN => Vec::new(),
+            Cardinal::Unknown => Vec::new(),
         }
     }
     /*
@@ -113,7 +113,7 @@ impl Cardinal {
             Cardinal::SW => vec![7, 8, 9],
             Cardinal::S => vec![7, 8, 9],
             Cardinal::SE => vec![7, 8, 9],
-            Cardinal::UNKNOWN => Vec::new(),
+            Cardinal::Unknown => Vec::new(),
         }
     }
     /*
@@ -130,7 +130,7 @@ impl Cardinal {
             Cardinal::E => vec![7, 8, 9],
             Cardinal::NE => vec![7, 8, 9],
             Cardinal::SE => vec![7, 8, 9],
-            Cardinal::UNKNOWN => Vec::new(),
+            Cardinal::Unknown => Vec::new(),
         }
     }
     /*
@@ -147,7 +147,7 @@ impl Cardinal {
             Cardinal::SW => vec![54, 55, 56, 63, 64, 65, 72, 73, 74],
             Cardinal::S => vec![57, 58, 59, 66, 67, 68, 75, 76, 77],
             Cardinal::SE => vec![60, 61, 62, 69, 70, 71, 78, 79, 80],
-            Cardinal::UNKNOWN => Vec::new(),
+            Cardinal::Unknown => Vec::new(),
         }
     }
 }

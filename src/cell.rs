@@ -5,27 +5,27 @@ use std::convert::TryInto;
 //type of the cell
 #[derive(Debug, Copy, Clone)]
 pub enum CellType {
-    UNKNOWN,
-    ORIGIN,
-    FOUND,
-    GUESS,
-    XWING,
+    Unknown,
+    Origin,
+    Found,
+    Guess,
+    Xwing,
 }
 /*
-UNKNOWN -> Value not yet  found,
-ORIGIN  -> Value given at start
-FOUND   -> Value found by calculation
-GUESS   -> possible value but not sure yet
-XWING   -> cell member of a X-wing (see lvl4)
+Unknown -> Value not yet  found,
+Origin  -> Value given at start
+Found   -> Value found by calculation
+Guess   -> possible value but not sure yet
+Xwing   -> cell member of a X-wing (see lvl4)
 */
 impl CellType {
     pub fn get_value(self) -> u8 {
         match self {
-            CellType::UNKNOWN => 1,
-            CellType::ORIGIN => 2,
-            CellType::FOUND => 3,
-            CellType::GUESS => 4,
-            CellType::XWING => 5,
+            CellType::Unknown => 1,
+            CellType::Origin => 2,
+            CellType::Found => 3,
+            CellType::Guess => 4,
+            CellType::Xwing => 5,
         }
     }
 }
@@ -80,7 +80,7 @@ impl Cell {
             possibles,
             //TODO           hypothesis : 0,
             answer: 0,
-            cell_type: CellType::UNKNOWN,
+            cell_type: CellType::Unknown,
             debug,
             just_resolved: false,
             possible_removed: false,
@@ -137,7 +137,7 @@ impl Cell {
             );*/
             //if only one possible left
             self.answer = val; //and we got our answer
-            self.cell_type = CellType::FOUND;
+            self.cell_type = CellType::Found;
             self.just_resolved = true;
             return true;
         }
@@ -206,7 +206,7 @@ impl Cell {
         res
     }
 
-    //self.cell_type = CellType::FOUND;
+    //self.cell_type = CellType::Found;
 
     /*
      set the value of the cell
@@ -232,7 +232,7 @@ impl Cell {
         //set the answer
         self.answer = val;
         self.cell_type = t;
-        if t == CellType::FOUND {
+        if t == CellType::Found {
             self.just_resolved = true;
         }
     }
@@ -318,6 +318,6 @@ fn clone_cell_test() {
     assert_eq!(ori.get_column(), copy.get_column());
     assert_eq!(ori.get_line(), copy.get_line());
     assert_eq!(ori.get_square(), copy.get_square());
-    ori.set_val(8, CellType::FOUND);
+    ori.set_val(8, CellType::Found);
     assert_ne!(ori.get_possibles(), copy.get_possibles());
 }

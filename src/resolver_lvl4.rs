@@ -58,7 +58,7 @@ impl ResolverLvl4 {
                 let mut p: u32 = 100_000_000;
                 for column in 1..=COLUMNSIZE {
                     let pos = coord_to_pos(line, column);
-                    let cell: &mut Cell = &mut (g.get_cell(pos));
+                    let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
                             None => {}
@@ -123,12 +123,12 @@ impl ResolverLvl4 {
                                     continue;
                                 }
                                 let pos = coord_to_pos(l, c.0.try_into().unwrap());
-                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos = coord_to_pos(l, c.1.try_into().unwrap());
-                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
                                     trouve = true;
                                 }
@@ -154,7 +154,7 @@ impl ResolverLvl4 {
                 let mut p: u32 = 100_000_000;
                 for line in 1..=LINESIZE {
                     let pos = coord_to_pos(line, column);
-                    let cell: &mut Cell = &mut (g.get_cell(pos));
+                    let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
                             None => {}
@@ -219,12 +219,12 @@ impl ResolverLvl4 {
                                     continue;
                                 }
                                 let pos = coord_to_pos(l.0.try_into().unwrap(), c);
-                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos = coord_to_pos(l.1.try_into().unwrap(), c);
-                                let cell: &mut Cell = &mut (g.get_cell(pos));
+                                let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
                                     trouve = true;
                                 }
@@ -239,17 +239,17 @@ impl ResolverLvl4 {
 
     fn set_xwing(&mut self, g: &mut Grid, l1: u8, l2: u8, c1: u8, c2: u8) {
         let pos = coord_to_pos(l1, c1);
-        let cell: &mut Cell = &mut (g.get_cell(pos));
-        cell.set_type(CellType::XWING);
+        let cell: &mut Cell = g.get_cell(pos);
+        cell.set_type(CellType::Xwing);
         let pos = coord_to_pos(l1, c2);
-        let cell: &mut Cell = &mut (g.get_cell(pos));
-        cell.set_type(CellType::XWING);
+        let cell: &mut Cell = g.get_cell(pos);
+        cell.set_type(CellType::Xwing);
         let pos = coord_to_pos(l2, c1);
-        let cell: &mut Cell = &mut (g.get_cell(pos));
-        cell.set_type(CellType::XWING);
+        let cell: &mut Cell = g.get_cell(pos);
+        cell.set_type(CellType::Xwing);
         let pos = coord_to_pos(l2, c2);
-        let cell: &mut Cell = &mut (g.get_cell(pos));
-        cell.set_type(CellType::XWING);
+        let cell: &mut Cell = g.get_cell(pos);
+        cell.set_type(CellType::Xwing);
     }
 
     fn decode(&mut self, d: u32) -> (usize, usize) {
@@ -284,87 +284,87 @@ fn test_decode() {
 #[test]
 fn test_resolve() {
     let mut g = Grid::default();
-    g.set_val(1, 1, 6, CellType::ORIGIN);
-    g.set_val(1, 2, 7, CellType::ORIGIN);
-    g.set_val(1, 3, 9, CellType::ORIGIN);
-    g.set_val(1, 4, 4, CellType::ORIGIN);
-    g.set_val(1, 5, 1, CellType::ORIGIN);
-    g.set_val(1, 6, 8, CellType::ORIGIN);
-    g.set_val(1, 7, 3, CellType::ORIGIN);
-    g.set_val(1, 8, 5, CellType::ORIGIN);
-    g.set_val(1, 9, 2, CellType::ORIGIN);
-    g.set_val(2, 1, 2, CellType::ORIGIN);
-    g.set_val(2, 2, 4, CellType::ORIGIN);
-    g.set_val(2, 3, 4, CellType::ORIGIN);
-    g.set_val(2, 4, 3, CellType::ORIGIN);
-    g.set_val(2, 5, 9, CellType::ORIGIN);
-    g.set_val(2, 6, 5, CellType::ORIGIN);
-    g.set_val(2, 7, 7, CellType::ORIGIN);
-    g.set_val(2, 8, 6, CellType::ORIGIN);
-    g.set_val(2, 9, 1, CellType::ORIGIN);
-    g.set_val(3, 1, 1, CellType::ORIGIN);
-    g.set_val(3, 2, 5, CellType::ORIGIN);
-    g.set_val(3, 3, 3, CellType::ORIGIN);
-    g.set_val(3, 4, 7, CellType::ORIGIN);
-    g.set_val(3, 5, 6, CellType::ORIGIN);
-    g.set_val(3, 6, 2, CellType::ORIGIN);
-    g.set_val(3, 7, 9, CellType::ORIGIN);
-    g.set_val(3, 8, 8, CellType::ORIGIN);
-    g.set_val(3, 9, 4, CellType::ORIGIN);
-    //ori.set_val(4, 1, 1, CellType::ORIGIN);
-    //ori.set_val(4, 2, 1, CellType::ORIGIN);
-    //ori.set_val(4, 3, 1, CellType::ORIGIN);
-    //ori.set_val(4, 4, 1, CellType::ORIGIN);
-    //ori.set_val(4, 5, 1, CellType::ORIGIN);
-    //ori.set_val(4, 6, 1, CellType::ORIGIN);
-    g.set_val(4, 7, 4, CellType::ORIGIN);
-    g.set_val(4, 8, 2, CellType::ORIGIN);
-    //ori.set_val(4, 9, 1, CellType::ORIGIN);
-    g.set_val(5, 1, 7, CellType::ORIGIN);
-    //ori.set_val(5, 2, 1, CellType::ORIGIN);
-    g.set_val(5, 3, 4, CellType::ORIGIN);
-    //ori.set_val(5, 4, 1, CellType::ORIGIN);
-    g.set_val(5, 5, 8, CellType::ORIGIN);
-    g.set_val(5, 6, 1, CellType::ORIGIN);
-    g.set_val(5, 7, 5, CellType::ORIGIN);
-    g.set_val(5, 8, 3, CellType::ORIGIN);
-    g.set_val(5, 9, 6, CellType::ORIGIN);
-    //ori.set_val(6, 1, 1, CellType::ORIGIN);
-    //ori.set_val(6, 2, 1, CellType::ORIGIN);
-    //ori.set_val(6, 3, 1, CellType::ORIGIN);
-    //ori.set_val(6, 4, 1, CellType::ORIGIN);
-    //ori.set_val(6, 5, 1, CellType::ORIGIN);
-    //ori.set_val(6, 6, 1, CellType::ORIGIN);
-    g.set_val(6, 7, 1, CellType::ORIGIN);
-    g.set_val(6, 8, 7, CellType::ORIGIN);
-    //ori.set_val(6, 9, 1, CellType::ORIGIN);
-    g.set_val(7, 1, 5, CellType::ORIGIN);
-    g.set_val(7, 2, 8, CellType::ORIGIN);
-    g.set_val(7, 3, 7, CellType::ORIGIN);
-    g.set_val(7, 4, 1, CellType::ORIGIN);
-    g.set_val(7, 5, 2, CellType::ORIGIN);
-    g.set_val(7, 6, 9, CellType::ORIGIN);
-    g.set_val(7, 7, 6, CellType::ORIGIN);
-    g.set_val(7, 8, 4, CellType::ORIGIN);
-    g.set_val(7, 9, 3, CellType::ORIGIN);
-    g.set_val(8, 1, 4, CellType::ORIGIN);
-    g.set_val(8, 2, 6, CellType::ORIGIN);
-    g.set_val(8, 3, 1, CellType::ORIGIN);
-    g.set_val(8, 4, 8, CellType::ORIGIN);
-    g.set_val(8, 5, 3, CellType::ORIGIN);
-    g.set_val(8, 6, 7, CellType::ORIGIN);
-    g.set_val(8, 7, 2, CellType::ORIGIN);
-    g.set_val(8, 8, 9, CellType::ORIGIN);
-    g.set_val(8, 9, 5, CellType::ORIGIN);
-    g.set_val(9, 1, 3, CellType::ORIGIN);
-    g.set_val(9, 2, 9, CellType::ORIGIN);
-    g.set_val(9, 3, 2, CellType::ORIGIN);
-    g.set_val(9, 4, 6, CellType::ORIGIN);
-    g.set_val(9, 5, 5, CellType::ORIGIN);
-    g.set_val(9, 6, 4, CellType::ORIGIN);
-    g.set_val(9, 7, 8, CellType::ORIGIN);
-    g.set_val(9, 8, 1, CellType::ORIGIN);
-    g.set_val(9, 9, 7, CellType::ORIGIN);
+    g.set_val(1, 1, 6, CellType::Origin);
+    g.set_val(1, 2, 7, CellType::Origin);
+    g.set_val(1, 3, 9, CellType::Origin);
+    g.set_val(1, 4, 4, CellType::Origin);
+    g.set_val(1, 5, 1, CellType::Origin);
+    g.set_val(1, 6, 8, CellType::Origin);
+    g.set_val(1, 7, 3, CellType::Origin);
+    g.set_val(1, 8, 5, CellType::Origin);
+    g.set_val(1, 9, 2, CellType::Origin);
+    g.set_val(2, 1, 2, CellType::Origin);
+    g.set_val(2, 2, 4, CellType::Origin);
+    g.set_val(2, 3, 4, CellType::Origin);
+    g.set_val(2, 4, 3, CellType::Origin);
+    g.set_val(2, 5, 9, CellType::Origin);
+    g.set_val(2, 6, 5, CellType::Origin);
+    g.set_val(2, 7, 7, CellType::Origin);
+    g.set_val(2, 8, 6, CellType::Origin);
+    g.set_val(2, 9, 1, CellType::Origin);
+    g.set_val(3, 1, 1, CellType::Origin);
+    g.set_val(3, 2, 5, CellType::Origin);
+    g.set_val(3, 3, 3, CellType::Origin);
+    g.set_val(3, 4, 7, CellType::Origin);
+    g.set_val(3, 5, 6, CellType::Origin);
+    g.set_val(3, 6, 2, CellType::Origin);
+    g.set_val(3, 7, 9, CellType::Origin);
+    g.set_val(3, 8, 8, CellType::Origin);
+    g.set_val(3, 9, 4, CellType::Origin);
+    //ori.set_val(4, 1, 1, CellType::Origin);
+    //ori.set_val(4, 2, 1, CellType::Origin);
+    //ori.set_val(4, 3, 1, CellType::Origin);
+    //ori.set_val(4, 4, 1, CellType::Origin);
+    //ori.set_val(4, 5, 1, CellType::Origin);
+    //ori.set_val(4, 6, 1, CellType::Origin);
+    g.set_val(4, 7, 4, CellType::Origin);
+    g.set_val(4, 8, 2, CellType::Origin);
+    //ori.set_val(4, 9, 1, CellType::Origin);
+    g.set_val(5, 1, 7, CellType::Origin);
+    //ori.set_val(5, 2, 1, CellType::Origin);
+    g.set_val(5, 3, 4, CellType::Origin);
+    //ori.set_val(5, 4, 1, CellType::Origin);
+    g.set_val(5, 5, 8, CellType::Origin);
+    g.set_val(5, 6, 1, CellType::Origin);
+    g.set_val(5, 7, 5, CellType::Origin);
+    g.set_val(5, 8, 3, CellType::Origin);
+    g.set_val(5, 9, 6, CellType::Origin);
+    //ori.set_val(6, 1, 1, CellType::Origin);
+    //ori.set_val(6, 2, 1, CellType::Origin);
+    //ori.set_val(6, 3, 1, CellType::Origin);
+    //ori.set_val(6, 4, 1, CellType::Origin);
+    //ori.set_val(6, 5, 1, CellType::Origin);
+    //ori.set_val(6, 6, 1, CellType::Origin);
+    g.set_val(6, 7, 1, CellType::Origin);
+    g.set_val(6, 8, 7, CellType::Origin);
+    //ori.set_val(6, 9, 1, CellType::Origin);
+    g.set_val(7, 1, 5, CellType::Origin);
+    g.set_val(7, 2, 8, CellType::Origin);
+    g.set_val(7, 3, 7, CellType::Origin);
+    g.set_val(7, 4, 1, CellType::Origin);
+    g.set_val(7, 5, 2, CellType::Origin);
+    g.set_val(7, 6, 9, CellType::Origin);
+    g.set_val(7, 7, 6, CellType::Origin);
+    g.set_val(7, 8, 4, CellType::Origin);
+    g.set_val(7, 9, 3, CellType::Origin);
+    g.set_val(8, 1, 4, CellType::Origin);
+    g.set_val(8, 2, 6, CellType::Origin);
+    g.set_val(8, 3, 1, CellType::Origin);
+    g.set_val(8, 4, 8, CellType::Origin);
+    g.set_val(8, 5, 3, CellType::Origin);
+    g.set_val(8, 6, 7, CellType::Origin);
+    g.set_val(8, 7, 2, CellType::Origin);
+    g.set_val(8, 8, 9, CellType::Origin);
+    g.set_val(8, 9, 5, CellType::Origin);
+    g.set_val(9, 1, 3, CellType::Origin);
+    g.set_val(9, 2, 9, CellType::Origin);
+    g.set_val(9, 3, 2, CellType::Origin);
+    g.set_val(9, 4, 6, CellType::Origin);
+    g.set_val(9, 5, 5, CellType::Origin);
+    g.set_val(9, 6, 4, CellType::Origin);
+    g.set_val(9, 7, 8, CellType::Origin);
+    g.set_val(9, 8, 1, CellType::Origin);
+    g.set_val(9, 9, 7, CellType::Origin);
 
     let mut l4 = ResolverLvl4::new();
     assert_eq!(false, l4.resolve(&mut g));

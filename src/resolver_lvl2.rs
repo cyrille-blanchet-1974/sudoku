@@ -96,12 +96,12 @@ impl ResolverLvl2 {
         }
         //check if cell is already solved
         let pos: usize = coord_to_pos(unsolved_line, unsolved_column);
-        let cell: &mut Cell = &mut (g.get_cell(pos));
+        let cell: &mut Cell = g.get_cell(pos);
         if cell.is_resolved() {
             return false;
         }
         //at this point only one line and one column unsolved => it is now
-        g.set_val(unsolved_line, unsolved_column, value, CellType::FOUND);
+        g.set_val(unsolved_line, unsolved_column, value, CellType::Found);
         let trc = format!(" {}/{}={}", unsolved_line, unsolved_column, value);
         self.trace.push_str(&trc);
         true

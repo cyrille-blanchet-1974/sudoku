@@ -96,7 +96,7 @@ fn manual(debug: bool, display: bool) {
             resolve(&mut g, debug, display);
             return;
         }
-        g.set_val(l, c, v, CellType::ORIGIN);
+        g.set_val(l, c, v, CellType::Origin);
         println!();
         g.display();
         if !g.is_valid() {
@@ -133,16 +133,18 @@ pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
 
 fn test_solving(debug: bool, display: bool) -> bool {
     println!("1->resolution test!");
-    let mut v = Vec::new();
-    v.push("1,?,?,?,?,?,?,?,?".to_string());
-    v.push("?,?,?,2,1,?,?,?,?".to_string());
-    v.push("?,?,?,?,?,?,3,?,?".to_string());
-    v.push("?,4,?,?,?,?,?,?,?".to_string());
-    v.push("?,?,?,?,5,?,?,1,?".to_string());
-    v.push("?,?,?,?,?,?,?,6,?".to_string());
-    v.push("?,?,7,?,?,?,?,?,?".to_string());
-    v.push("?,?,?,?,?,8,?,?,?".to_string());
-    v.push("?,?,?,?,?,?,1,?,9".to_string());
+    let v = vec![
+        "1,?,?,?,?,?,?,?,?".to_string(),
+        "?,?,?,2,1,?,?,?,?".to_string(),
+        "?,?,?,?,?,?,3,?,?".to_string(),
+        "?,4,?,?,?,?,?,?,?".to_string(),
+        "?,?,?,?,5,?,?,1,?".to_string(),
+        "?,?,?,?,?,?,?,6,?".to_string(),
+        "?,?,7,?,?,?,?,?,?".to_string(),
+        "?,?,?,?,?,8,?,?,?".to_string(),
+        "?,?,?,?,?,?,1,?,9".to_string(),
+    ];
+
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 43 steps (26 guesses all good) // 74 steps 29 guess 1 bad
@@ -164,16 +166,17 @@ fn test_solving(debug: bool, display: bool) -> bool {
 
 fn test_solving_easy(debug: bool, display: bool) -> bool {
     println!("2->resolution easy!");
-    let mut v = Vec::new();
-    v.push("1,?,7,?,?,?,?,?,?".to_string());
-    v.push("?,?,4,2,9,?,?,?,6".to_string());
-    v.push("?,9,?,?,8,7,?,2,4".to_string());
-    v.push("4,7,5,1,?,?,8,6,?".to_string());
-    v.push("?,?,?,?,?,?,?,?,?".to_string());
-    v.push("?,1,3,?,?,8,5,7,9".to_string());
-    v.push("3,4,?,8,6,?,?,1,?".to_string());
-    v.push("7,?,?,?,2,4,6,?,?".to_string());
-    v.push("?,?,?,?,?,?,9,?,5".to_string());
+    let v = vec![
+        "1,?,7,?,?,?,?,?,?".to_string(),
+        "?,?,4,2,9,?,?,?,6".to_string(),
+        "?,9,?,?,8,7,?,2,4".to_string(),
+        "4,7,5,1,?,?,8,6,?".to_string(),
+        "?,?,?,?,?,?,?,?,?".to_string(),
+        "?,1,3,?,?,8,5,7,9".to_string(),
+        "3,4,?,8,6,?,?,1,?".to_string(),
+        "7,?,?,?,2,4,6,?,?".to_string(),
+        "?,?,?,?,?,?,9,?,5".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved 3 steps (0 guess)
@@ -194,16 +197,17 @@ fn test_solving_easy(debug: bool, display: bool) -> bool {
 
 fn test_solving_medium(debug: bool, display: bool) -> bool {
     println!("3->resolution medium!");
-    let mut v = Vec::new();
-    v.push("5,?,?,?,4,?,?,?,?".to_string());
-    v.push("?,8,?,?,?,?,?,2,3".to_string());
-    v.push("?,?,?,8,5,3,7,?,?".to_string());
-    v.push("2,?,?,?,?,?,6,4,?".to_string());
-    v.push("6,?,8,?,?,?,3,?,1".to_string());
-    v.push("?,7,4,?,?,?,?,?,9".to_string());
-    v.push("?,?,1,3,7,2,?,?,?".to_string());
-    v.push("8,?,3,?,?,?,?,1,?".to_string());
-    v.push("?,?,?,?,9,?,?,?,2".to_string());
+    let v = vec![
+        "5,?,?,?,4,?,?,?,?".to_string(),
+        "?,8,?,?,?,?,?,2,3".to_string(),
+        "?,?,?,8,5,3,7,?,?".to_string(),
+        "2,?,?,?,?,?,6,4,?".to_string(),
+        "6,?,8,?,?,?,3,?,1".to_string(),
+        "?,7,4,?,?,?,?,?,9".to_string(),
+        "?,?,1,3,7,2,?,?,?".to_string(),
+        "8,?,3,?,?,?,?,1,?".to_string(),
+        "?,?,?,?,9,?,?,?,2".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 9 steps (2 guesses All goods) // 10 steps 2 guesses 0 bad
@@ -224,16 +228,17 @@ fn test_solving_medium(debug: bool, display: bool) -> bool {
 
 fn test_solving_difficult(debug: bool, display: bool) -> bool {
     println!("4->resolution difficult!");
-    let mut v = Vec::new();
-    v.push("?,?,?,?,?,?,?,?,?".to_string());
-    v.push("5,?,2,9,?,8,?,?,?".to_string());
-    v.push("1,6,?,2,3,?,?,?,?".to_string());
-    v.push("?,?,1,?,?,?,7,?,4".to_string());
-    v.push("?,?,4,?,9,?,3,?,?".to_string());
-    v.push("7,?,8,?,?,?,5,?,?".to_string());
-    v.push("?,?,?,?,8,5,?,6,7".to_string());
-    v.push("?,?,?,6,?,7,8,?,1".to_string());
-    v.push("?,?,?,?,?,?,?,?,?".to_string());
+    let v = vec![
+        "?,?,?,?,?,?,?,?,?".to_string(),
+        "5,?,2,9,?,8,?,?,?".to_string(),
+        "1,6,?,2,3,?,?,?,?".to_string(),
+        "?,?,1,?,?,?,7,?,4".to_string(),
+        "?,?,4,?,9,?,3,?,?".to_string(),
+        "7,?,8,?,?,?,5,?,?".to_string(),
+        "?,?,?,?,8,5,?,6,7".to_string(),
+        "?,?,?,6,?,7,8,?,1".to_string(),
+        "?,?,?,?,?,?,?,?,?".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 9 steps (0 guess)
@@ -254,16 +259,17 @@ fn test_solving_difficult(debug: bool, display: bool) -> bool {
 
 fn test_solving_diabolical(debug: bool, display: bool) -> bool {
     println!("5->resolution diabolic!");
-    let mut v = Vec::new();
-    v.push("?,8,3,9,?,?,?,?,?".to_string());
-    v.push("5,?,?,?,?,?,?,?,?".to_string());
-    v.push("?,?,?,1,4,?,?,2,?".to_string());
-    v.push("3,?,9,?,?,8,6,?,?".to_string());
-    v.push("?,?,7,?,?,?,1,?,?".to_string());
-    v.push("?,?,4,2,?,?,3,?,7".to_string());
-    v.push("?,4,?,?,6,3,?,?,?".to_string());
-    v.push("?,?,?,?,?,?,?,?,5".to_string());
-    v.push("?,?,?,?,?,4,9,3,?".to_string());
+    let v = vec![
+        "?,8,3,9,?,?,?,?,?".to_string(),
+        "5,?,?,?,?,?,?,?,?".to_string(),
+        "?,?,?,1,4,?,?,2,?".to_string(),
+        "3,?,9,?,?,8,6,?,?".to_string(),
+        "?,?,7,?,?,?,1,?,?".to_string(),
+        "?,?,4,2,?,?,3,?,7".to_string(),
+        "?,4,?,?,6,3,?,?,?".to_string(),
+        "?,?,?,?,?,?,?,?,5".to_string(),
+        "?,?,?,?,?,4,9,3,?".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 10 steps (1 good guess)  // 12 steps 1 good guess
@@ -284,16 +290,17 @@ fn test_solving_diabolical(debug: bool, display: bool) -> bool {
 
 fn test_solving_highest(debug: bool, display: bool) -> bool {
     println!("6->resolution highest");
-    let mut v = Vec::new();
-    v.push("1,?,?,?,?,7,?,9,?".to_string());
-    v.push("?,3,?,?,2,?,?,?,8".to_string());
-    v.push("?,?,9,6,?,?,5,?,?".to_string());
-    v.push("?,?,5,3,?,?,9,?,?".to_string());
-    v.push("?,1,?,?,8,?,?,?,2".to_string());
-    v.push("6,?,?,?,?,4,?,?,?".to_string());
-    v.push("3,?,?,?,?,?,?,1,?".to_string());
-    v.push("?,4,?,?,?,?,?,?,7".to_string());
-    v.push("?,?,7,?,?,?,3,?,?".to_string());
+    let v = vec![
+        "1,?,?,?,?,7,?,9,?".to_string(),
+        "?,3,?,?,2,?,?,?,8".to_string(),
+        "?,?,9,6,?,?,5,?,?".to_string(),
+        "?,?,5,3,?,?,9,?,?".to_string(),
+        "?,1,?,?,8,?,?,?,2".to_string(),
+        "6,?,?,?,?,4,?,?,?".to_string(),
+        "3,?,?,?,?,?,?,1,?".to_string(),
+        "?,4,?,?,?,?,?,?,7".to_string(),
+        "?,?,7,?,?,?,3,?,?".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 46 steps (11 guesses, 6 wrongs and 5 goods)  //132 steps  25 guess  19 bads
@@ -314,16 +321,17 @@ fn test_solving_highest(debug: bool, display: bool) -> bool {
 
 fn test_solving_mindless(debug: bool, display: bool) -> bool {
     println!("7->resolution mindless");
-    let mut v = Vec::new();
-    v.push("1,?,?,?,?,?,?,?,2".to_string());
-    v.push("?,9,?,4,?,?,?,5,?".to_string());
-    v.push("?,?,6,?,?,?,7,?,?".to_string());
-    v.push("?,5,?,9,?,3,?,?,?".to_string());
-    v.push("?,?,?,?,7,?,?,?,?".to_string());
-    v.push("?,?,?,8,5,?,?,4,?".to_string());
-    v.push("7,?,?,?,?,?,6,?,?".to_string());
-    v.push("?,3,?,?,?,9,?,8,?".to_string());
-    v.push("?,?,2,?,?,?,?,?,1".to_string());
+    let v = vec![
+        "1,?,?,?,?,?,?,?,2".to_string(),
+        "?,9,?,4,?,?,?,5,?".to_string(),
+        "?,?,6,?,?,?,7,?,?".to_string(),
+        "?,5,?,9,?,3,?,?,?".to_string(),
+        "?,?,?,?,7,?,?,?,?".to_string(),
+        "?,?,?,8,5,?,?,4,?".to_string(),
+        "7,?,?,?,?,?,6,?,?".to_string(),
+        "?,3,?,?,?,9,?,8,?".to_string(),
+        "?,?,2,?,?,?,?,?,1".to_string(),
+    ];
     let mut g1 = from_vec(v, debug);
     resolve(&mut g1, debug, display)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
