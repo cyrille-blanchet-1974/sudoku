@@ -353,6 +353,40 @@ fn test_solving_mindless(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
+fn test_solving_hardest(debug: bool, display: bool) -> bool {
+    println!("7->resolution hardest");
+    let v = vec![
+        "8,?,?,?,?,?,?,?,?".to_string(),
+        "?,?,3,6,?,?,?,?,?".to_string(),
+        "?,7,?,?,9,?,2,?,?".to_string(),
+        "?,5,?,?,?,7,?,?,?".to_string(),
+        "?,?,?,?,4,5,7,?,?".to_string(),
+        "?,?,?,1,?,?,?,3,?".to_string(),
+        "?,?,1,?,?,?,?,6,8".to_string(),
+        "?,?,8,5,?,?,?,1,?".to_string(),
+        "?,9,?,?,?,?,4,?,?".to_string(),
+    ];
+    let mut g1 = from_vec(v, debug);
+    resolve(&mut g1, debug, display)
+    /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
+    chomebook:Duration=  89.336526ms (release)    904.471428ms (debug)
+    XPS17 = 86.0264ms (release)   1.0990636s (debug)
+    //31 steps 10 good guesses
+    -------------------------------                           -------------------------------
+    | 1  ?  ? | ?  ?  ? | ?  ?  2 |                           | 1  7  4 | 3  8  5 | 9  6  2 |
+    | ?  9  ? | 4  ?  ? | ?  5  ? |                           | 2  9  3 | 4  6  7 | 1  5  8 |
+    | ?  ?  6 | ?  ?  ? | 7  ?  ? |                           | 5  8  6 | 1  9  2 | 7  3  4 |
+    -------------------------------                           -------------------------------
+    | ?  5  ? | 9  ?  3 | ?  ?  ? |                           | 4  5  1 | 9  2  3 | 8  7  6 |
+    | ?  ?  ? | ?  7  ? | ?  ?  ? |                           | 9  2  8 | 6  7  4 | 3  1  5 |
+    | ?  ?  ? | 8  5  ? | ?  4  ? |                           | 3  6  7 | 8  5  1 | 2  4  9 |
+    -------------------------------                           -------------------------------
+    | 7  ?  ? | ?  ?  ? | 6  ?  ? |                           | 7  1  9 | 5  4  8 | 6  2  3 |
+    | ?  3  ? | ?  ?  9 | ?  8  ? |                           | 6  3  5 | 2  1  9 | 4  8  7 |
+    | ?  ?  2 | ?  ?  ? | ?  ?  1 |                           | 8  4  2 | 7  3  6 | 5  9  1 |
+    -------------------------------                           -------------------------------*/
+}
+
 fn resolve_from_disk(fic: String, debug: bool, display: bool) -> bool {
     let mut g1 = read(&fic, debug);
     println!("8->resolution from file {}!", fic);
@@ -377,8 +411,9 @@ fn main() {
         println!("5:test solving diabolical");
         println!("6:test solving highest");
         println!("7:test solving mindless");
-        println!("8:test a grid read from disk");
-        println!("9:fill manualy");
+        println!("8:test solving hardest");
+        println!("9:test a grid read from disk");
+        println!("10:fill manualy");
         println!("97:toggle debugging (actual:{})", debug);
         println!("98:toggle display (actual:{})", display);
         println!("99:quit");
@@ -414,9 +449,12 @@ fn main() {
                 test_solving_mindless(debug, display);
             }
             Some(8) => {
-                test_from_disk(debug, display);
+                test_solving_hardest(debug, display);
             }
             Some(9) => {
+                test_from_disk(debug, display);
+            }
+            Some(10) => {
                 manual(debug, display);
             }
             Some(99) => {
@@ -439,6 +477,7 @@ fn resolve_test() {
     assert_eq!(true, test_solving_diabolical(false, false));
     assert_eq!(true, test_solving_highest(false, false));
     assert_eq!(true, test_solving_mindless(false, false));
+    assert_eq!(true, test_solving_hardest(false, false));
     assert_eq!(
         true,
         resolve_from_disk("test/easy.txt".to_string(), false, false)
@@ -470,5 +509,9 @@ fn resolve_test() {
     assert_eq!(
         true,
         resolve_from_disk("test/m.txt".to_string(), false, false)
+    );
+    assert_eq!(
+        true,
+        resolve_from_disk("test/hardest.txt".to_string(), false, false)
     );
 }
