@@ -84,7 +84,7 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
-            let trc = format!(" {}/{}={}", coord.0, coord.1, val);
+            let trc = format!(" l:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;
         }
@@ -115,7 +115,7 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
-            let trc = format!(" {}/{}={}", coord.0, coord.1, val);
+            let trc = format!(" c:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;
         }
@@ -146,7 +146,7 @@ impl ResolverLvl3 {
             let v: u8 = val.try_into().unwrap();
             let coord = pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
-            let trc = format!(" {}/{}={}", coord.0, coord.1, val);
+            let trc = format!(" s:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
             return true;
         }
