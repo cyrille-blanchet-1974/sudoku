@@ -149,9 +149,23 @@ impl Grid {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         let v: usize = val.try_into().unwrap();
-        let ok = cell.remove_a_possible_and_verify(v);
-        if ok {
-            self.set_val(line, column, val, CellType::Found)
+        if self.debug {
+            println!("removing value {} from cell: l:{}/c:{}", val, line, column);
+        }
+        cell.remove_a_possible_and_verify(v);
+        if cell.is_resolved() {
+            if self.debug {
+                println!(
+                    "Cell  l:{}/c:{} resolved (only one value left)",
+                    line, column
+                );
+            }
+            match cell.get_answer() {
+                None => {}
+                Some(x) => {
+                    self.set_val(line, column, x, CellType::Found);
+                }
+            }
         }
     }
 
@@ -228,7 +242,7 @@ impl Grid {
 
     /**
      * get a cell candidate to guessing
-     * if posible a cell part of a xing else on with the possibles
+     * if posible a cell part of a xwing else on with the possibles
      * return cell position in an Option
      */
     pub fn get_a_guess(&mut self) -> Option<usize> {

@@ -119,12 +119,12 @@ impl Resolver {
         //let run level 9 -> guesses
         //first made a copy of
         let mut sav = g.clone();
-        let sav_step = self.step;
+        let sav_step = self.step - 1;
         self.nblvl9guess += 1;
         //second find a unsolved cell
         match sav.get_a_guess() {
             None => {
-                println!("Strange error: grid not solved by with no unsolved cell (or unsoved cell with no possibles values)");
+                println!("Strange error: grid not solved but with no unsolved cell (or unsoved cell with no possibles values)");
                 false
             }
             Some(val) => {
