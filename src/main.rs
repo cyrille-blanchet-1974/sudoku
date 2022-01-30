@@ -6,6 +6,7 @@ mod grid;
 mod line;
 mod read;
 mod resolver;
+mod resolver_force;
 mod resolver_lvl1;
 mod resolver_lvl2;
 mod resolver_lvl3;
@@ -17,6 +18,7 @@ use constant::*;
 use grid::*;
 use read::*;
 use resolver::*;
+use resolver_force::ResolverForce;
 use std::io;
 use std::time::SystemTime;
 
@@ -50,7 +52,7 @@ fn read_string(mess: String) -> String {
     res.to_string()
 }
 
-fn manual(debug: bool, display: bool) {
+fn manual(debug: bool, display: bool, raw_res: bool) {
     let mut g = Grid::default();
     println!("resolved = {}", g.is_resolved());
     println!();
@@ -67,7 +69,7 @@ fn manual(debug: bool, display: bool) {
             continue;
         }
         if l == 0 {
-            resolve(&mut g, debug, display);
+            resolve(&mut g, debug, display, raw_res);
             return;
         }
         println!("[1-{}] 0 to solve", MAX);
@@ -80,7 +82,7 @@ fn manual(debug: bool, display: bool) {
             continue;
         }
         if c == 0 {
-            resolve(&mut g, debug, display);
+            resolve(&mut g, debug, display, raw_res);
             return;
         }
         println!("[1-{}] 0 to solve", MAX);
@@ -93,7 +95,7 @@ fn manual(debug: bool, display: bool) {
             continue;
         }
         if v == 0 {
-            resolve(&mut g, debug, display);
+            resolve(&mut g, debug, display, raw_res);
             return;
         }
         g.set_val(l, c, v, CellType::Origin);
@@ -110,28 +112,53 @@ fn manual(debug: bool, display: bool) {
     }
 }
 
-pub fn resolve(g: &mut Grid, debug: bool, display: bool) -> bool {
-    let mut r = Resolver::new(debug, display);
-    println!("****Initial data for the grid****");
-    g.display();
-    let start_elapse = SystemTime::now();
-    //let mut tps = Duration::new(0, 0);
-    let res = r.go(g);
-    let end = SystemTime::now();
-    let tps = end
-        .duration_since(start_elapse)
-        .expect("ERROR computing duration!");
-    println!("Duration={:?}", tps);
+pub fn resolve(g: &mut Grid, debug: bool, display: bool, raw_res: bool) -> bool {
+    if raw_res {
+        println!("****Initial data for the grid****");
+        g.display();
+        let start_elapse = SystemTime::now();
+        let mut force = ResolverForce::new(debug);
+        let _res = force.resolve(g);
+        let end = SystemTime::now();
+        let tps = end
+            .duration_since(start_elapse)
+            .expect("ERROR computing duration!");
+        println!("Duration={:?}", tps);
 
-    println!("****Final data for the grid****");
-    g.display();
-    g.legend();
-    println!("Grid resolved!!!!!");
-    r.display_stats();
-    res
+        println!("Check if multiple solutions");
+        let start_elapse = SystemTime::now();
+        let nb = force.count_solutions(g);
+        let res = force.resolve(g);
+        let end = SystemTime::now();
+        let tps = end
+            .duration_since(start_elapse)
+            .expect("ERROR computing duration!");
+        println!("Duration={:?}", tps);
+        println!("{} solutions found", nb);
+        res
+    } else {
+        let mut r = Resolver::new(debug, display);
+        println!("****Initial data for the grid****");
+        g.display();
+        let start_elapse = SystemTime::now();
+        //let mut tps = Duration::new(0, 0);
+        let res = r.go(g);
+        let end = SystemTime::now();
+        let tps = end
+            .duration_since(start_elapse)
+            .expect("ERROR computing duration!");
+        println!("Duration={:?}", tps);
+
+        println!("****Final data for the grid****");
+        g.display();
+        g.legend();
+        println!("Grid resolved!!!!!");
+        r.display_stats();
+        res
+    }
 }
 
-fn test_solving(debug: bool, display: bool) -> bool {
+fn test_solving(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("1->resolution test!");
     let v = vec![
         "1,?,?,?,?,?,?,?,?".to_string(),
@@ -146,7 +173,7 @@ fn test_solving(debug: bool, display: bool) -> bool {
     ];
 
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 43 steps (26 guesses all good) // 74 steps 29 guess 1 bad
     -------------------------------                       -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  ? |                       | 1  2  3 | 4  6  5 | 7  9  8 |
@@ -164,7 +191,7 @@ fn test_solving(debug: bool, display: bool) -> bool {
     */
 }
 
-fn test_solving_easy(debug: bool, display: bool) -> bool {
+fn test_solving_easy(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("2->resolution easy!");
     let v = vec![
         "1,?,7,?,?,?,?,?,?".to_string(),
@@ -178,7 +205,7 @@ fn test_solving_easy(debug: bool, display: bool) -> bool {
         "?,?,?,?,?,?,9,?,5".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved 3 steps (0 guess)
     -------------------------------                           -------------------------------
     | 1  ?  7 | ?  ?  ? | ?  ?  ? |                           | 1  2  7 | 4  5  6 | 3  9  8 |
@@ -195,7 +222,7 @@ fn test_solving_easy(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_medium(debug: bool, display: bool) -> bool {
+fn test_solving_medium(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("3->resolution medium!");
     let v = vec![
         "5,?,?,?,4,?,?,?,?".to_string(),
@@ -209,7 +236,7 @@ fn test_solving_medium(debug: bool, display: bool) -> bool {
         "?,?,?,?,9,?,?,?,2".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 9 steps (2 guesses All goods) // 10 steps 2 guesses 0 bad
     -------------------------------                           -------------------------------
     | 5  ?  ? | ?  4  ? | ?  ?  ? |                           | 5  3  7 | 2  4  9 | 1  8  6 |
@@ -226,7 +253,7 @@ fn test_solving_medium(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_difficult(debug: bool, display: bool) -> bool {
+fn test_solving_difficult(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("4->resolution difficult!");
     let v = vec![
         "?,?,?,?,?,?,?,?,?".to_string(),
@@ -240,7 +267,7 @@ fn test_solving_difficult(debug: bool, display: bool) -> bool {
         "?,?,?,?,?,?,?,?,?".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 9 steps (0 guess)
     -------------------------------                           -------------------------------
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |                           | 9  8  3 | 5  7  6 | 1  4  2 |
@@ -257,7 +284,7 @@ fn test_solving_difficult(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_diabolical(debug: bool, display: bool) -> bool {
+fn test_solving_diabolical(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("5->resolution diabolic!");
     let v = vec![
         "?,8,3,9,?,?,?,?,?".to_string(),
@@ -271,7 +298,7 @@ fn test_solving_diabolical(debug: bool, display: bool) -> bool {
         "?,?,?,?,?,4,9,3,?".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 10 steps (1 good guess)  // 12 steps 1 good guess
     -------------------------------                           -------------------------------
     | ?  8  3 | 9  ?  ? | ?  ?  ? |                           | 4  8  3 | 9  2  7 | 5  1  6 |
@@ -288,7 +315,7 @@ fn test_solving_diabolical(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_highest(debug: bool, display: bool) -> bool {
+fn test_solving_highest(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("6->resolution highest");
     let v = vec![
         "1,?,?,?,?,7,?,9,?".to_string(),
@@ -302,7 +329,7 @@ fn test_solving_highest(debug: bool, display: bool) -> bool {
         "?,?,7,?,?,?,3,?,?".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 46 steps (11 guesses, 6 wrongs and 5 goods)  //132 steps  25 guess  19 bads
     -------------------------------                           -------------------------------
     | 1  ?  ? | ?  ?  7 | ?  9  ? |                           | 1  6  2 | 8  5  7 | 4  9  3 |
@@ -319,7 +346,7 @@ fn test_solving_highest(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_mindless(debug: bool, display: bool) -> bool {
+fn test_solving_mindless(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("7->resolution mindless");
     let v = vec![
         "1,?,?,?,?,?,?,?,2".to_string(),
@@ -333,7 +360,7 @@ fn test_solving_mindless(debug: bool, display: bool) -> bool {
         "?,?,2,?,?,?,?,?,1".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
     chomebook:Duration=  89.336526ms (release)    904.471428ms (debug)
     XPS17 = 86.0264ms (release)   1.0990636s (debug)
@@ -353,7 +380,7 @@ fn test_solving_mindless(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn test_solving_hardest(debug: bool, display: bool) -> bool {
+fn test_solving_hardest(debug: bool, display: bool, raw_res: bool) -> bool {
     println!("7->resolution hardest");
     let v = vec![
         "8,?,?,?,?,?,?,?,?".to_string(),
@@ -367,7 +394,7 @@ fn test_solving_hardest(debug: bool, display: bool) -> bool {
         "?,9,?,?,?,?,4,?,?".to_string(),
     ];
     let mut g1 = from_vec(v, debug);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
     chomebook:Duration=  89.336526ms (release)    904.471428ms (debug)
     XPS17 = 86.0264ms (release)   1.0990636s (debug)
@@ -387,15 +414,15 @@ fn test_solving_hardest(debug: bool, display: bool) -> bool {
     -------------------------------                           -------------------------------*/
 }
 
-fn resolve_from_disk(fic: String, debug: bool, display: bool) -> bool {
+fn resolve_from_disk(fic: String, debug: bool, display: bool, raw_res: bool) -> bool {
     let mut g1 = read(&fic, debug);
     println!("8->resolution from file {}!", fic);
-    resolve(&mut g1, debug, display)
+    resolve(&mut g1, debug, display, raw_res)
 }
 
-fn test_from_disk(debug: bool, display: bool) -> bool {
+fn test_from_disk(debug: bool, display: bool, raw_res: bool) -> bool {
     let fic = read_string("Filename?".to_string());
-    resolve_from_disk(fic, debug, display)
+    resolve_from_disk(fic, debug, display, raw_res)
 }
 
 fn main() {
@@ -403,6 +430,7 @@ fn main() {
     println!("size = {}x{}", LINESIZE, COLUMNSIZE);
     let mut debug = false;
     let mut display = false;
+    let mut raw_res = false;
     loop {
         println!("1:test solving");
         println!("2:test solving easy");
@@ -414,12 +442,20 @@ fn main() {
         println!("8:test solving hardest");
         println!("9:test a grid read from disk");
         println!("10:fill manualy");
+        if raw_res {
+            println!("96:toggle force/clever solving (actual: force)");
+        } else {
+            println!("96:toggle force/clever solving (actual: clever)");
+        }
         println!("97:toggle debugging (actual:{})", debug);
         println!("98:toggle display (actual:{})", display);
         println!("99:quit");
         match read_u8("Your choice?".to_string()) {
             None => {
                 continue;
+            }
+            Some(96) => {
+                raw_res = !raw_res;
             }
             Some(97) => {
                 debug = !debug;
@@ -428,34 +464,34 @@ fn main() {
                 display = !display;
             }
             Some(1) => {
-                test_solving(debug, display);
+                test_solving(debug, display, raw_res);
             }
             Some(2) => {
-                test_solving_easy(debug, display);
+                test_solving_easy(debug, display, raw_res);
             }
             Some(3) => {
-                test_solving_medium(debug, display);
+                test_solving_medium(debug, display, raw_res);
             }
             Some(4) => {
-                test_solving_difficult(debug, display);
+                test_solving_difficult(debug, display, raw_res);
             }
             Some(5) => {
-                test_solving_diabolical(debug, display);
+                test_solving_diabolical(debug, display, raw_res);
             }
             Some(6) => {
-                test_solving_highest(debug, display);
+                test_solving_highest(debug, display, raw_res);
             }
             Some(7) => {
-                test_solving_mindless(debug, display);
+                test_solving_mindless(debug, display, raw_res);
             }
             Some(8) => {
-                test_solving_hardest(debug, display);
+                test_solving_hardest(debug, display, raw_res);
             }
             Some(9) => {
-                test_from_disk(debug, display);
+                test_from_disk(debug, display, raw_res);
             }
             Some(10) => {
-                manual(debug, display);
+                manual(debug, display, raw_res);
             }
             Some(99) => {
                 println!("Sudoku resolution End!");
@@ -470,48 +506,48 @@ fn main() {
 
 #[test]
 fn resolve_test() {
-    assert_eq!(true, test_solving(false, false));
-    assert_eq!(true, test_solving_easy(false, false));
-    assert_eq!(true, test_solving_medium(false, false));
-    assert_eq!(true, test_solving_difficult(false, false));
-    assert_eq!(true, test_solving_diabolical(false, false));
-    assert_eq!(true, test_solving_highest(false, false));
-    assert_eq!(true, test_solving_mindless(false, false));
-    assert_eq!(true, test_solving_hardest(false, false));
+    assert_eq!(true, test_solving(false, false, false));
+    assert_eq!(true, test_solving_easy(false, false, false));
+    assert_eq!(true, test_solving_medium(false, false, false));
+    assert_eq!(true, test_solving_difficult(false, false, false));
+    assert_eq!(true, test_solving_diabolical(false, false, false));
+    assert_eq!(true, test_solving_highest(false, false, false));
+    assert_eq!(true, test_solving_mindless(false, false, false));
+    assert_eq!(true, test_solving_hardest(false, false, false));
     assert_eq!(
         true,
-        resolve_from_disk("test/easy.txt".to_string(), false, false)
+        resolve_from_disk("test/easy.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/medium.txt".to_string(), false, false)
+        resolve_from_disk("test/medium.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/difficult.txt".to_string(), false, false)
+        resolve_from_disk("test/difficult.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/diabolic.txt".to_string(), false, false)
+        resolve_from_disk("test/diabolic.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/pascal.txt".to_string(), false, false)
+        resolve_from_disk("test/pascal.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/pascal2.txt".to_string(), false, false)
+        resolve_from_disk("test/pascal2.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/pascal3.txt".to_string(), false, false)
+        resolve_from_disk("test/pascal3.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/m.txt".to_string(), false, false)
+        resolve_from_disk("test/m.txt".to_string(), false, false, false)
     );
     assert_eq!(
         true,
-        resolve_from_disk("test/hardest.txt".to_string(), false, false)
+        resolve_from_disk("test/hardest.txt".to_string(), false, false, false)
     );
 }

@@ -35,3 +35,10 @@ pub fn from_vec(data: Vec<String>, debug: bool) -> Grid {
     }
     g
 }
+
+pub fn from_vecvec(data: &[Vec<u8>], debug: bool) -> Grid {
+    let mut g = Grid::default();
+    g.set_debug(debug);
+    g.compute_vecvec(data);
+    g
+}

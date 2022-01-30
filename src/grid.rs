@@ -726,4 +726,22 @@ impl Grid {
             self.set_val(line_number, c + 1, r, CellType::Origin);
         }
     }
+
+    pub fn compute_vecline(&mut self, line_number: u8, vl: &[u8]) {
+        let mut c = 1;
+        for val in vl {
+            if *val != 0 {
+                self.set_val(line_number, c, *val, CellType::Origin);
+            }
+            c += 1;
+        }
+    }
+
+    pub fn compute_vecvec(&mut self, vv: &[Vec<u8>]) {
+        let mut l = 1;
+        for v in vv {
+            self.compute_vecline(l, v);
+            l += 1;
+        }
+    }
 }
