@@ -3,25 +3,25 @@ mod cell;
 mod column;
 mod constant;
 mod grid;
-mod grid_filler;
 mod line;
 mod read;
+mod square;
 mod resolver;
-mod resolver_count;
-mod resolver_force;
 mod resolver_lvl1;
 mod resolver_lvl2;
 mod resolver_lvl3;
 mod resolver_lvl4;
-mod square;
+mod resolver_force;
 mod ui;
+mod grid_filler;
+mod unicity;
 
 use constant::*;
 use grid::*;
 use grid_filler::*;
 use resolver::*;
-use resolver_count::ResolverCount;
 use resolver_force::ResolverForce;
+use unicity::VerifyUnicity;
 use std::time::SystemTime;
 use ui::*;
 
@@ -58,20 +58,19 @@ pub fn raw_solving(g: &mut Grid, debug: bool) -> bool {
     println!("Duration={:?}", tps);
     res
 }
-pub fn count_solving(g: &mut Grid, debug: bool) -> u8 {
-    println!("****Initial data for the grid****");
-    g.display();
+
+pub fn verify_unicity(g: &mut Grid, debug: bool) -> u8 {
     println!("Check if multiple solutions");
     let start_elapse = SystemTime::now();
-    let mut force = ResolverCount::new(debug, g);
-    let nb = force.count_solutions();
+    let mut v= VerifyUnicity::new(debug, g.clone());
+    let res = v.is_unique();
     let end = SystemTime::now();
     let tps = end
         .duration_since(start_elapse)
         .expect("ERROR computing duration!");
     println!("Duration={:?}", tps);
-    println!("{} solutions found", nb);
-    nb
+    println!("Nb Solution found : {}",res);
+    res
 }
 
 fn main() {
@@ -110,7 +109,7 @@ fn main() {
                 raw_solving(&mut g, debug);
             }
             Some(4) => {
-                count_solving(&mut g, debug);
+                verify_unicity(&mut g, debug);
             }
             Some(99) => {
                 println!("Sudoku resolution End!");

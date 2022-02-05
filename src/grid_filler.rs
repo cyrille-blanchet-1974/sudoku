@@ -1,4 +1,4 @@
-//use cell::CellType;
+use super::cell::CellType;
 use super::constant::*;
 use super::grid::*;
 use super::read::*;
@@ -47,6 +47,18 @@ fn manual() -> Option<Grid> {
         if v == 0 {
             return Some(g);
         }
+        g.set_val(l, c, v, CellType::Origin);
+        println!();
+        g.display();
+        if !g.is_valid() {
+            println!("Sudoku invalid!");
+            return None;
+        }
+        if g.is_resolved() {
+            println!("Sudoku resolved!");
+            return Some(g);
+        }
+
     }
     //None
 }

@@ -241,6 +241,22 @@ impl Grid {
     }
 
     /**
+     * get the list of the cells unknowns
+     *
+     */
+    pub fn get_unresolved(&mut self) -> Vec<u8> {
+        let mut res = Vec::new();
+        for i in 0..GRIDSIZE {
+            let pos: usize = i.try_into().unwrap();
+            let cell: &mut Cell = &mut (self.cells[pos]);
+            if !cell.is_resolved() {
+                res.push(i);
+            }
+        }
+        res
+    }
+
+    /**
      * get a cell candidate to guessing
      * if posible a cell part of a xwing else on with the possibles
      * return cell position in an Option
