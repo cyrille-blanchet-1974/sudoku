@@ -483,6 +483,36 @@ impl Grid {
         }
     }
 
+    /**
+     * display the actual grid en Black and white
+     */
+    pub fn display_bw(&mut self) {
+        println!("+---------+---------+--------+");
+        for line in 1..=LINESIZE {
+            print!("|");
+            for column in 1..=COLUMNSIZE {
+                let pos = coord_to_pos(line, column);
+                let cell: &Cell = &self.cells[pos];
+                match cell.get_answer() {
+                    None => {
+                        print!(" ? ");
+                    }
+                    Some(x) => {
+                        print!(" {} ", x);
+                    }
+                };
+                if column % 3 == 0 {
+                    print!("|");
+                }
+            }
+            println!();
+
+            if line % 3 == 0 {
+                println!("+---------+---------+---------+");
+            }
+        }
+    }
+
     pub fn display_lefts(&mut self) {
         let lefts = self.get_lefts();
         print!("Remains:");
