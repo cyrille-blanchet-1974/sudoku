@@ -187,12 +187,8 @@ fn raw_solve_test() {
     assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/diabolic.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
-    
-    //this grid do not work with raw force need debug
-    //let mut g = from_disk("test/pascal.txt".to_string(), false);
-    //assert_eq!(true, raw_solving(&mut g, false)); 
-    //this grid do not work with raw force need debug
-    
+    let mut g = from_disk("test/pascal.txt".to_string(), false);
+    assert_eq!(true, raw_solving(&mut g, false)); 
     let mut g = from_disk("test/pascal2.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/pascal3.txt".to_string(), false);
@@ -202,3 +198,5 @@ fn raw_solve_test() {
     let mut g = from_disk("test/hardest.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
 }
+
+
