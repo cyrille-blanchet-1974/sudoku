@@ -59,17 +59,21 @@ pub fn raw_solving(g: &mut Grid, debug: bool) -> bool {
     res
 }
 
-pub fn verify_unicity(g: &mut Grid, debug: bool) -> u8 {
+pub fn verify_unicity(g: &mut Grid) -> bool {
     println!("Check if multiple solutions");
     let start_elapse = SystemTime::now();
-    let mut v= VerifyUnicity::new(debug, g.clone());
+    let mut v= VerifyUnicity::new(g.clone());
     let res = v.is_unique();
     let end = SystemTime::now();
     let tps = end
         .duration_since(start_elapse)
         .expect("ERROR computing duration!");
     println!("Duration={:?}", tps);
-    println!("Nb Solution found : {}",res);
+    if !res {
+        println!("Grid has more than one solution -> not a valid Sudoku");
+    } else {
+        println!("We found a unique solution");
+    }
     res
 }
 
@@ -109,7 +113,7 @@ fn main() {
                 raw_solving(&mut g, debug);
             }
             Some(4) => {
-                verify_unicity(&mut g, debug);
+                verify_unicity(&mut g);
             }
             Some(99) => {
                 println!("Sudoku resolution End!");
@@ -200,3 +204,40 @@ fn raw_solve_test() {
 }
 
 
+#[test]
+fn uniq_test() {
+    let mut g = sample(false);
+    assert_eq!(false, verify_unicity(&mut g));
+    let mut g = easy(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = medium(false);
+    assert_eq!(false, verify_unicity(&mut g));
+    let mut g = difficult(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = diabolical(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = highest(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = mindless(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = hardest(false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/easy.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/medium.txt".to_string(), false);
+    assert_eq!(false, verify_unicity(&mut g));
+    let mut g = from_disk("test/difficult.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/diabolic.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/pascal.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/pascal2.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/pascal3.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/m.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = from_disk("test/hardest.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+}

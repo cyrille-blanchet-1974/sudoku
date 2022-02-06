@@ -1,5 +1,6 @@
 use super::accessor::pos_to_coord;
 use super::grid::*;
+use super::cell::CellType;
 use super::resolver::*;
 use std::convert::TryInto;
 /*
@@ -7,60 +8,58 @@ use std::convert::TryInto;
 
 */
 pub struct VerifyUnicity {
-    debug: bool,
     initial: Grid
 }
 
 impl VerifyUnicity {
-    pub fn new(debug: bool, g: Grid) -> VerifyUnicity {
-        VerifyUnicity { debug, initial: g }
+    pub fn new(initial: Grid) -> VerifyUnicity {
+        VerifyUnicity { initial}
     }
 
-    //display the grid
-    /*pub fn display(&mut self, g: &mut Grid) {
-        g.display_bw();
-    }*/
-
-    pub fn is_unique(&mut self) -> u8 {
-        if self.debug {
-            println!("Solutions for this grid:");
-        }
-        let mut nb=0;
+    pub fn is_unique(&mut self) -> bool {
+        println!("Solutions for this grid:");
         //first make a copy of the grid and solve it     
         let mut first = self.initial.clone();
-        let mut r = Resolver::new(self.debug, false);
+        let mut r = Resolver::new(false, false);
         let res = r.go(&mut first);  
         //if not solved, return 0
         if !res { 
             println!("None!!!");
-            return nb;
+            return false;
         }
-        if self.debug {
-            first.display();
-        }
-        nb +=1;
+        first.display();
         //second loop on cells of type Guess
         for p in self.initial.get_unresolved(){
             let pos: usize = p.try_into().unwrap();
             let answer = first.get_cell(pos).get_answer();
-            //on a virgin copy remove the answer of this cell of the possibles values
-            let mut second = self.initial.clone();
+            if answer == None {
+                continue;
+            }
+            let answer = answer.unwrap();
             let coord = pos_to_coord(pos);
-            second.remove_a_possible(coord.0,coord.1,answer.unwrap());
-            //try to resolve the grid
-            let mut r2 = Resolver::new(self.debug, false);
-            let res2 = r2.go(&mut second);
-            //if solve then this grid a more than one solution
-            if res2 {
-                if self.debug {
-                    second.display();
+            //on a virgin copy try other value for this cell
+            for possible in 1..=9{
+                if possible == answer {
+                    continue;
                 }
-                nb +=1;
-                //we cntinue to display others...
+                let mut second = self.initial.clone();
+                second.set_val(coord.0, coord.1, possible, CellType::Origin);
+                if second.is_valid() {
+                    //try to resolve the grid
+                    let mut r2 = Resolver::new(false, false);
+                    let res2 = r2.go(&mut second);
+                    //if solve then this grid a more than one solution
+                    if res2 {
+                        println!("Other Solution:");
+                        second.display();
+                        println!("May exists other solutions");
+                        return false;
+                        //we cound continue to display others...?
+                    }
+                }
             }
             //else continue
         }
-        nb
+        true
     }
-
 }
