@@ -1,7 +1,7 @@
-use super::accessor::pos_to_coord;
-use super::grid::*;
-use super::cell::CellType;
-use super::resolver::*;
+use super::super::objects::accessor::pos_to_coord;
+use super::super::objects::grid::*;
+use super::super::objects::cell::CellType;
+use super::super::resolvers::resolver::*;
 use std::convert::TryInto;
 /*
  here we use cpu power to try all possibilities
@@ -16,7 +16,7 @@ impl VerifyUnicity {
         VerifyUnicity { initial}
     }
 
-    pub fn is_unique(&mut self) -> bool {
+    pub fn unique(&mut self) -> bool {
         println!("Solutions for this grid:");
         //first make a copy of the grid and solve it     
         let mut first = self.initial.clone();
@@ -44,7 +44,7 @@ impl VerifyUnicity {
                 }
                 let mut second = self.initial.clone();
                 second.set_val(coord.0, coord.1, possible, CellType::Origin);
-                if second.is_valid() {
+                if second.valid() {
                     //try to resolve the grid
                     let mut r2 = Resolver::new(false, false);
                     let res2 = r2.go(&mut second);

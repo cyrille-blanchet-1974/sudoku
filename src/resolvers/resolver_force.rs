@@ -1,7 +1,7 @@
-use super::cell::*;
-use super::constant::*;
-use super::grid::*;
-use super::read::from_vecvec;
+use super::super::objects::cell::*;
+use super::super::objects::constant::*;
+use super::super::objects::grid::*;
+use super::super::read::from_vecvec;
 use std::convert::TryInto;
 
 /*
@@ -54,10 +54,11 @@ impl ResolverForce {
     }
 
     pub fn in_square(&mut self, row: usize, col: usize, val: u8) -> bool {
-        let lrow = row - row % 3;
-        let lcol = col - col % 3;
-        for r in self.data.iter().skip(lrow).take(3) {
-            for c in r.iter().skip(lcol).take(3) {
+        let side:usize = SQUARE_SIDE.try_into().unwrap();
+        let lrow = row - row % side;
+        let lcol = col - col % side;
+        for r in self.data.iter().skip(lrow).take(side) {
+            for c in r.iter().skip(lcol).take(side) {
                 if *c == val {
                     return true;
                 }

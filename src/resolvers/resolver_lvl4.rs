@@ -1,7 +1,7 @@
-use super::accessor::*;
-use super::cell::*;
-use super::constant::*;
-use super::grid::*;
+use super::super::objects::accessor::*;
+use super::super::objects::cell::*;
+use super::super::objects::constant::*;
+use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl4 {
@@ -29,7 +29,7 @@ impl ResolverLvl4 {
     return true if found one or more
     */
     pub fn resolve(&mut self, g: &mut Grid) -> bool {
-        if g.is_resolved() {
+        if g.resolved() {
             return false;
         }
         self.trace = "".to_string();
@@ -71,7 +71,7 @@ impl ResolverLvl4 {
                             }
                         };
                     }
-                    if cell.is_a_possible(val) {
+                    if cell.candidate(val) {
                         t.0 += 1;
                         t.1 += p;
                     }
@@ -124,12 +124,12 @@ impl ResolverLvl4 {
                                 }
                                 let pos = coord_to_pos(l, c.0.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
-                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
+                                if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos = coord_to_pos(l, c.1.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
-                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
+                                if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                             }
@@ -167,7 +167,7 @@ impl ResolverLvl4 {
                             }
                         };
                     }
-                    if cell.is_a_possible(val) {
+                    if cell.candidate(val) {
                         t.0 += 1;
                         t.1 += p;
                     }
@@ -220,12 +220,12 @@ impl ResolverLvl4 {
                                 }
                                 let pos = coord_to_pos(l.0.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
-                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
+                                if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos = coord_to_pos(l.1.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
-                                if !cell.is_resolved() && cell.remove_a_possible_and_verify(val) {
+                                if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                             }

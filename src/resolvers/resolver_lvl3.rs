@@ -1,7 +1,7 @@
-use super::accessor::*;
-use super::cell::*;
-use super::constant::*;
-use super::grid::*;
+use super::super::objects::accessor::*;
+use super::super::objects::cell::*;
+use super::super::objects::constant::*;
+use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl3 {
@@ -33,7 +33,7 @@ impl ResolverLvl3 {
     return true if found one or more
     */
     pub fn resolve(&mut self, g: &mut Grid) -> bool {
-        if g.is_resolved() {
+        if g.resolved() {
             return false;
         }
         self.trace = "".to_string();
@@ -70,7 +70,7 @@ impl ResolverLvl3 {
         for p in self.acc.get_line(line) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
-            if cell.is_a_possible(val) {
+            if cell.candidate(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;
@@ -101,7 +101,7 @@ impl ResolverLvl3 {
         for p in self.acc.get_column(column) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
-            if cell.is_a_possible(val) {
+            if cell.candidate(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;
@@ -132,7 +132,7 @@ impl ResolverLvl3 {
         for p in self.acc.get_square(square) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
-            if cell.is_a_possible(val) {
+            if cell.candidate(val) {
                 if unsolve != 255 {
                     //second possible? -> 2 possibles -> not a solution
                     return false;

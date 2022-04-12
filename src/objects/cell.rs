@@ -90,7 +90,7 @@ impl Cell {
     /**
      * check if resolved
      */
-    pub fn is_resolved(&mut self) -> bool {
+    pub fn is_resolved(&self) -> bool {
         self.answer != 0
     }
 
@@ -125,7 +125,7 @@ impl Cell {
                          //check all possible
         for i in 1..=MAX {
             let pos = i.try_into().unwrap();
-            if self.is_a_possible(pos) {
+            if self.candidate(pos) {
                 count += 1; //one more
                 val = i;
             }
@@ -148,7 +148,7 @@ impl Cell {
      * remove a value from the possibles
      * and return true if the cell is resolve
      */
-    pub fn remove_a_possible_and_verify(&mut self, val: usize) -> bool {
+    pub fn remove_candidate_and_verify(&mut self, val: usize) -> bool {
         if self.answer != 0 {
             true
         } else {
@@ -170,7 +170,7 @@ impl Cell {
     /**
      * is the value a possible
      */
-    pub fn is_a_possible(&mut self, val: usize) -> bool {
+    pub fn candidate(&mut self, val: usize) -> bool {
         self.possibles[val - 1]
     }
 
@@ -199,7 +199,7 @@ impl Cell {
     pub fn get_possibles(&mut self) -> Vec<u8> {
         let mut res = Vec::new();
         for i in 1..=MAX {
-            if self.is_a_possible(i.try_into().unwrap()) {
+            if self.candidate(i.try_into().unwrap()) {
                 res.push(i);
             }
         }
@@ -212,7 +212,7 @@ impl Cell {
      set the value of the cell
     */
     pub fn set_val(&mut self, val: u8, t: CellType) {
-        if !self.is_a_possible(val.try_into().unwrap()) {
+        if !self.candidate(val.try_into().unwrap()) {
             if self.debug {
                 println!(
                     "ERROR! {} is not possible on cell {} (l:{}/c:{})",
@@ -266,10 +266,10 @@ fn possible_test() {
     let mut c = Cell::new(1, false);
     for i in 1..MAX + 1 {
         let pos = i.try_into().unwrap();
-        assert_eq!(true, c.is_a_possible(pos));
+        assert_eq!(true, c.candidate(pos));
     }
     c.remove_a_possible(5);
-    assert_eq!(false, c.is_a_possible(5));
+    assert_eq!(false, c.candidate(5));
 }
 
 #[test]
@@ -279,7 +279,7 @@ fn resolution_test() {
     assert_eq!(None, c.get_answer());
     for v in 1..MAX {
         let val = v.try_into().unwrap();
-        c.remove_a_possible_and_verify(val);
+        c.remove_candidate_and_verify(val);
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());

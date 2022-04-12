@@ -1,5 +1,5 @@
-use super::cell::*;
-use super::grid::*;
+use super::super::objects::cell::*;
+use super::super::objects::grid::*;
 use super::resolver_lvl1::*;
 use super::resolver_lvl2::*;
 use super::resolver_lvl3::*;
@@ -79,7 +79,7 @@ impl Resolver {
             g.display();
         }
         //if already resolved...
-        if !g.is_resolved() {
+        if !g.resolved() {
             //loop until no more to solve
             loop {
                 if self.debug {
@@ -94,7 +94,7 @@ impl Resolver {
                 if self.debug {
                     g.display_lefts();
                 }
-                if !g.is_valid() {
+                if !g.valid() {
                     if self.debug {
                         println!("Error in the grid!");
                     }
@@ -102,7 +102,7 @@ impl Resolver {
                 }
             }
         }
-        let res = g.is_resolved();
+        let res = g.resolved();
         if !res {
             return self.resolve_lvl9(g, spacer);
         }
@@ -162,7 +162,7 @@ impl Resolver {
                     }
                     self.nblvl9wrongguess += 1;
                     //wrong guess -> remove this value from the possibles of the original grid and continue
-                    g.remove_a_possible(line, column, guess);
+                    g.remove_candidate(line, column, guess);
                     self.gos(g, s)
                 }
             }

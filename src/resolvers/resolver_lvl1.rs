@@ -1,6 +1,6 @@
-use super::accessor::*;
-use super::cell::*;
-use super::grid::*;
+use super::super::objects::accessor::*;
+use super::super::objects::cell::*;
+use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl1 {
@@ -31,7 +31,7 @@ impl ResolverLvl1 {
     return true if found one or more
     */
     pub fn resolve(&mut self, g: &mut Grid) -> bool {
-        if g.is_resolved() {
+        if g.resolved() {
             return false;
         }
         self.trace = "".to_string();
@@ -69,7 +69,7 @@ impl ResolverLvl1 {
             if cell.is_resolved() {
                 continue;
             }
-            if cell.remove_a_possible_and_verify(val) {
+            if cell.remove_candidate_and_verify(val) {
                 //removing a possible we found the answer of the cell
                 //so we must clean lines,columns and squares
                 if let Some(x) = cell.get_answer() {

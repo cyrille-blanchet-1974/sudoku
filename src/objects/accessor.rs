@@ -196,9 +196,9 @@ impl Accessor {
 fn gen_squares() -> HashMap<u8, Vec<u8>> {
     let mut res = HashMap::new();
     let mut i = 1;
-    for l in 0..3 {
-        for c in 0..3 {
-            res.insert(i, gen_square(l * 3, (l + 1) * 3, c * 3, (c + 1) * 3));
+    for l in 0..SQUARE_SIDE {
+        for c in 0..SQUARE_SIDE {
+            res.insert(i, gen_square(l * SQUARE_SIDE, (l + 1) * SQUARE_SIDE, c * SQUARE_SIDE, (c + 1) * SQUARE_SIDE));
             i += 1;
         }
     }

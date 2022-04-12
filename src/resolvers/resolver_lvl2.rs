@@ -1,7 +1,7 @@
-use super::accessor::*;
-use super::cell::*;
-use super::constant::*;
-use super::grid::*;
+use super::super::objects::accessor::*;
+use super::super::objects::cell::*;
+use super::super::objects::constant::*;
+use super::super::objects::grid::*;
 
 pub struct ResolverLvl2 {
     trace: String,
@@ -30,7 +30,7 @@ impl ResolverLvl2 {
     return true if found at least a new value for a cell
     */
     pub fn resolve(&mut self, g: &mut Grid) -> bool {
-        if g.is_resolved() {
+        if g.resolved() {
             return false;
         }
         self.trace = "".to_string();

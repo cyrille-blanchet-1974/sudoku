@@ -1,27 +1,15 @@
-mod accessor;
-mod cell;
-mod column;
-mod constant;
-mod grid;
-mod line;
+mod objects;
+mod resolvers;
 mod read;
-mod square;
-mod resolver;
-mod resolver_lvl1;
-mod resolver_lvl2;
-mod resolver_lvl3;
-mod resolver_lvl4;
-mod resolver_force;
 mod ui;
 mod grid_filler;
-mod unicity;
 
-use constant::*;
-use grid::*;
+use objects::constant::*;
+use objects::grid::*;
 use grid_filler::*;
-use resolver::*;
-use resolver_force::ResolverForce;
-use unicity::VerifyUnicity;
+use resolvers::resolver::*;
+use resolvers::resolver_force::ResolverForce;
+use resolvers::unicity::VerifyUnicity;
 use std::time::SystemTime;
 use ui::*;
 
@@ -63,7 +51,7 @@ pub fn verify_unicity(g: &mut Grid) -> bool {
     println!("Check if multiple solutions");
     let start_elapse = SystemTime::now();
     let mut v= VerifyUnicity::new(g.clone());
-    let res = v.is_unique();
+    let res = v.unique();
     let end = SystemTime::now();
     let tps = end
         .duration_since(start_elapse)

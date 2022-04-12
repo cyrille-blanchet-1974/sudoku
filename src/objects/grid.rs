@@ -145,14 +145,14 @@ impl Grid {
     /**
      * remove a possible value from a cell
      **/
-    pub fn remove_a_possible(&mut self, line: u8, column: u8, val: u8) {
+    pub fn remove_candidate(&mut self, line: u8, column: u8, val: u8) {
         let pos = coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         let v: usize = val.try_into().unwrap();
         if self.debug {
             println!("removing value {} from cell: l:{}/c:{}", val, line, column);
         }
-        cell.remove_a_possible_and_verify(v);
+        cell.remove_candidate_and_verify(v);
         if cell.is_resolved() {
             if self.debug {
                 println!(
@@ -176,7 +176,7 @@ impl Grid {
     /**
      * check if the Grid is resolved
      */
-    pub fn is_resolved(&mut self) -> bool {
+    pub fn resolved(&mut self) -> bool {
         if !self.resolved {
             for i in 0..GRIDSIZE {
                 let pos: usize = i.try_into().unwrap();
@@ -194,7 +194,7 @@ impl Grid {
      * Verify the grid
      * return false if two cell of the same line, column or square have the same value
      * */
-    pub fn is_valid(&self) -> bool {
+    pub fn valid(&self) -> bool {
         let mut mess;
         for line in 1..=COLUMNSIZE {
             mess = format!("line {}", line);
@@ -457,7 +457,12 @@ impl Grid {
                     .set_fg(Some(Color::White)),
             )
             .unwrap();
-        writeln!(&mut stdout, "╔═════════╦═════════╦═════════╗").unwrap();
+
+        let first = get_square_deco("╔","═══","╦","╗");
+        let last = get_square_deco("╚","═══","╩","╝");
+        let mid = get_square_deco("╟","═══","╬","╢");
+    
+        writeln!(&mut stdout, "{}",first).unwrap();
         for line in 1..=LINESIZE {
             write!(&mut stdout, "║").unwrap();
             for column in 1..=COLUMNSIZE {
@@ -485,16 +490,16 @@ impl Grid {
                             .set_fg(Some(Color::White)),
                     )
                     .unwrap();
-                if column % 3 == 0 {
+                if column % SQUARE_SIDE == 0 {
                     write!(&mut stdout, "║").unwrap();
                 }
             }
             println!();
 
-            if line % 9 == 0 {
-                writeln!(&mut stdout, "╚═════════╩═════════╩═════════╝").unwrap();
-            } else if line % 3 == 0 {
-                writeln!(&mut stdout, "╟═════════╬═════════╬═════════╢").unwrap();
+            if line % COLUMNSIZE == 0 {
+                writeln!(&mut stdout, "{}",last).unwrap();
+            } else if line % SQUARE_SIDE == 0 {
+                writeln!(&mut stdout, "{}",mid).unwrap();
             }
         }
     }
@@ -503,7 +508,8 @@ impl Grid {
      * display the actual grid en Black and white
      */
     pub fn display_bw(&mut self) {
-        println!("+---------+---------+--------+");
+        let linesep = get_square_deco("+","---","+","+");
+        println!("{}",linesep);
         for line in 1..=LINESIZE {
             print!("|");
             for column in 1..=COLUMNSIZE {
@@ -517,14 +523,14 @@ impl Grid {
                         print!(" {} ", x);
                     }
                 };
-                if column % 3 == 0 {
+                if column % SQUARE_SIDE == 0 {
                     print!("|");
                 }
             }
             println!();
 
-            if line % 3 == 0 {
-                println!("+---------+---------+---------+");
+            if line % SQUARE_SIDE == 0 {
+                println!("{}",linesep);
             }
         }
     }
@@ -551,12 +557,12 @@ impl Grid {
             if cell.debug() {
                 nb += 1;
             }
-            if nb == 3 {
+            if nb == SQUARE_SIDE {
                 println!();
                 nb = 0;
             }
         }
-        if nb != 3 {
+        if nb != SQUARE_SIDE {
             println!();
         }
         println!("-------------------------------DEBUG-------------------------------");
@@ -617,7 +623,7 @@ impl Clone for Grid {
 #[test]
 fn resolution_test() {
     let mut g = Grid::default();
-    assert_eq!(false, g.is_resolved());
+    assert_eq!(false, g.resolved());
 }
 
 #[test]
@@ -711,35 +717,35 @@ fn display_test() {
 #[test]
 fn check_is_valid() {
     let mut g = Grid::default();
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 1, 1, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 3, 3, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 4, 4, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 5, 5, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 6, 6, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 7, 7, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 8, 8, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
     g.set_val(1, 9, 9, CellType::Origin);
-    assert_eq!(true, g.is_valid());
+    assert_eq!(true, g.valid());
 
     let mut g2 = g.clone();
     g2.set_val(2, 1, 1, CellType::Origin); //two 1 on samae column
-    assert_eq!(false, g2.is_valid());
+    assert_eq!(false, g2.valid());
 
     let mut g2 = g.clone();
     g2.set_val(1, 2, 1, CellType::Origin); //Two 1 on same line
-    assert_eq!(false, g2.is_valid());
+    assert_eq!(false, g2.valid());
 
     let mut g2 = g.clone();
     g2.set_val(3, 3, 1, CellType::Origin); //Two 1 on same square
-    assert_eq!(false, g2.is_valid());
+    assert_eq!(false, g2.valid());
 }
 
 #[test]
@@ -791,3 +797,35 @@ impl Grid {
         }
     }
 }
+
+
+    //grid decorations
+    fn get_square_deco(first:&str, fill:&str,sep:&str,last:&str)->String{
+        let mut res = String::new();
+        res.push_str(first);
+        for i in 0..SQUARE_SIDE {
+            for _j in 0..SQUARE_SIDE {
+                res.push_str(fill);
+            }
+            if i != SQUARE_SIDE-1 {
+                res.push_str(sep);
+            }
+        }
+        res.push_str(last);
+        res
+    }
+
+
+    #[test]
+    fn deco_test() {
+        let first = get_square_deco("╔","═══","╦","╗");
+        assert_eq!(first, "╔═════════╦═════════╦═════════╗".to_string());
+        let last = get_square_deco("╚","═══","╩","╝");
+        assert_eq!(last, "╚═════════╩═════════╩═════════╝".to_string());
+        let mid = get_square_deco("╟","═══","╬","╢");
+        assert_eq!(mid, "╟═════════╬═════════╬═════════╢".to_string());
+
+        let simple = get_square_deco("+","---","+","+");
+        assert_eq!(simple, "+---------+---------+---------+".to_string());        
+    }
+    

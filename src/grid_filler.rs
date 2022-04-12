@@ -1,12 +1,12 @@
-use super::cell::CellType;
-use super::constant::*;
-use super::grid::*;
+use super::objects::cell::CellType;
+use super::objects::constant::*;
+use super::objects::grid::*;
 use super::read::*;
 use super::ui::*;
 
 fn manual() -> Option<Grid> {
     let mut g = Grid::default();
-    println!("resolved = {}", g.is_resolved());
+    println!("resolved = {}", g.resolved());
     println!();
     g.display();
     loop {
@@ -50,11 +50,11 @@ fn manual() -> Option<Grid> {
         g.set_val(l, c, v, CellType::Origin);
         println!();
         g.display();
-        if !g.is_valid() {
+        if !g.valid() {
             println!("Sudoku invalid!");
             return None;
         }
-        if g.is_resolved() {
+        if g.resolved() {
             println!("Sudoku resolved!");
             return Some(g);
         }
