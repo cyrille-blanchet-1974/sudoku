@@ -11,7 +11,7 @@ impl Metrics {
     pub fn new(side: u8) -> Metrics {
         let columnsize = side * side;
         let linesize = side * side;
-        let gridsize = (columnsize * linesize) as u16;
+        let gridsize = columnsize as u16 * linesize as u16;
         let max = side * side;
         Metrics {
             squareside: side,
