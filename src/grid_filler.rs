@@ -58,7 +58,6 @@ fn manual() -> Option<Grid> {
             println!("Sudoku resolved!");
             return Some(g);
         }
-
     }
     //None
 }

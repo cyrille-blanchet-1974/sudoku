@@ -1,4 +1,5 @@
 use super::accessor::*;
+use super::cardinal::*;
 use super::cell::CellType;
 use super::cell::*;
 use super::column::*;
@@ -458,11 +459,11 @@ impl Grid {
             )
             .unwrap();
 
-        let first = get_square_deco("╔","═══","╦","╗");
-        let last = get_square_deco("╚","═══","╩","╝");
-        let mid = get_square_deco("╟","═══","╬","╢");
-    
-        writeln!(&mut stdout, "{}",first).unwrap();
+        let first = get_square_deco("╔", "═══", "╦", "╗");
+        let last = get_square_deco("╚", "═══", "╩", "╝");
+        let mid = get_square_deco("╟", "═══", "╬", "╢");
+
+        writeln!(&mut stdout, "{}", first).unwrap();
         for line in 1..=LINESIZE {
             write!(&mut stdout, "║").unwrap();
             for column in 1..=COLUMNSIZE {
@@ -497,9 +498,9 @@ impl Grid {
             println!();
 
             if line % COLUMNSIZE == 0 {
-                writeln!(&mut stdout, "{}",last).unwrap();
+                writeln!(&mut stdout, "{}", last).unwrap();
             } else if line % SQUARE_SIDE == 0 {
-                writeln!(&mut stdout, "{}",mid).unwrap();
+                writeln!(&mut stdout, "{}", mid).unwrap();
             }
         }
     }
@@ -508,8 +509,8 @@ impl Grid {
      * display the actual grid en Black and white
      */
     pub fn display_bw(&mut self) {
-        let linesep = get_square_deco("+","---","+","+");
-        println!("{}",linesep);
+        let linesep = get_square_deco("+", "---", "+", "+");
+        println!("{}", linesep);
         for line in 1..=LINESIZE {
             print!("|");
             for column in 1..=COLUMNSIZE {
@@ -530,7 +531,7 @@ impl Grid {
             println!();
 
             if line % SQUARE_SIDE == 0 {
-                println!("{}",linesep);
+                println!("{}", linesep);
             }
         }
     }
@@ -798,34 +799,31 @@ impl Grid {
     }
 }
 
-
-    //grid decorations
-    fn get_square_deco(first:&str, fill:&str,sep:&str,last:&str)->String{
-        let mut res = String::new();
-        res.push_str(first);
-        for i in 0..SQUARE_SIDE {
-            for _j in 0..SQUARE_SIDE {
-                res.push_str(fill);
-            }
-            if i != SQUARE_SIDE-1 {
-                res.push_str(sep);
-            }
+//grid decorations
+fn get_square_deco(first: &str, fill: &str, sep: &str, last: &str) -> String {
+    let mut res = String::new();
+    res.push_str(first);
+    for i in 0..SQUARE_SIDE {
+        for _j in 0..SQUARE_SIDE {
+            res.push_str(fill);
         }
-        res.push_str(last);
-        res
+        if i != SQUARE_SIDE - 1 {
+            res.push_str(sep);
+        }
     }
+    res.push_str(last);
+    res
+}
 
+#[test]
+fn deco_test() {
+    let first = get_square_deco("╔", "═══", "╦", "╗");
+    assert_eq!(first, "╔═════════╦═════════╦═════════╗".to_string());
+    let last = get_square_deco("╚", "═══", "╩", "╝");
+    assert_eq!(last, "╚═════════╩═════════╩═════════╝".to_string());
+    let mid = get_square_deco("╟", "═══", "╬", "╢");
+    assert_eq!(mid, "╟═════════╬═════════╬═════════╢".to_string());
 
-    #[test]
-    fn deco_test() {
-        let first = get_square_deco("╔","═══","╦","╗");
-        assert_eq!(first, "╔═════════╦═════════╦═════════╗".to_string());
-        let last = get_square_deco("╚","═══","╩","╝");
-        assert_eq!(last, "╚═════════╩═════════╩═════════╝".to_string());
-        let mid = get_square_deco("╟","═══","╬","╢");
-        assert_eq!(mid, "╟═════════╬═════════╬═════════╢".to_string());
-
-        let simple = get_square_deco("+","---","+","+");
-        assert_eq!(simple, "+---------+---------+---------+".to_string());        
-    }
-    
+    let simple = get_square_deco("+", "---", "+", "+");
+    assert_eq!(simple, "+---------+---------+---------+".to_string());
+}

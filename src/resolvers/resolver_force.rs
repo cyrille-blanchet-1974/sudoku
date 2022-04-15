@@ -54,7 +54,7 @@ impl ResolverForce {
     }
 
     pub fn in_square(&mut self, row: usize, col: usize, val: u8) -> bool {
-        let side:usize = SQUARE_SIDE.try_into().unwrap();
+        let side: usize = SQUARE_SIDE.try_into().unwrap();
         let lrow = row - row % side;
         let lcol = col - col % side;
         for r in self.data.iter().skip(lrow).take(side) {

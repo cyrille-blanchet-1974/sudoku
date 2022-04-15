@@ -1,12 +1,12 @@
-mod objects;
-mod resolvers;
-mod read;
-mod ui;
 mod grid_filler;
+mod objects;
+mod read;
+mod resolvers;
+mod ui;
 
+use grid_filler::*;
 use objects::constant::*;
 use objects::grid::*;
-use grid_filler::*;
 use resolvers::resolver::*;
 use resolvers::resolver_force::ResolverForce;
 use resolvers::unicity::VerifyUnicity;
@@ -50,7 +50,7 @@ pub fn raw_solving(g: &mut Grid, debug: bool) -> bool {
 pub fn verify_unicity(g: &mut Grid) -> bool {
     println!("Check if multiple solutions");
     let start_elapse = SystemTime::now();
-    let mut v= VerifyUnicity::new(g.clone());
+    let mut v = VerifyUnicity::new(g.clone());
     let res = v.unique();
     let end = SystemTime::now();
     let tps = end
@@ -152,7 +152,6 @@ fn clever_solve_test() {
     assert_eq!(true, clever_solving(&mut g, false, false));
 }
 
-
 #[test]
 fn raw_solve_test() {
     let mut g = sample(false);
@@ -180,7 +179,7 @@ fn raw_solve_test() {
     let mut g = from_disk("test/diabolic.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/pascal.txt".to_string(), false);
-    assert_eq!(true, raw_solving(&mut g, false)); 
+    assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/pascal2.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/pascal3.txt".to_string(), false);
@@ -190,7 +189,6 @@ fn raw_solve_test() {
     let mut g = from_disk("test/hardest.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
 }
-
 
 #[test]
 fn uniq_test() {

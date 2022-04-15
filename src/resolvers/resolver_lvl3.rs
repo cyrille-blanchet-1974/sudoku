@@ -1,7 +1,9 @@
 use super::super::objects::accessor::*;
+use super::super::objects::cardinal::*;
 use super::super::objects::cell::*;
 use super::super::objects::constant::*;
 use super::super::objects::grid::*;
+
 use std::convert::TryInto;
 
 pub struct ResolverLvl3 {

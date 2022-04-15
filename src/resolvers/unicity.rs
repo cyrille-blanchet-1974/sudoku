@@ -1,6 +1,6 @@
 use super::super::objects::accessor::pos_to_coord;
-use super::super::objects::grid::*;
 use super::super::objects::cell::CellType;
+use super::super::objects::grid::*;
 use super::super::resolvers::resolver::*;
 use std::convert::TryInto;
 /*
@@ -8,28 +8,28 @@ use std::convert::TryInto;
 
 */
 pub struct VerifyUnicity {
-    initial: Grid
+    initial: Grid,
 }
 
 impl VerifyUnicity {
     pub fn new(initial: Grid) -> VerifyUnicity {
-        VerifyUnicity { initial}
+        VerifyUnicity { initial }
     }
 
     pub fn unique(&mut self) -> bool {
         println!("Solutions for this grid:");
-        //first make a copy of the grid and solve it     
+        //first make a copy of the grid and solve it
         let mut first = self.initial.clone();
         let mut r = Resolver::new(false, false);
-        let res = r.go(&mut first);  
+        let res = r.go(&mut first);
         //if not solved, return 0
-        if !res { 
+        if !res {
             println!("None!!!");
             return false;
         }
         first.display();
         //second loop on cells of type Guess
-        for p in self.initial.get_unresolved(){
+        for p in self.initial.get_unresolved() {
             let pos: usize = p.try_into().unwrap();
             let answer = first.get_cell(pos).get_answer();
             if answer == None {
@@ -38,7 +38,7 @@ impl VerifyUnicity {
             let answer = answer.unwrap();
             let coord = pos_to_coord(pos);
             //on a virgin copy try other value for this cell
-            for possible in 1..=9{
+            for possible in 1..=9 {
                 if possible == answer {
                     continue;
                 }
