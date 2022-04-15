@@ -1,6 +1,6 @@
 use super::super::objects::cell::*;
-use super::super::objects::constant::*;
 use super::super::objects::grid::*;
+use super::super::objects::metrics::*;
 use super::super::read::from_vecvec;
 use std::convert::TryInto;
 
@@ -10,12 +10,17 @@ use std::convert::TryInto;
 pub struct ResolverForce {
     debug: bool,
     data: Vec<Vec<u8>>,
+    metrics: Metrics,
 }
 
 impl ResolverForce {
     pub fn new(debug: bool, g: &mut Grid) -> ResolverForce {
         let flat = grid_to_vec(g);
-        ResolverForce { debug, data: flat }
+        ResolverForce {
+            debug,
+            data: flat,
+            metrics: g.get_metrics(),
+        }
     }
 
     //display the grid
@@ -34,7 +39,7 @@ impl ResolverForce {
     }
 
     pub fn in_row(&mut self, row: usize, val: u8) -> bool {
-        for col in 0..MAX {
+        for col in 0..self.metrics.get_max() {
             let c: usize = col.try_into().unwrap();
             if self.data[row][c] == val {
                 return true;
@@ -44,7 +49,7 @@ impl ResolverForce {
     }
 
     pub fn in_col(&mut self, col: usize, val: u8) -> bool {
-        for row in 0..MAX {
+        for row in 0..self.metrics.get_max() {
             let r: usize = row.try_into().unwrap();
             if self.data[r][col] == val {
                 return true;
@@ -54,7 +59,7 @@ impl ResolverForce {
     }
 
     pub fn in_square(&mut self, row: usize, col: usize, val: u8) -> bool {
-        let side: usize = SQUARE_SIDE.try_into().unwrap();
+        let side: usize = self.metrics.get_square_side().try_into().unwrap();
         let lrow = row - row % side;
         let lcol = col - col % side;
         for r in self.data.iter().skip(lrow).take(side) {
@@ -72,12 +77,12 @@ impl ResolverForce {
     }
 
     pub fn raw_force(&mut self) -> bool {
-        for row in 0..MAX {
+        for row in 0..self.metrics.get_max() {
             let r: usize = row.try_into().unwrap();
-            for col in 0..MAX {
+            for col in 0..self.metrics.get_max() {
                 let c: usize = col.try_into().unwrap();
                 if self.data[r][c] == 0 {
-                    for val in 1..=MAX {
+                    for val in 1..=self.metrics.get_max() {
                         if self.valid(r, c, val) {
                             self.data[r][c] = val;
                             let res = self.raw_force();
@@ -97,11 +102,12 @@ impl ResolverForce {
 }
 
 pub fn grid_to_vec(g: &mut Grid) -> Vec<Vec<u8>> {
+    let max = g.get_metrics().get_max();
     let mut flat = Vec::new();
-    for l in 0..MAX {
+    for l in 0..max {
         let mut line = Vec::new();
-        for c in 0..MAX {
-            let pos: usize = (l * MAX + c).try_into().unwrap();
+        for c in 0..max {
+            let pos: usize = (l * max + c).try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.is_resolved() {
                 line.push(cell.get_answer().unwrap());

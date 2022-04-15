@@ -4,7 +4,7 @@ use std::io::BufRead;
 use std::io::BufReader;
 
 pub fn read(fic: &str, debug: bool) -> Grid {
-    let mut g = Grid::default();
+    let mut g = Grid::new(3); //TODO: param
     g.set_debug(debug);
     let input = File::open(&fic);
     match input {
@@ -26,7 +26,7 @@ pub fn read(fic: &str, debug: bool) -> Grid {
 }
 
 pub fn from_vec(data: Vec<String>, debug: bool) -> Grid {
-    let mut g = Grid::default();
+    let mut g = Grid::new(3); //TODO:param
     g.set_debug(debug);
     let mut line_number = 1;
     for d in data {
@@ -37,7 +37,7 @@ pub fn from_vec(data: Vec<String>, debug: bool) -> Grid {
 }
 
 pub fn from_vecvec(data: &[Vec<u8>], debug: bool) -> Grid {
-    let mut g = Grid::default();
+    let mut g = Grid::new(3); //TODO: param
     g.set_debug(debug);
     g.compute_vecvec(data);
     g

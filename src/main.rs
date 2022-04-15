@@ -5,7 +5,6 @@ mod resolvers;
 mod ui;
 
 use grid_filler::*;
-use objects::constant::*;
 use objects::grid::*;
 use resolvers::resolver::*;
 use resolvers::resolver_force::ResolverForce;
@@ -67,10 +66,14 @@ pub fn verify_unicity(g: &mut Grid) -> bool {
 
 fn main() {
     println!("Sudoku resolution!");
-    println!("size = {}x{}", LINESIZE, COLUMNSIZE);
     let mut debug = false;
     let mut display = false;
     let mut g = sample(debug);
+    println!(
+        "size = {}x{}",
+        g.get_metrics().get_nb_line(),
+        g.get_metrics().get_nb_column()
+    );
     loop {
         println!("1:change grid");
         println!("2:clever solving");

@@ -1,25 +1,24 @@
-use super::constant::*;
 use std::convert::TryInto;
 
 //the column
 pub struct Column {
     known_values: Vec<bool>, //Value already solve in the line
+    max: u8,
 }
 
-impl Default for Column {
-    fn default() -> Self {
+impl Column {
+    pub fn new(max: u8) -> Column {
         //add all known values (False at start)
         let mut known = Vec::new();
-        for _i in 0..MAX {
+        for _i in 0..max {
             known.push(false);
         }
         Column {
             known_values: known,
+            max,
         }
     }
-}
 
-impl Column {
     /**
      * add a known value to the column
      */
@@ -27,7 +26,7 @@ impl Column {
         if val < 1 {
             return;
         }
-        if val > MAX {
+        if val > self.max {
             return;
         }
         let val: usize = (val - 1).try_into().unwrap();
@@ -41,7 +40,7 @@ impl Column {
         if val < 1 {
             return false;
         }
-        if val > MAX {
+        if val > self.max {
             return false;
         }
         let val: usize = (val - 1).try_into().unwrap();
@@ -53,7 +52,7 @@ impl Column {
     */
     pub fn _get_unknown(&self) -> Vec<u8> {
         let mut res = Vec::new();
-        for i in 0..MAX {
+        for i in 0..self.max {
             let pos: usize = i.try_into().unwrap();
             if !self.known_values[pos] {
                 res.push(i + 1);
@@ -65,7 +64,7 @@ impl Column {
 
 #[test]
 fn add_a_known_value_test() {
-    let mut c = Column::default();
+    let mut c = Column::new(9);
     c.add_a_known_value(1);
     c.add_a_known_value(2);
     c.add_a_known_value(3);
@@ -77,14 +76,14 @@ fn add_a_known_value_test() {
     c.add_a_known_value(9);
     c.add_a_known_value(10);
     c.add_a_known_value(0);
-    for i in 0..=MAX {
+    for i in 0..=c.max {
         c.add_a_known_value(i);
     }
 }
 
 #[test]
 fn is_known_test() {
-    let mut c = Column::default();
+    let mut c = Column::new(9);
     c.add_a_known_value(1);
     c.add_a_known_value(3);
     assert_eq!(true, c.is_known(1));
@@ -102,7 +101,7 @@ fn is_known_test() {
 
 #[test]
 fn get_unknown_test() {
-    let mut c = Column::default();
+    let mut c = Column::new(9);
     c.add_a_known_value(1);
     c.add_a_known_value(3);
     assert_eq!(vec!(2, 4, 5, 6, 7, 8, 9), c._get_unknown());
@@ -114,13 +113,16 @@ impl Clone for Column {
         for v in &self.known_values {
             p.push(*v);
         }
-        Column { known_values: p }
+        Column {
+            known_values: p,
+            max: self.max,
+        }
     }
 }
 
 #[test]
 fn clone_column_test() {
-    let mut ori = Column::default();
+    let mut ori = Column::new(9);
     ori.add_a_known_value(1);
     ori.add_a_known_value(3);
     ori.add_a_known_value(5);

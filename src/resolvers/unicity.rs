@@ -1,4 +1,4 @@
-use super::super::objects::accessor::pos_to_coord;
+use super::super::objects::accessor::*;
 use super::super::objects::cell::CellType;
 use super::super::objects::grid::*;
 use super::super::resolvers::resolver::*;
@@ -28,6 +28,7 @@ impl VerifyUnicity {
             return false;
         }
         first.display();
+        let acc = Accessor::new(first.get_metrics().get_square_side());
         //second loop on cells of type Guess
         for p in self.initial.get_unresolved() {
             let pos: usize = p.try_into().unwrap();
@@ -36,7 +37,7 @@ impl VerifyUnicity {
                 continue;
             }
             let answer = answer.unwrap();
-            let coord = pos_to_coord(pos);
+            let coord = acc.coordconverter.pos_to_coord(pos);
             //on a virgin copy try other value for this cell
             for possible in 1..=9 {
                 if possible == answer {

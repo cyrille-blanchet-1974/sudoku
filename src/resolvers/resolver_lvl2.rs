@@ -1,7 +1,6 @@
 use super::super::objects::accessor::*;
 use super::super::objects::cardinal::*;
 use super::super::objects::cell::*;
-use super::super::objects::constant::*;
 use super::super::objects::grid::*;
 
 pub struct ResolverLvl2 {
@@ -40,7 +39,7 @@ impl ResolverLvl2 {
         let squ = Cardinal::C;
         for sq in squ.get_all() {
             //iter on values
-            for value in 1..=MAX {
+            for value in 1..=g.get_metrics().get_max() {
                 if self.resolve_square_val(g, sq, value) {
                     resolve_some = true
                 }
@@ -95,8 +94,11 @@ impl ResolverLvl2 {
             //if tree columns solved then let go
             return false;
         }
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         //check if cell is already solved
-        let pos: usize = coord_to_pos(unsolved_line, unsolved_column);
+        let pos: usize = acc
+            .coordconverter
+            .coord_to_pos(unsolved_line, unsolved_column);
         let cell: &mut Cell = g.get_cell(pos);
         if cell.is_resolved() {
             return false;

@@ -1,6 +1,5 @@
-use super::accessor::*;
 use super::cardinal::*;
-use super::constant::*;
+use super::coordconverter::*;
 use std::convert::TryInto;
 
 //type of the cell
@@ -38,8 +37,8 @@ impl PartialEq for CellType {
 //the cell
 pub struct Cell {
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
-    column: u8,           //column in the grid 1..9
-    line: u8,             //line in the grid 1..9
+    column: u8,           //column in the grid 1..max
+    line: u8,             //line in the grid 1..max
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
     answer: u8,           //value of the cell when solved
@@ -47,6 +46,7 @@ pub struct Cell {
     debug: bool,
     just_resolved: bool,
     possible_removed: bool,
+    max: u8,
 }
 
 impl Cell {
@@ -63,16 +63,18 @@ impl Cell {
         self.debug = debug;
     }
     //construct a cell giving his position in the grid
-    pub fn new(pos: usize, debug: bool) -> Cell {
+    pub fn new(pos: usize, debug: bool, squareside: u8) -> Cell {
         //add all possibles
         let mut possibles = Vec::new();
-        for _i in 0..MAX {
+        let max = squareside * squareside;
+        for _i in 0..max {
             possibles.push(true);
         }
+        let c = CoordConverter::new(squareside);
         //calculate line/column
-        let coord = pos_to_coord(pos);
+        let coord = c.pos_to_coord(pos);
         //then square
-        let square = pos_to_square(pos);
+        let square = c.pos_to_square(pos);
         Cell {
             position: pos,
             column: coord.1,
@@ -85,6 +87,7 @@ impl Cell {
             debug,
             just_resolved: false,
             possible_removed: false,
+            max,
         }
     }
 
@@ -124,7 +127,7 @@ impl Cell {
         let mut count = 0; //count of possible left
         let mut val = 1; //val
                          //check all possible
-        for i in 1..=MAX {
+        for i in 1..=self.max {
             let pos = i.try_into().unwrap();
             if self.candidate(pos) {
                 count += 1; //one more
@@ -199,7 +202,7 @@ impl Cell {
      */
     pub fn get_possibles(&mut self) -> Vec<u8> {
         let mut res = Vec::new();
-        for i in 1..=MAX {
+        for i in 1..=self.max {
             if self.candidate(i.try_into().unwrap()) {
                 res.push(i);
             }
@@ -224,7 +227,7 @@ impl Cell {
             return;
         }
         //remove other possibles
-        for i in 1..=MAX {
+        for i in 1..=self.max {
             if i != val {
                 let pos = i.try_into().unwrap();
                 self.remove_a_possible(pos);
@@ -264,8 +267,8 @@ impl Cell {
 
 #[test]
 fn possible_test() {
-    let mut c = Cell::new(1, false);
-    for i in 1..MAX + 1 {
+    let mut c = Cell::new(1, false, 3);
+    for i in 1..c.max + 1 {
         let pos = i.try_into().unwrap();
         assert_eq!(true, c.candidate(pos));
     }
@@ -275,10 +278,10 @@ fn possible_test() {
 
 #[test]
 fn resolution_test() {
-    let mut c = Cell::new(1, false);
+    let mut c = Cell::new(1, false, 3);
     assert_eq!(false, c.is_resolved());
     assert_eq!(None, c.get_answer());
-    for v in 1..MAX {
+    for v in 1..c.max {
         let val = v.try_into().unwrap();
         c.remove_candidate_and_verify(val);
     }
@@ -303,13 +306,14 @@ impl Clone for Cell {
             debug: self.debug,
             just_resolved: self.just_resolved,
             possible_removed: self.possible_removed,
+            max: self.max,
         }
     }
 }
 
 #[test]
 fn clone_cell_test() {
-    let mut ori = Cell::new(1, false);
+    let mut ori = Cell::new(1, false, 3);
     ori.remove_a_possible(5);
     ori.debug();
     let mut copy = ori.clone();

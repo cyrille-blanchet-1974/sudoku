@@ -1,20 +1,17 @@
 use super::super::objects::accessor::*;
 use super::super::objects::cardinal::*;
 use super::super::objects::cell::*;
-use super::super::objects::constant::*;
 use super::super::objects::grid::*;
 
 use std::convert::TryInto;
 
 pub struct ResolverLvl3 {
-    acc: Accessor, //methods to retreive cells by coordinates
     trace: String,
 }
 
 impl ResolverLvl3 {
     pub fn new() -> ResolverLvl3 {
         ResolverLvl3 {
-            acc: Accessor::new(),
             trace: String::new(),
         }
     }
@@ -40,14 +37,14 @@ impl ResolverLvl3 {
         }
         self.trace = "".to_string();
         let mut solve_one_at_least = false;
-        for v in 1..=MAX {
+        for v in 1..=g.get_metrics().get_max() {
             let val: usize = v.try_into().unwrap();
-            for line in 1..=COLUMNSIZE {
+            for line in 1..=g.get_metrics().get_nb_column() {
                 if self.resolve_line(g, line, val) {
                     solve_one_at_least = true;
                 }
             }
-            for column in 1..=LINESIZE {
+            for column in 1..=g.get_metrics().get_nb_line() {
                 if self.resolve_column(g, column, val) {
                     solve_one_at_least = true;
                 }
@@ -67,9 +64,10 @@ impl ResolverLvl3 {
             //if val already solved in the line
             return false;
         }
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         let mut unsolve = 255;
         //iterate on all cells of the line
-        for p in self.acc.get_line(line) {
+        for p in acc.get_line(line) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
@@ -84,7 +82,7 @@ impl ResolverLvl3 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
-            let coord = pos_to_coord(pos);
+            let coord = acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" l:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
@@ -98,9 +96,10 @@ impl ResolverLvl3 {
             //if val already solved in the column
             return false;
         }
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         let mut unsolve = 255;
         //iterate on all cells of the line
-        for p in self.acc.get_column(column) {
+        for p in acc.get_column(column) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
@@ -115,7 +114,7 @@ impl ResolverLvl3 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
-            let coord = pos_to_coord(pos);
+            let coord = acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" c:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);
@@ -129,9 +128,10 @@ impl ResolverLvl3 {
             //if val already solved in the square
             return false;
         }
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         let mut unsolve = 255;
         //iterate on all cells of the line
-        for p in self.acc.get_square(square) {
+        for p in acc.get_square(square) {
             let pos: usize = p.try_into().unwrap();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
@@ -146,7 +146,7 @@ impl ResolverLvl3 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
             let v: u8 = val.try_into().unwrap();
-            let coord = pos_to_coord(pos);
+            let coord = acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" s:{}/{}={}", coord.0, coord.1, val);
             self.trace.push_str(&trc);

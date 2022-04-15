@@ -3,8 +3,8 @@ use super::cardinal::*;
 use super::cell::CellType;
 use super::cell::*;
 use super::column::*;
-use super::constant::*;
 use super::line::*;
+use super::metrics::*;
 use super::square::*;
 use std::convert::TryInto;
 use std::io::Write;
@@ -19,34 +19,37 @@ pub struct Grid {
     squares: Vec<Square>,
     resolved: bool,
     debug: bool,
+    metrics: Metrics,
 }
 
-impl Default for Grid {
+//methods to update Grid struct
+impl Grid {
     /**
      * create a default Sudoku Grid
      */
-    fn default() -> Self {
+    pub fn new(side: u8) -> Grid {
         let mut cells = Vec::new();
+        let metrics = Metrics::new(side);
         //construct all cells
-        for i in 0..GRIDSIZE {
-            cells.push(Cell::new(i.try_into().unwrap(), false));
+        for i in 0..metrics.get_grid_size() {
+            cells.push(Cell::new(i.try_into().unwrap(), false, side));
         }
-        let acc = Accessor::new();
+        let acc = Accessor::new(side);
         let mut lines = Vec::new();
         //construct all lines
-        for _i in 0..COLUMNSIZE {
-            lines.push(Line::default());
+        for _i in 0..metrics.get_nb_column() {
+            lines.push(Line::new(metrics.get_max()));
         }
         let mut columns = Vec::new();
         //construct all columns
-        for _i in 0..LINESIZE {
-            columns.push(Column::default());
+        for _i in 0..metrics.get_nb_line() {
+            columns.push(Column::new(metrics.get_max()));
         }
         let mut squares = Vec::new();
         let c = Cardinal::C;
         //construct all Squares
         for _i in c.get_all() {
-            squares.push(Square::default());
+            squares.push(Square::new(metrics.get_max()));
         }
         Grid {
             cells,
@@ -56,22 +59,24 @@ impl Default for Grid {
             squares,
             resolved: false,
             debug: false,
+            metrics,
         }
     }
-}
 
-//methods to update Grid struct
-impl Grid {
+    pub fn get_metrics(&self) -> Metrics {
+        self.metrics
+    }
+
     /**
      * how many cells not found for a given value
      */
     fn get_lefts(&mut self) -> Vec<u8> {
         //number of cell lefts for a value
         let mut lefts = Vec::new();
-        for _i in 0..MAX {
-            lefts.push(MAX);
+        for _i in 0..self.metrics.get_max() {
+            lefts.push(self.metrics.get_max());
         }
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = self.get_cell(pos);
             match cell.get_answer() {
@@ -107,7 +112,7 @@ impl Grid {
      */
     pub fn something_has_some_change(&mut self) -> bool {
         let mut res = false;
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.something_has_some_change() {
@@ -119,7 +124,7 @@ impl Grid {
     }
     pub fn set_debug(&mut self, debug: bool) {
         self.debug = debug;
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             cell.set_debug(debug);
@@ -129,7 +134,7 @@ impl Grid {
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
      **/
     pub fn set_val(&mut self, line: u8, column: u8, val: u8, t: CellType) {
-        let pos = coord_to_pos(line, column);
+        let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val, t);
         let c: usize = (column - 1).try_into().unwrap();
@@ -138,7 +143,9 @@ impl Grid {
         let l: usize = (line - 1).try_into().unwrap();
         let lin: &mut Line = &mut (self.lines[l]);
         lin.add_a_known_value(val);
-        let s: usize = (pos_to_square(pos).get_value() - 1).try_into().unwrap();
+        let s: usize = (self.acc.coordconverter.pos_to_square(pos).get_value() - 1)
+            .try_into()
+            .unwrap();
         let squ: &mut Square = &mut (self.squares[s]);
         squ.add_a_known_value(val);
     }
@@ -147,7 +154,7 @@ impl Grid {
      * remove a possible value from a cell
      **/
     pub fn remove_candidate(&mut self, line: u8, column: u8, val: u8) {
-        let pos = coord_to_pos(line, column);
+        let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         let v: usize = val.try_into().unwrap();
         if self.debug {
@@ -179,7 +186,7 @@ impl Grid {
      */
     pub fn resolved(&mut self) -> bool {
         if !self.resolved {
-            for i in 0..GRIDSIZE {
+            for i in 0..self.metrics.get_grid_size() {
                 let pos: usize = i.try_into().unwrap();
                 let cell: &mut Cell = &mut (self.cells[pos]);
                 if !cell.is_resolved() {
@@ -197,14 +204,14 @@ impl Grid {
      * */
     pub fn valid(&self) -> bool {
         let mut mess;
-        for line in 1..=COLUMNSIZE {
+        for line in 1..=self.metrics.get_nb_column() {
             mess = format!("line {}", line);
             let res = self.is_valid_set(self.acc.get_line(line), mess);
             if !res {
                 return false;
             }
         }
-        for column in 1..=LINESIZE {
+        for column in 1..=self.metrics.get_nb_line() {
             mess = format!("column {}", column);
             let res = self.is_valid_set(self.acc.get_column(column), mess);
             if !res {
@@ -223,15 +230,49 @@ impl Grid {
     }
 }
 
+#[test]
+fn check_is_valid() {
+    let mut g = Grid::new(3);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 1, 1, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 3, 3, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 4, 4, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 5, 5, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 6, 6, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 7, 7, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 8, 8, CellType::Origin);
+    assert_eq!(true, g.valid());
+    g.set_val(1, 9, 9, CellType::Origin);
+    assert_eq!(true, g.valid());
+
+    let mut g2 = g.clone();
+    g2.set_val(2, 1, 1, CellType::Origin); //two 1 on samae column
+    assert_eq!(false, g2.valid());
+
+    let mut g2 = g.clone();
+    g2.set_val(1, 2, 1, CellType::Origin); //Two 1 on same line
+    assert_eq!(false, g2.valid());
+
+    let mut g2 = g.clone();
+    g2.set_val(3, 3, 1, CellType::Origin); //Two 1 on same square
+    assert_eq!(false, g2.valid());
+}
+
 //resolve helping methods
 impl Grid {
     /**
      * get the list of the resolved cells of the grid
      *
      */
-    pub fn get_resolved(&mut self) -> Vec<u8> {
+    pub fn get_resolved(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_resolved() {
@@ -245,9 +286,9 @@ impl Grid {
      * get the list of the cells unknowns
      *
      */
-    pub fn get_unresolved(&mut self) -> Vec<u8> {
+    pub fn get_unresolved(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if !cell.is_resolved() {
@@ -277,7 +318,7 @@ impl Grid {
      */
     pub fn get_first_xwing(&mut self) -> Option<usize> {
         //if a xwing exist return if
-        for pos in 0..GRIDSIZE {
+        for pos in 0..self.metrics.get_grid_size() {
             let p: usize = pos.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() && cell.get_type() == CellType::Xwing {
@@ -294,7 +335,7 @@ impl Grid {
     pub fn get_first_unsolved(&mut self) -> Option<usize> {
         let mut potential = (0, 999); //position/nb possibles
                                       //find a cell not resolved
-        for pos in 0..GRIDSIZE {
+        for pos in 0..self.metrics.get_grid_size() {
             let p: usize = pos.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() {
@@ -345,9 +386,9 @@ impl Grid {
     /**
      * Check in a set of cells if a value is present more than one time
      * */
-    pub fn is_valid_set(&self, set: Vec<u8>, text: String) -> bool {
+    pub fn is_valid_set(&self, set: Vec<u16>, text: String) -> bool {
         let mut count = Vec::new();
-        for _i in 0..MAX {
+        for _i in 0..self.metrics.get_max() {
             count.push(0);
         }
         for v in set {
@@ -361,7 +402,7 @@ impl Grid {
                 }
             };
         }
-        for i in 0..MAX {
+        for i in 0..self.metrics.get_max() {
             let pos: usize = i.try_into().unwrap();
             match count.get(pos) {
                 None => {}
@@ -377,6 +418,12 @@ impl Grid {
         }
         true
     }
+}
+
+#[test]
+fn resolution_test() {
+    let mut g = Grid::new(3);
+    assert_eq!(false, g.resolved());
 }
 
 //display and debug methods
@@ -459,15 +506,15 @@ impl Grid {
             )
             .unwrap();
 
-        let first = get_square_deco("╔", "═══", "╦", "╗");
-        let last = get_square_deco("╚", "═══", "╩", "╝");
-        let mid = get_square_deco("╟", "═══", "╬", "╢");
+        let first = self.get_square_deco("╔", "═══", "╦", "╗");
+        let last = self.get_square_deco("╚", "═══", "╩", "╝");
+        let mid = self.get_square_deco("╟", "═══", "╬", "╢");
 
         writeln!(&mut stdout, "{}", first).unwrap();
-        for line in 1..=LINESIZE {
+        for line in 1..=self.metrics.get_nb_line() {
             write!(&mut stdout, "║").unwrap();
-            for column in 1..=COLUMNSIZE {
-                let pos = coord_to_pos(line, column);
+            for column in 1..=self.metrics.get_nb_column() {
+                let pos = self.acc.coordconverter.coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
                 match cell.get_answer() {
                     None => {
@@ -491,15 +538,15 @@ impl Grid {
                             .set_fg(Some(Color::White)),
                     )
                     .unwrap();
-                if column % SQUARE_SIDE == 0 {
+                if column % self.metrics.get_square_side() == 0 {
                     write!(&mut stdout, "║").unwrap();
                 }
             }
             println!();
 
-            if line % COLUMNSIZE == 0 {
+            if line % self.metrics.get_nb_column() == 0 {
                 writeln!(&mut stdout, "{}", last).unwrap();
-            } else if line % SQUARE_SIDE == 0 {
+            } else if line % self.metrics.get_square_side() == 0 {
                 writeln!(&mut stdout, "{}", mid).unwrap();
             }
         }
@@ -509,12 +556,12 @@ impl Grid {
      * display the actual grid en Black and white
      */
     pub fn display_bw(&mut self) {
-        let linesep = get_square_deco("+", "---", "+", "+");
+        let linesep = self.get_square_deco("+", "---", "+", "+");
         println!("{}", linesep);
-        for line in 1..=LINESIZE {
+        for line in 1..=self.metrics.get_nb_line() {
             print!("|");
-            for column in 1..=COLUMNSIZE {
-                let pos = coord_to_pos(line, column);
+            for column in 1..=self.metrics.get_nb_column() {
+                let pos = self.acc.coordconverter.coord_to_pos(line, column);
                 let cell: &Cell = &self.cells[pos];
                 match cell.get_answer() {
                     None => {
@@ -524,13 +571,13 @@ impl Grid {
                         print!(" {} ", x);
                     }
                 };
-                if column % SQUARE_SIDE == 0 {
+                if column % self.metrics.get_square_side() == 0 {
                     print!("|");
                 }
             }
             println!();
 
-            if line % SQUARE_SIDE == 0 {
+            if line % self.metrics.get_square_side() == 0 {
                 println!("{}", linesep);
             }
         }
@@ -539,7 +586,7 @@ impl Grid {
     pub fn display_lefts(&mut self) {
         let lefts = self.get_lefts();
         print!("Remains:");
-        for i in 0..MAX {
+        for i in 0..self.metrics.get_max() {
             let idx: usize = i.try_into().unwrap();
             print!(" {}=>{}", i + 1, lefts[idx]);
         }
@@ -552,84 +599,57 @@ impl Grid {
     pub fn debug(&mut self) {
         println!("-------------------------------DEBUG-------------------------------");
         let mut nb = 0;
-        for i in 0..GRIDSIZE {
+        for i in 0..self.metrics.get_grid_size() {
             let pos: usize = i.try_into().unwrap();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.debug() {
                 nb += 1;
             }
-            if nb == SQUARE_SIDE {
+            if nb == self.metrics.get_square_side() {
                 println!();
                 nb = 0;
             }
         }
-        if nb != SQUARE_SIDE {
+        if nb != self.metrics.get_square_side() {
             println!();
         }
         println!("-------------------------------DEBUG-------------------------------");
     }
-}
 
-impl Grid {
-    pub fn copy_from(&mut self, g: Grid) {
-        self.cells.clear();
-        for v in g.cells {
-            self.cells.push(v.clone());
+    //grid decorations
+    fn get_square_deco(&self, first: &str, fill: &str, sep: &str, last: &str) -> String {
+        let mut res = String::new();
+        res.push_str(first);
+        for i in 0..self.metrics.get_square_side() {
+            for _j in 0..self.metrics.get_square_side() {
+                res.push_str(fill);
+            }
+            if i != self.metrics.get_square_side() - 1 {
+                res.push_str(sep);
+            }
         }
-        self.lines.clear();
-        for v in g.lines {
-            self.lines.push(v.clone());
-        }
-        self.columns.clear();
-        for v in g.columns {
-            self.columns.push(v.clone());
-        }
-        self.squares.clear();
-        for v in g.squares {
-            self.squares.push(v.clone());
-        }
-    }
-}
-
-impl Clone for Grid {
-    fn clone(&self) -> Grid {
-        let mut cells = Vec::new();
-        for v in &self.cells {
-            cells.push(v.clone());
-        }
-        let mut lines = Vec::new();
-        for v in &self.lines {
-            lines.push(v.clone());
-        }
-        let mut columns = Vec::new();
-        for v in &self.columns {
-            columns.push(v.clone());
-        }
-        let mut squares = Vec::new();
-        for v in &self.squares {
-            squares.push(v.clone());
-        }
-        Grid {
-            cells,
-            acc: Accessor::new(), //Accessor always contains sames datas
-            lines,
-            columns,
-            squares,
-            resolved: self.resolved,
-            debug: self.debug,
-        }
+        res.push_str(last);
+        res
     }
 }
 
 #[test]
-fn resolution_test() {
-    let mut g = Grid::default();
-    assert_eq!(false, g.resolved());
+fn deco_test() {
+    let g = Grid::new(3);
+    let first = g.get_square_deco("╔", "═══", "╦", "╗");
+    assert_eq!(first, "╔═════════╦═════════╦═════════╗".to_string());
+    let last = g.get_square_deco("╚", "═══", "╩", "╝");
+    assert_eq!(last, "╚═════════╩═════════╩═════════╝".to_string());
+    let mid = g.get_square_deco("╟", "═══", "╬", "╢");
+    assert_eq!(mid, "╟═════════╬═════════╬═════════╢".to_string());
+
+    let simple = g.get_square_deco("+", "---", "+", "+");
+    assert_eq!(simple, "+---------+---------+---------+".to_string());
 }
 
 #[test]
 fn display_test() {
-    let mut g = Grid::default();
+    let mut g = Grid::new(3);
     g.display();
     g.set_val(1, 1, 1, CellType::Origin);
     g.set_val(1, 2, 2, CellType::Origin);
@@ -715,43 +735,63 @@ fn display_test() {
     g.display();
 }
 
-#[test]
-fn check_is_valid() {
-    let mut g = Grid::default();
-    assert_eq!(true, g.valid());
-    g.set_val(1, 1, 1, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 3, 3, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 4, 4, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 5, 5, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 6, 6, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 7, 7, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 8, 8, CellType::Origin);
-    assert_eq!(true, g.valid());
-    g.set_val(1, 9, 9, CellType::Origin);
-    assert_eq!(true, g.valid());
+//methods to duplicate a grid
+impl Grid {
+    pub fn copy_from(&mut self, g: Grid) {
+        self.cells.clear();
+        for v in g.cells {
+            self.cells.push(v.clone());
+        }
+        self.lines.clear();
+        for v in g.lines {
+            self.lines.push(v.clone());
+        }
+        self.columns.clear();
+        for v in g.columns {
+            self.columns.push(v.clone());
+        }
+        self.squares.clear();
+        for v in g.squares {
+            self.squares.push(v.clone());
+        }
+    }
+}
 
-    let mut g2 = g.clone();
-    g2.set_val(2, 1, 1, CellType::Origin); //two 1 on samae column
-    assert_eq!(false, g2.valid());
-
-    let mut g2 = g.clone();
-    g2.set_val(1, 2, 1, CellType::Origin); //Two 1 on same line
-    assert_eq!(false, g2.valid());
-
-    let mut g2 = g.clone();
-    g2.set_val(3, 3, 1, CellType::Origin); //Two 1 on same square
-    assert_eq!(false, g2.valid());
+//methods to clone a grid
+impl Clone for Grid {
+    fn clone(&self) -> Grid {
+        let mut cells = Vec::new();
+        for v in &self.cells {
+            cells.push(v.clone());
+        }
+        let mut lines = Vec::new();
+        for v in &self.lines {
+            lines.push(v.clone());
+        }
+        let mut columns = Vec::new();
+        for v in &self.columns {
+            columns.push(v.clone());
+        }
+        let mut squares = Vec::new();
+        for v in &self.squares {
+            squares.push(v.clone());
+        }
+        Grid {
+            cells,
+            acc: Accessor::new(self.metrics.get_square_side()), //Accessor always contains sames datas
+            lines,
+            columns,
+            squares,
+            resolved: self.resolved,
+            debug: self.debug,
+            metrics: self.metrics,
+        }
+    }
 }
 
 #[test]
 fn clone_grid_test() {
-    let mut ori = Grid::default();
+    let mut ori = Grid::new(3);
     ori.set_val(1, 1, 1, CellType::Origin);
     ori.set_val(2, 4, 1, CellType::Origin);
     ori.set_val(3, 7, 1, CellType::Origin);
@@ -797,33 +837,4 @@ impl Grid {
             l += 1;
         }
     }
-}
-
-//grid decorations
-fn get_square_deco(first: &str, fill: &str, sep: &str, last: &str) -> String {
-    let mut res = String::new();
-    res.push_str(first);
-    for i in 0..SQUARE_SIDE {
-        for _j in 0..SQUARE_SIDE {
-            res.push_str(fill);
-        }
-        if i != SQUARE_SIDE - 1 {
-            res.push_str(sep);
-        }
-    }
-    res.push_str(last);
-    res
-}
-
-#[test]
-fn deco_test() {
-    let first = get_square_deco("╔", "═══", "╦", "╗");
-    assert_eq!(first, "╔═════════╦═════════╦═════════╗".to_string());
-    let last = get_square_deco("╚", "═══", "╩", "╝");
-    assert_eq!(last, "╚═════════╩═════════╩═════════╝".to_string());
-    let mid = get_square_deco("╟", "═══", "╬", "╢");
-    assert_eq!(mid, "╟═════════╬═════════╬═════════╢".to_string());
-
-    let simple = get_square_deco("+", "---", "+", "+");
-    assert_eq!(simple, "+---------+---------+---------+".to_string());
 }

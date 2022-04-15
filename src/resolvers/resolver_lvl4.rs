@@ -1,6 +1,5 @@
 use super::super::objects::accessor::*;
 use super::super::objects::cell::*;
-use super::super::objects::constant::*;
 use super::super::objects::grid::*;
 use std::convert::TryInto;
 
@@ -46,18 +45,19 @@ impl ResolverLvl4 {
 
     fn resolve_line(&mut self, g: &mut Grid) -> bool {
         let mut trouve = false;
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         //loop values
-        for v in 1..=MAX {
+        for v in 1..=g.get_metrics().get_max() {
             let val: usize = v.try_into().unwrap();
             let mut tab = Vec::new();
             //loop lines
-            'lines: for line in 1..=LINESIZE {
+            'lines: for line in 1..=g.get_metrics().get_nb_line() {
                 let mut t = (0, 0); // count   and positions
                                     //count is nb of cell with val in possibles
                                     //positions is 'binairy' positions of column with val possible
                 let mut p: u32 = 100_000_000;
-                for column in 1..=COLUMNSIZE {
-                    let pos = coord_to_pos(line, column);
+                for column in 1..=g.get_metrics().get_nb_column() {
+                    let pos = acc.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
@@ -88,19 +88,19 @@ impl ResolverLvl4 {
             }
             //check if we find 2 lines with only 2 count and the same position
             //loop on tab
-            for line in 1..=LINESIZE {
+            for line in 1..=g.get_metrics().get_nb_line() {
                 let l: usize = line.try_into().unwrap();
                 let t = tab[l - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
-                    for line2 in line + 1..=LINESIZE {
+                    for line2 in line + 1..=g.get_metrics().get_nb_line() {
                         let l2: usize = line2.try_into().unwrap();
                         let t2 = tab[l2 - 1];
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
                             //found 2 lines each of them has value v possible in the sames columns
-                            let c = self.decode(t2.1);
+                            let c = self.decode(t2.1, 9);
                             //Set type of cells to 'Xwing"
                             self.set_xwing(
                                 g,
@@ -115,19 +115,21 @@ impl ResolverLvl4 {
                             );
                             self.trace.push_str(&trc);
                             //So we can remove value v of all other cells of this two columns
-                            for l in 1..=LINESIZE {
+                            for l in 1..=g.get_metrics().get_nb_line() {
                                 if l == line {
                                     continue;
                                 }
                                 if l == line2 {
                                     continue;
                                 }
-                                let pos = coord_to_pos(l, c.0.try_into().unwrap());
+                                let pos =
+                                    acc.coordconverter.coord_to_pos(l, c.0.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
-                                let pos = coord_to_pos(l, c.1.try_into().unwrap());
+                                let pos =
+                                    acc.coordconverter.coord_to_pos(l, c.1.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
@@ -142,18 +144,19 @@ impl ResolverLvl4 {
     }
     fn resolve_column(&mut self, g: &mut Grid) -> bool {
         let mut trouve = false;
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         //loop values
-        for v in 1..=MAX {
+        for v in 1..=g.get_metrics().get_max() {
             let val: usize = v.try_into().unwrap();
             let mut tab = Vec::new();
             //loop columns
-            'cols: for column in 1..=COLUMNSIZE {
+            'cols: for column in 1..=g.get_metrics().get_nb_column() {
                 let mut t = (0, 0); // count   and positions
                                     //count is nb of cell with val in possibles
                                     //positions is 'binairy' positions of line with val possible
                 let mut p: u32 = 100_000_000;
-                for line in 1..=LINESIZE {
-                    let pos = coord_to_pos(line, column);
+                for line in 1..=g.get_metrics().get_nb_line() {
+                    let pos = acc.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
@@ -184,19 +187,19 @@ impl ResolverLvl4 {
             }
             //check if we find 2 cols with only 2 count and the same position
             //loop on tab
-            for column in 1..=COLUMNSIZE {
+            for column in 1..=g.get_metrics().get_nb_column() {
                 let c: usize = column.try_into().unwrap();
                 let t = tab[c - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
-                    for column2 in column + 1..=COLUMNSIZE {
+                    for column2 in column + 1..=g.get_metrics().get_nb_column() {
                         let c2: usize = column2.try_into().unwrap();
                         let t2 = tab[c2 - 1];
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
                             //found 2 cols each of them has value v possible in the sames lines
-                            let l = self.decode(t2.1);
+                            let l = self.decode(t2.1, 9);
                             //Set type of cells to 'Xwing"
                             self.set_xwing(
                                 g,
@@ -211,19 +214,21 @@ impl ResolverLvl4 {
                             );
                             self.trace.push_str(&trc);
                             //So we can remove value v of all other cells of this two lines
-                            for c in 1..=COLUMNSIZE {
+                            for c in 1..=g.get_metrics().get_nb_column() {
                                 if c == column {
                                     continue;
                                 }
                                 if c == column2 {
                                     continue;
                                 }
-                                let pos = coord_to_pos(l.0.try_into().unwrap(), c);
+                                let pos =
+                                    acc.coordconverter.coord_to_pos(l.0.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
-                                let pos = coord_to_pos(l.1.try_into().unwrap(), c);
+                                let pos =
+                                    acc.coordconverter.coord_to_pos(l.1.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
@@ -238,26 +243,27 @@ impl ResolverLvl4 {
     }
 
     fn set_xwing(&mut self, g: &mut Grid, l1: u8, l2: u8, c1: u8, c2: u8) {
-        let pos = coord_to_pos(l1, c1);
+        let acc = Accessor::new(g.get_metrics().get_square_side());
+        let pos = acc.coordconverter.coord_to_pos(l1, c1);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = coord_to_pos(l1, c2);
+        let pos = acc.coordconverter.coord_to_pos(l1, c2);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = coord_to_pos(l2, c1);
+        let pos = acc.coordconverter.coord_to_pos(l2, c1);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = coord_to_pos(l2, c2);
+        let pos = acc.coordconverter.coord_to_pos(l2, c2);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
     }
 
-    fn decode(&mut self, d: u32) -> (usize, usize) {
+    fn decode(&mut self, d: u32, linesize: u8) -> (usize, usize) {
         let mut p: u32 = 100_000_000;
         let mut u1 = 0;
         let mut u2 = 0;
         let mut d32 = d;
-        for line in 1..=LINESIZE {
+        for line in 1..=linesize {
             if d32 >= p {
                 d32 -= p;
                 if u1 == 0 {
@@ -276,14 +282,14 @@ impl ResolverLvl4 {
 #[test]
 fn test_decode() {
     let mut l4 = ResolverLvl4::new();
-    assert_eq!((1, 2), l4.decode(110000000));
-    assert_eq!((1, 9), l4.decode(100000001));
-    assert_eq!((3, 6), l4.decode(001006000));
+    assert_eq!((1, 2), l4.decode(110000000, 9));
+    assert_eq!((1, 9), l4.decode(100000001, 9));
+    assert_eq!((3, 6), l4.decode(001006000, 9));
 }
 
 #[test]
 fn test_resolve() {
-    let mut g = Grid::default();
+    let mut g = Grid::new(3);
     g.set_val(1, 1, 6, CellType::Origin);
     g.set_val(1, 2, 7, CellType::Origin);
     g.set_val(1, 3, 9, CellType::Origin);

@@ -1,47 +1,47 @@
 use super::objects::cell::CellType;
-use super::objects::constant::*;
 use super::objects::grid::*;
 use super::read::*;
 use super::ui::*;
-
-fn manual() -> Option<Grid> {
-    let mut g = Grid::default();
+//let acc = Accessor::new(g.get_metrics().get_square_side());
+fn manual(squareside: u8) -> Option<Grid> {
+    let mut g = Grid::new(squareside);
     println!("resolved = {}", g.resolved());
     println!();
     g.display();
+    let max = g.get_metrics().get_max();
     loop {
-        println!("[1-{}] 0 to solve", MAX);
+        println!("[1-{}] 0 to solve", max);
         let l = read_u8("Line?".to_string());
         if l.is_none() {
             continue;
         }
         let l = l.unwrap();
         //control >=0 useless because type is u8 unsigned 8
-        if l > MAX {
+        if l > max {
             continue;
         }
         if l == 0 {
             return Some(g);
         }
-        println!("[1-{}] 0 to solve", MAX);
+        println!("[1-{}] 0 to solve", max);
         let c = read_u8("Column?".to_string());
         if c.is_none() {
             continue;
         }
         let c = c.unwrap();
-        if c > MAX {
+        if c > max {
             continue;
         }
         if c == 0 {
             return Some(g);
         }
-        println!("[1-{}] 0 to solve", MAX);
+        println!("[1-{}] 0 to solve", max);
         let v = read_u8("Value?".to_string());
         if v.is_none() {
             continue;
         }
         let v = v.unwrap();
-        if v > MAX {
+        if v > max {
             continue;
         }
         if v == 0 {
@@ -352,7 +352,7 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
                 return Some(from_disk(fic, debug));
             }
             Some(10) => {
-                return manual();
+                return manual(3);
             }
             Some(99) => {
                 println!("Sudoku resolution End!");

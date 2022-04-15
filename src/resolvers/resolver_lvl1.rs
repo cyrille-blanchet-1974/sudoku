@@ -4,14 +4,12 @@ use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl1 {
-    acc: Accessor, //methods to retreive cells by coordinates
     trace: String,
 }
 
 impl ResolverLvl1 {
     pub fn new() -> ResolverLvl1 {
         ResolverLvl1 {
-            acc: Accessor::new(),
             trace: String::new(),
         }
     }
@@ -51,7 +49,7 @@ impl ResolverLvl1 {
     If a cell is resolved then his value is in no other cells of the same Row,
     in no other cells of the same column and in no other cells of the same square
     */
-    fn resolve_val(&mut self, g: &mut Grid, p: u8) {
+    fn resolve_val(&mut self, g: &mut Grid, p: u16) {
         //get value of the received cell
         let pos: usize = p.try_into().unwrap();
         let cell: &mut Cell = g.get_cell(pos);
@@ -87,23 +85,24 @@ impl ResolverLvl1 {
     from a cell retrieve the cells of the same line, same column and same square
     but not the original one
     */
-    fn get_to_clean(&self, g: &mut Grid, p: u8) -> Vec<u8> {
+    fn get_to_clean(&self, g: &mut Grid, p: u16) -> Vec<u16> {
         let mut res = Vec::new();
         let pos: usize = p.try_into().unwrap();
+        let acc = Accessor::new(g.get_metrics().get_square_side());
         let cell: &Cell = g.get_cell(pos);
-        let lin = self.acc.get_line(cell.get_line());
+        let lin = acc.get_line(cell.get_line());
         for l in lin {
             if l != p {
                 res.push(l);
             }
         }
-        let col = self.acc.get_column(cell.get_column());
+        let col = acc.get_column(cell.get_column());
         for c in col {
             if c != p {
                 res.push(c);
             }
         }
-        let squ = self.acc.get_square(cell.get_square());
+        let squ = acc.get_square(cell.get_square());
         for s in squ {
             if s != p {
                 res.push(s);
