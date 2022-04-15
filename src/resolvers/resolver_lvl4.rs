@@ -48,7 +48,7 @@ impl ResolverLvl4 {
         let acc = Accessor::new(g.get_metrics().get_square_side());
         let max = g.get_metrics().get_max();
         let nb_line = g.get_metrics().get_nb_line();
-        let nb_column=g.get_metrics().get_nb_column();
+        let nb_column = g.get_metrics().get_nb_column();
         //loop values
         for v in 1..=max {
             let val: usize = v.try_into().unwrap();
@@ -149,8 +149,8 @@ impl ResolverLvl4 {
         let mut trouve = false;
         let acc = Accessor::new(g.get_metrics().get_square_side());
         let max = g.get_metrics().get_max();
-        let nb_line=g.get_metrics().get_nb_line();
-        let nb_column=g.get_metrics().get_nb_column();
+        let nb_line = g.get_metrics().get_nb_line();
+        let nb_column = g.get_metrics().get_nb_column();
         //loop values
         for v in 1..=max {
             let val: usize = v.try_into().unwrap();

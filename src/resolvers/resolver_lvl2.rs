@@ -37,9 +37,10 @@ impl ResolverLvl2 {
         let mut resolve_some = false;
         //iter on squares
         let squ = Cardinal::C;
+        let max = g.get_metrics().get_max();
         for sq in squ.get_all() {
             //iter on values
-            for value in 1..=g.get_metrics().get_max() {
+            for value in 1..=max {
                 if self.resolve_square_val(g, sq, value) {
                     resolve_some = true
                 }
