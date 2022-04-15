@@ -20,6 +20,7 @@ pub struct Grid {
     resolved: bool,
     debug: bool,
     metrics: Metrics,
+    trace: String,
 }
 
 //methods to update Grid struct
@@ -60,11 +61,27 @@ impl Grid {
             resolved: false,
             debug: false,
             metrics,
+            trace: String::new(),
         }
     }
 
     pub fn get_metrics(&self) -> Metrics {
         self.metrics
+    }
+
+    /*
+        get a string containg what was found
+    */
+    pub fn get_trace(&self) -> String {
+        let mut output = String::new();
+        output.push_str(&self.trace);
+        output
+    }
+    pub fn clear_trace(&mut self) {
+        self.trace.clear();
+    }
+    pub fn add_trace(&mut self, s: String) {
+        self.trace.push_str(&s);
     }
 
     /**
@@ -776,6 +793,8 @@ impl Clone for Grid {
         for v in &self.squares {
             squares.push(v.clone());
         }
+        let mut trace = String::new();
+        trace.push_str(&self.trace);
         Grid {
             cells,
             acc: Accessor::new(self.metrics.get_square_side()), //Accessor always contains sames datas
@@ -785,6 +804,7 @@ impl Clone for Grid {
             resolved: self.resolved,
             debug: self.debug,
             metrics: self.metrics,
+            trace,
         }
     }
 }

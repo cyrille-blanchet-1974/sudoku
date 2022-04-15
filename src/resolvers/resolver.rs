@@ -17,10 +17,10 @@ pub struct Resolver {
     nblvl4ko: u32,
     nblvl9guess: u32,
     nblvl9wrongguess: u32,
-    resolver1: ResolverLvl1,
-    resolver2: ResolverLvl2,
-    resolver3: ResolverLvl3,
-    resolver4: ResolverLvl4,
+    resolver1: Option<ResolverLvl1>,
+    resolver2: Option<ResolverLvl2>,
+    resolver3: Option<ResolverLvl3>,
+    resolver4: Option<ResolverLvl4>,
     debug: bool,
     display: bool,
 }
@@ -39,10 +39,10 @@ impl Resolver {
             nblvl4ko: 0,
             nblvl9guess: 0,
             nblvl9wrongguess: 0,
-            resolver1: ResolverLvl1::new(),
-            resolver2: ResolverLvl2::new(),
-            resolver3: ResolverLvl3::new(),
-            resolver4: ResolverLvl4::new(),
+            resolver1: None,
+            resolver2: None,
+            resolver3: None,
+            resolver4: None,
             debug,
             display,
         }
@@ -72,6 +72,10 @@ impl Resolver {
     }
 
     pub fn go(&mut self, g: &mut Grid) -> bool {
+        self.resolver1 = Some(ResolverLvl1::new(g.get_metrics().get_square_side()));
+        self.resolver2 = Some(ResolverLvl2::new(g.get_metrics().get_square_side()));
+        self.resolver3 = Some(ResolverLvl3::new(g.get_metrics().get_square_side()));
+        self.resolver4 = Some(ResolverLvl4::new(g.get_metrics().get_square_side()));
         self.gos(g, "".to_string())
     }
     pub fn gos(&mut self, g: &mut Grid, spacer: String) -> bool {
@@ -173,41 +177,41 @@ impl Resolver {
         self.step += 1;
         //try 3 first type of resolution
         //only solution when removing founds of the same line columnand square
-        let res1 = self.resolver1.resolve(g);
+        let res1 = self.resolver1.as_ref().unwrap().resolve(g);
         self.nblvl1 += 1;
         if !res1 {
             self.nblvl1ko += 1;
         } else if self.debug {
-            let trc = self.resolver1.get_trace();
+            let trc = g.get_trace();
             println!("{}Level1 => {}", space, trc);
         }
         //value fount in two other line and two other column of a square
-        let res2 = self.resolver2.resolve(g);
+        let res2 = self.resolver2.as_ref().unwrap().resolve(g);
         self.nblvl2 += 1;
         if !res2 {
             self.nblvl2ko += 1;
         } else if self.debug {
-            let trc = self.resolver2.get_trace();
+            let trc = g.get_trace();
             println!("{}Level2 => {}", space, trc);
         }
         //value not in the possible of other cells of the same line OR
         //value not in the possible of other cells of the same column OR
         //value not in the possible of other cells of the same square
-        let res3 = self.resolver3.resolve(g);
+        let res3 = self.resolver3.as_ref().unwrap().resolve(g);
         self.nblvl3 += 1;
         if !res3 {
             self.nblvl3ko += 1;
         } else if self.debug {
-            let trc = self.resolver3.get_trace();
+            let trc = g.get_trace();
             println!("{}Level3 => {}", space, trc);
         }
         //x-wing
-        let res4 = self.resolver4.resolve(g);
+        let res4 = self.resolver4.as_ref().unwrap().resolve(g);
         self.nblvl4 += 1;
         if !res4 {
             self.nblvl4ko += 1;
         } else if self.debug {
-            let trc = self.resolver4.get_trace();
+            let trc = g.get_trace();
             println!("{}Level4 => {}", space, trc);
         }
         g.something_has_some_change()

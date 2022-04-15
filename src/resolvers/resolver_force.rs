@@ -25,7 +25,7 @@ impl ResolverForce {
 
     //display the grid
     pub fn display(&mut self) {
-        let mut g = from_vecvec(&self.data, self.debug);
+        let mut g = from_vecvec(self.metrics.get_square_side(), &self.data, self.debug);
         g.display_bw();
     }
 

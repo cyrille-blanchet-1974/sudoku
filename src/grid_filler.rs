@@ -2,7 +2,7 @@ use super::objects::cell::CellType;
 use super::objects::grid::*;
 use super::read::*;
 use super::ui::*;
-//let acc = Accessor::new(g.get_metrics().get_square_side());
+
 fn manual(squareside: u8) -> Option<Grid> {
     let mut g = Grid::new(squareside);
     println!("resolved = {}", g.resolved());
@@ -74,7 +74,7 @@ pub fn sample(debug: bool) -> Grid {
         "?,?,?,?,?,8,?,?,?".to_string(),
         "?,?,?,?,?,?,1,?,9".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 43 steps (26 guesses all good) // 74 steps 29 guess 1 bad
     -------------------------------                       -------------------------------
     | 1  ?  ? | ?  ?  ? | ?  ?  ? |                       | 1  2  3 | 4  6  5 | 7  9  8 |
@@ -92,6 +92,25 @@ pub fn sample(debug: bool) -> Grid {
     */
 }
 
+pub fn sample22(debug: bool) -> Grid {
+    let v = vec![
+        "1,?,2,?".to_string(),
+        "?,?,?,?".to_string(),
+        "3,?,4,?".to_string(),
+        "?,?,?,?".to_string(),
+    ];
+    from_vec(2, v, debug)
+    /*Solved in 43 steps (26 guesses all good) // 74 steps 29 guess 1 bad
+    ---------------                       ---------------
+    | 1  ? | 2  ? |                       | 1  ? | 2  ? |
+    | ?  ? | ?  ? |                       | ?  ? | ?  ? |
+    ---------------                       ---------------
+    | 3  ? | 4  ? |                       | 3  ? | 4  ? |
+    | ?  ? | ?  ? |                       | ?  ? | ?  ? |
+    ---------------                       ---------------
+    */
+}
+
 pub fn easy(debug: bool) -> Grid {
     let v = vec![
         "1,?,7,?,?,?,?,?,?".to_string(),
@@ -104,7 +123,7 @@ pub fn easy(debug: bool) -> Grid {
         "7,?,?,?,2,4,6,?,?".to_string(),
         "?,?,?,?,?,?,9,?,5".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved 3 steps (0 guess)
     -------------------------------                           -------------------------------
     | 1  ?  7 | ?  ?  ? | ?  ?  ? |                           | 1  2  7 | 4  5  6 | 3  9  8 |
@@ -133,7 +152,7 @@ pub fn medium(debug: bool) -> Grid {
         "8,?,3,?,?,?,?,1,?".to_string(),
         "?,?,?,?,9,?,?,?,2".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 9 steps (2 guesses All goods) // 10 steps 2 guesses 0 bad
     -------------------------------                           -------------------------------
     | 5  ?  ? | ?  4  ? | ?  ?  ? |                           | 5  3  7 | 2  4  9 | 1  8  6 |
@@ -162,7 +181,7 @@ pub fn difficult(debug: bool) -> Grid {
         "?,?,?,6,?,7,8,?,1".to_string(),
         "?,?,?,?,?,?,?,?,?".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 9 steps (0 guess)
     -------------------------------                           -------------------------------
     | ?  ?  ? | ?  ?  ? | ?  ?  ? |                           | 9  8  3 | 5  7  6 | 1  4  2 |
@@ -191,7 +210,7 @@ pub fn diabolical(debug: bool) -> Grid {
         "?,?,?,?,?,?,?,?,5".to_string(),
         "?,?,?,?,?,4,9,3,?".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 10 steps (1 good guess)  // 12 steps 1 good guess
     -------------------------------                           -------------------------------
     | ?  8  3 | 9  ?  ? | ?  ?  ? |                           | 4  8  3 | 9  2  7 | 5  1  6 |
@@ -220,7 +239,7 @@ pub fn highest(debug: bool) -> Grid {
         "?,4,?,?,?,?,?,?,7".to_string(),
         "?,?,7,?,?,?,3,?,?".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 46 steps (11 guesses, 6 wrongs and 5 goods)  //132 steps  25 guess  19 bads
     -------------------------------                           -------------------------------
     | 1  ?  ? | ?  ?  7 | ?  9  ? |                           | 1  6  2 | 8  5  7 | 4  9  3 |
@@ -249,7 +268,7 @@ pub fn mindless(debug: bool) -> Grid {
         "?,3,?,?,?,9,?,8,?".to_string(),
         "?,?,2,?,?,?,?,?,1".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
     chomebook:Duration=  89.336526ms (release)    904.471428ms (debug)
     XPS17 = 86.0264ms (release)   1.0990636s (debug)
@@ -281,7 +300,7 @@ pub fn hardest(debug: bool) -> Grid {
         "?,?,8,5,?,?,?,1,?".to_string(),
         "?,9,?,?,?,?,4,?,?".to_string(),
     ];
-    from_vec(v, debug)
+    from_vec(3, v, debug)
     /*Solved in 487 steps (95 guesses, 87 wrongs and 9 goods)
     chomebook:Duration=  89.336526ms (release)    904.471428ms (debug)
     XPS17 = 86.0264ms (release)   1.0990636s (debug)
@@ -302,7 +321,7 @@ pub fn hardest(debug: bool) -> Grid {
 }
 
 pub fn from_disk(fic: String, debug: bool) -> Grid {
-    read(&fic, debug)
+    read(3, &fic, debug)
 }
 
 pub fn choose_grid(debug: bool) -> Option<Grid> {
@@ -317,7 +336,10 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
         println!("7:mindless");
         println!("8:hardest");
         println!("9:grid read from disk");
-        println!("10:fill manualy");
+        println!("12:fill manualy (2x2)");
+        println!("13:fill manualy (3x3)");
+        println!("14:fill manualy (4x4)");
+        println!("22: sample (2x2)");
         println!("99:quit");
         match read_u8("Your choice?".to_string()) {
             None => {
@@ -351,8 +373,17 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
                 let fic = read_string("Filename?".to_string());
                 return Some(from_disk(fic, debug));
             }
-            Some(10) => {
+            Some(12) => {
+                return manual(2);
+            }
+            Some(13) => {
                 return manual(3);
+            }
+            Some(14) => {
+                return manual(4);
+            }
+            Some(22) => {
+                return Some(sample22(debug));
             }
             Some(99) => {
                 println!("Sudoku resolution End!");

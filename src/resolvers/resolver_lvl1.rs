@@ -4,23 +4,14 @@ use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl1 {
-    trace: String,
+    acc: Accessor,
 }
 
 impl ResolverLvl1 {
-    pub fn new() -> ResolverLvl1 {
+    pub fn new(side: u8) -> ResolverLvl1 {
         ResolverLvl1 {
-            trace: String::new(),
+            acc: Accessor::new(side),
         }
-    }
-
-    /*
-        get a string containg what was found
-    */
-    pub fn get_trace(&self) -> String {
-        let mut output = String::new();
-        output.push_str(&self.trace);
-        output
     }
 
     /*
@@ -28,11 +19,11 @@ impl ResolverLvl1 {
     in no other cells of the same column and in no other cells of the same square
     return true if found one or more
     */
-    pub fn resolve(&mut self, g: &mut Grid) -> bool {
+    pub fn resolve(&self, g: &mut Grid) -> bool {
         if g.resolved() {
             return false;
         }
-        self.trace = "".to_string();
+        g.clear_trace();
         //get resolved cells positions
         let mut resolved = g.get_resolved();
         let prev_count = resolved.len();
@@ -49,7 +40,7 @@ impl ResolverLvl1 {
     If a cell is resolved then his value is in no other cells of the same Row,
     in no other cells of the same column and in no other cells of the same square
     */
-    fn resolve_val(&mut self, g: &mut Grid, p: u16) {
+    fn resolve_val(&self, g: &mut Grid, p: u16) {
         //get value of the received cell
         let pos: usize = p.try_into().unwrap();
         let cell: &mut Cell = g.get_cell(pos);
@@ -74,7 +65,7 @@ impl ResolverLvl1 {
                     let col = cell.get_column();
                     let line = cell.get_line();
                     let trc = format!(" {}/{}={}", line, col, x);
-                    self.trace.push_str(&trc);
+                    g.add_trace(trc);
                     g.set_val(line, col, x, CellType::Found);
                 }
             }
@@ -88,21 +79,20 @@ impl ResolverLvl1 {
     fn get_to_clean(&self, g: &mut Grid, p: u16) -> Vec<u16> {
         let mut res = Vec::new();
         let pos: usize = p.try_into().unwrap();
-        let acc = Accessor::new(g.get_metrics().get_square_side());
         let cell: &Cell = g.get_cell(pos);
-        let lin = acc.get_line(cell.get_line());
+        let lin = self.acc.get_line(cell.get_line());
         for l in lin {
             if l != p {
                 res.push(l);
             }
         }
-        let col = acc.get_column(cell.get_column());
+        let col = self.acc.get_column(cell.get_column());
         for c in col {
             if c != p {
                 res.push(c);
             }
         }
-        let squ = acc.get_square(cell.get_square());
+        let squ = self.acc.get_square(cell.get_square());
         for s in squ {
             if s != p {
                 res.push(s);

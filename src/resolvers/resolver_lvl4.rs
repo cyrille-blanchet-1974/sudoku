@@ -1,37 +1,28 @@
-use super::super::objects::accessor::*;
 use super::super::objects::cell::*;
+use super::super::objects::coordconverter::*;
 use super::super::objects::grid::*;
 use std::convert::TryInto;
 
 pub struct ResolverLvl4 {
-    trace: String,
+    coordconverter: CoordConverter,
 }
 
 impl ResolverLvl4 {
-    pub fn new() -> ResolverLvl4 {
+    pub fn new(side: u8) -> ResolverLvl4 {
         ResolverLvl4 {
-            trace: String::new(),
+            coordconverter: CoordConverter::new(side),
         }
-    }
-
-    /*
-        get a string containg what was found
-    */
-    pub fn get_trace(&self) -> String {
-        let mut output = String::new();
-        output.push_str(&self.trace);
-        output
     }
 
     /*
     X-wing resolve
     return true if found one or more
     */
-    pub fn resolve(&mut self, g: &mut Grid) -> bool {
+    pub fn resolve(&self, g: &mut Grid) -> bool {
         if g.resolved() {
             return false;
         }
-        self.trace = "".to_string();
+        g.clear_trace();
         let mut solve_one_at_least = false;
         if self.resolve_line(g) {
             solve_one_at_least = true;
@@ -43,9 +34,8 @@ impl ResolverLvl4 {
         solve_one_at_least
     }
 
-    fn resolve_line(&mut self, g: &mut Grid) -> bool {
+    fn resolve_line(&self, g: &mut Grid) -> bool {
         let mut trouve = false;
-        let acc = Accessor::new(g.get_metrics().get_square_side());
         let max = g.get_metrics().get_max();
         let nb_line = g.get_metrics().get_nb_line();
         let nb_column = g.get_metrics().get_nb_column();
@@ -60,7 +50,7 @@ impl ResolverLvl4 {
                                     //positions is 'binairy' positions of column with val possible
                 let mut p: u32 = 100_000_000;
                 for column in 1..=nb_column {
-                    let pos = acc.coordconverter.coord_to_pos(line, column);
+                    let pos = self.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
@@ -103,7 +93,7 @@ impl ResolverLvl4 {
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
                             //found 2 lines each of them has value v possible in the sames columns
-                            let c = self.decode(t2.1, 9);
+                            let c = self.decode(t2.1, nb_line);
                             //Set type of cells to 'Xwing"
                             self.set_xwing(
                                 g,
@@ -116,7 +106,7 @@ impl ResolverLvl4 {
                                 "xwing found for val {} in lines {} and {}  and columns {} and {}",
                                 val, l, l2, c.0, c.1
                             );
-                            self.trace.push_str(&trc);
+                            g.add_trace(trc);
                             //So we can remove value v of all other cells of this two columns
                             for l in 1..=nb_line {
                                 if l == line {
@@ -126,13 +116,13 @@ impl ResolverLvl4 {
                                     continue;
                                 }
                                 let pos =
-                                    acc.coordconverter.coord_to_pos(l, c.0.try_into().unwrap());
+                                    self.coordconverter.coord_to_pos(l, c.0.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos =
-                                    acc.coordconverter.coord_to_pos(l, c.1.try_into().unwrap());
+                                    self.coordconverter.coord_to_pos(l, c.1.try_into().unwrap());
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
@@ -145,9 +135,8 @@ impl ResolverLvl4 {
         }
         trouve
     }
-    fn resolve_column(&mut self, g: &mut Grid) -> bool {
+    fn resolve_column(&self, g: &mut Grid) -> bool {
         let mut trouve = false;
-        let acc = Accessor::new(g.get_metrics().get_square_side());
         let max = g.get_metrics().get_max();
         let nb_line = g.get_metrics().get_nb_line();
         let nb_column = g.get_metrics().get_nb_column();
@@ -162,7 +151,7 @@ impl ResolverLvl4 {
                                     //positions is 'binairy' positions of line with val possible
                 let mut p: u32 = 100_000_000;
                 for line in 1..=nb_line {
-                    let pos = acc.coordconverter.coord_to_pos(line, column);
+                    let pos = self.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
                         match cell.get_answer() {
@@ -205,7 +194,7 @@ impl ResolverLvl4 {
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
                             //found 2 cols each of them has value v possible in the sames lines
-                            let l = self.decode(t2.1, 9);
+                            let l = self.decode(t2.1, nb_line);
                             //Set type of cells to 'Xwing"
                             self.set_xwing(
                                 g,
@@ -218,7 +207,7 @@ impl ResolverLvl4 {
                                 "xwing found for val {} in columns {} and {}  and lines {} and {}",
                                 val, c, c2, l.0, l.1
                             );
-                            self.trace.push_str(&trc);
+                            g.add_trace(trc);
                             //So we can remove value v of all other cells of this two lines
                             for c in 1..=nb_column {
                                 if c == column {
@@ -228,13 +217,13 @@ impl ResolverLvl4 {
                                     continue;
                                 }
                                 let pos =
-                                    acc.coordconverter.coord_to_pos(l.0.try_into().unwrap(), c);
+                                    self.coordconverter.coord_to_pos(l.0.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
                                 }
                                 let pos =
-                                    acc.coordconverter.coord_to_pos(l.1.try_into().unwrap(), c);
+                                    self.coordconverter.coord_to_pos(l.1.try_into().unwrap(), c);
                                 let cell: &mut Cell = g.get_cell(pos);
                                 if !cell.is_resolved() && cell.remove_candidate_and_verify(val) {
                                     trouve = true;
@@ -248,23 +237,22 @@ impl ResolverLvl4 {
         trouve
     }
 
-    fn set_xwing(&mut self, g: &mut Grid, l1: u8, l2: u8, c1: u8, c2: u8) {
-        let acc = Accessor::new(g.get_metrics().get_square_side());
-        let pos = acc.coordconverter.coord_to_pos(l1, c1);
+    fn set_xwing(&self, g: &mut Grid, l1: u8, l2: u8, c1: u8, c2: u8) {
+        let pos = self.coordconverter.coord_to_pos(l1, c1);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = acc.coordconverter.coord_to_pos(l1, c2);
+        let pos = self.coordconverter.coord_to_pos(l1, c2);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = acc.coordconverter.coord_to_pos(l2, c1);
+        let pos = self.coordconverter.coord_to_pos(l2, c1);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
-        let pos = acc.coordconverter.coord_to_pos(l2, c2);
+        let pos = self.coordconverter.coord_to_pos(l2, c2);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
     }
 
-    fn decode(&mut self, d: u32, linesize: u8) -> (usize, usize) {
+    fn decode(&self, d: u32, linesize: u8) -> (usize, usize) {
         let mut p: u32 = 100_000_000;
         let mut u1 = 0;
         let mut u2 = 0;
@@ -287,7 +275,7 @@ impl ResolverLvl4 {
 
 #[test]
 fn test_decode() {
-    let mut l4 = ResolverLvl4::new();
+    let l4 = ResolverLvl4::new(3);
     assert_eq!((1, 2), l4.decode(110000000, 9));
     assert_eq!((1, 9), l4.decode(100000001, 9));
     assert_eq!((3, 6), l4.decode(001006000, 9));
@@ -378,6 +366,6 @@ fn test_resolve() {
     g.set_val(9, 8, 1, CellType::Origin);
     g.set_val(9, 9, 7, CellType::Origin);
 
-    let mut l4 = ResolverLvl4::new();
+    let l4 = ResolverLvl4::new(3);
     assert_eq!(false, l4.resolve(&mut g));
 }

@@ -2,6 +2,7 @@ use super::cardinal::*;
 use super::metrics::*;
 use std::convert::TryInto;
 
+#[derive(Debug, Copy, Clone)]
 pub struct CoordConverter {
     metrics: Metrics,
 }
@@ -16,7 +17,7 @@ impl CoordConverter {
     from a position calculate line and column
     */
     pub fn pos_to_coord(&self, pos: usize) -> (u8, u8) {
-        let pos: u8 = pos.try_into().unwrap();
+        let pos: u16 = pos.try_into().unwrap();
         for lin in 1..=self.metrics.get_nb_line() {
             for col in 1..=self.metrics.get_nb_column() {
                 let p = col + (lin - 1) * self.metrics.get_nb_line() - 1;
