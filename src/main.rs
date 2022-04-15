@@ -82,7 +82,7 @@ fn main() {
         println!("97:toggle debugging (actual:{})", debug);
         println!("98:toggle display (actual:{})", display);
         println!("99:quit");
-        match read_u8("Your choice?".to_string()) {
+        match read_u16("Your choice?".to_string()) {
             None => {
                 continue;
             }

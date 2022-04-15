@@ -1,7 +1,7 @@
 use std::io;
 
 //ask the user and read his answer
-pub fn read_u8(mess: String) -> Option<u8> {
+pub fn read_u16(mess: String) -> Option<u16> {
     println!("{}", mess);
     let mut res = String::new();
     io::stdin()
@@ -9,7 +9,7 @@ pub fn read_u8(mess: String) -> Option<u8> {
         .expect("Failed to read line");
     let res = res.trim();
 
-    let r: u8 = match res.parse() {
+    let r: u16 = match res.parse() {
         Err(e) => {
             println!("erreur {}", e);
             return None;

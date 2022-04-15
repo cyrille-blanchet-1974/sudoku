@@ -3,14 +3,14 @@ use super::coordconverter::*;
 use std::collections::HashMap;
 
 pub struct Accessor {
-    lines: HashMap<u8, Vec<u16>>,
-    columns: HashMap<u8, Vec<u16>>,
-    squares: HashMap<u8, Vec<u16>>,
+    lines: HashMap<u16, Vec<u16>>,
+    columns: HashMap<u16, Vec<u16>>,
+    squares: HashMap<u16, Vec<u16>>,
     pub coordconverter: CoordConverter,
 }
 
 impl Accessor {
-    pub fn new(squareside: u8) -> Accessor {
+    pub fn new(squareside: u16) -> Accessor {
         Accessor {
             lines: gen_lines(squareside * squareside),
             columns: gen_columns(squareside * squareside),
@@ -19,13 +19,13 @@ impl Accessor {
         }
     }
 
-    pub fn get_line(&self, l: u8) -> Vec<u16> {
+    pub fn get_line(&self, l: u16) -> Vec<u16> {
         match self.lines.get(&l) {
             None => Vec::new(),
             Some(x) => x.clone(),
         }
     }
-    pub fn get_column(&self, c: u8) -> Vec<u16> {
+    pub fn get_column(&self, c: u16) -> Vec<u16> {
         match self.columns.get(&c) {
             None => Vec::new(),
             Some(x) => x.clone(),
@@ -39,7 +39,7 @@ impl Accessor {
     }
 }
 
-fn gen_squares(squareside: u8) -> HashMap<u8, Vec<u16>> {
+fn gen_squares(squareside: u16) -> HashMap<u16, Vec<u16>> {
     let mut res = HashMap::new();
     let mut i = 1;
     for l in 0..squareside {
@@ -60,17 +60,17 @@ fn gen_squares(squareside: u8) -> HashMap<u8, Vec<u16>> {
     res
 }
 
-fn gen_square(l1: u8, l2: u8, c1: u8, c2: u8, max: u8) -> Vec<u16> {
+fn gen_square(l1: u16, l2: u16, c1: u16, c2: u16, max: u16) -> Vec<u16> {
     let mut res = Vec::new();
     for line in l1..l2 {
         for column in c1..c2 {
-            res.push((line * max + column) as u16);
+            res.push(line * max + column);
         }
     }
     res
 }
 
-fn gen_lines(max: u8) -> HashMap<u8, Vec<u16>> {
+fn gen_lines(max: u16) -> HashMap<u16, Vec<u16>> {
     let mut res = HashMap::new();
     for i in 0..max {
         res.insert(i + 1, gen_line(i, max));
@@ -78,17 +78,17 @@ fn gen_lines(max: u8) -> HashMap<u8, Vec<u16>> {
     res
 }
 
-fn gen_line(l: u8, max: u8) -> Vec<u16> {
+fn gen_line(l: u16, max: u16) -> Vec<u16> {
     let mut res = Vec::new();
     let mut pos = l * max;
     for _i in 0..max {
-        res.push(pos as u16);
+        res.push(pos);
         pos += 1;
     }
     res
 }
 
-fn gen_columns(max: u8) -> HashMap<u8, Vec<u16>> {
+fn gen_columns(max: u16) -> HashMap<u16, Vec<u16>> {
     let mut res = HashMap::new();
     for i in 0..max {
         res.insert(i + 1, gen_column(i, max));
@@ -96,12 +96,12 @@ fn gen_columns(max: u8) -> HashMap<u8, Vec<u16>> {
     res
 }
 
-fn gen_column(c: u8, max: u8) -> Vec<u16> {
+fn gen_column(c: u16, max: u16) -> Vec<u16> {
     let mut res = Vec::new();
-    let mut pos = c as u16;
+    let mut pos = c;
     for _i in 0..max {
         res.push(pos);
-        pos += max as u16;
+        pos += max;
     }
     res
 }

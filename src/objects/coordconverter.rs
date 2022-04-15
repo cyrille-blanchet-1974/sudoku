@@ -8,7 +8,7 @@ pub struct CoordConverter {
 }
 
 impl CoordConverter {
-    pub fn new(squareside: u8) -> CoordConverter {
+    pub fn new(squareside: u16) -> CoordConverter {
         CoordConverter {
             metrics: Metrics::new(squareside),
         }
@@ -16,7 +16,7 @@ impl CoordConverter {
     /*
     from a position calculate line and column
     */
-    pub fn pos_to_coord(&self, pos: usize) -> (u8, u8) {
+    pub fn pos_to_coord(&self, pos: usize) -> (u16, u16) {
         let pos: u16 = pos.try_into().unwrap();
         for lin in 1..=self.metrics.get_nb_line() {
             for col in 1..=self.metrics.get_nb_column() {
@@ -29,7 +29,7 @@ impl CoordConverter {
         panic!("Position {} not supported", pos);
     }
 
-    pub fn coord_to_pos(&self, line: u8, column: u8) -> usize {
+    pub fn coord_to_pos(&self, line: u16, column: u16) -> usize {
         let pos = (line - 1) * self.metrics.get_nb_line() + column - 1;
         pos.try_into().unwrap()
     }
@@ -95,7 +95,7 @@ fn coord_to_pos_test() {
 #[test]
 fn pos_to_square_test() {
     //Macro (sort of)
-    fn local(i: usize) -> u8 {
+    fn local(i: usize) -> u16 {
         let a = CoordConverter::new(3);
         a.pos_to_square(i).get_value()
     }

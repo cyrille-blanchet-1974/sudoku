@@ -14,7 +14,7 @@ pub enum Cardinal {
     Unknown,
 }
 impl Cardinal {
-    pub fn get_value(self) -> u8 {
+    pub fn get_value(self) -> u16 {
         match self {
             Cardinal::NW => 1,
             Cardinal::N => 2,
@@ -29,7 +29,7 @@ impl Cardinal {
         }
     }
 
-    pub fn from(self, val: u8) -> Cardinal {
+    pub fn from(self, val: u16) -> Cardinal {
         match val {
             1 => Cardinal::NW,
             2 => Cardinal::N,
@@ -46,7 +46,7 @@ impl Cardinal {
     /*
      get coord of square ((line,column) ,(line,column))
     */
-    pub fn get_coord(self) -> ((u8, u8), (u8, u8)) {
+    pub fn get_coord(self) -> ((u16, u16), (u16, u16)) {
         match self {
             Cardinal::NW => ((1, 1), (3, 3)),
             Cardinal::N => ((4, 1), (6, 3)),
@@ -99,7 +99,7 @@ impl Cardinal {
     /*
      get coord of square ((line,column) ,(line,column))
     */
-    pub fn get_lines(self) -> Vec<u8> {
+    pub fn get_lines(self) -> Vec<u16> {
         match self {
             Cardinal::NW => vec![1, 2, 3],
             Cardinal::N => vec![1, 2, 3],
@@ -116,7 +116,7 @@ impl Cardinal {
     /*
     get columns of a square
     */
-    pub fn get_columns(self) -> Vec<u8> {
+    pub fn get_columns(self) -> Vec<u16> {
         match self {
             Cardinal::NW => vec![1, 2, 3],
             Cardinal::W => vec![1, 2, 3],
@@ -133,7 +133,7 @@ impl Cardinal {
     /*
      get cells of square
     */
-    pub fn _get_cells(self) -> Vec<u8> {
+    pub fn _get_cells(self) -> Vec<u16> {
         match self {
             Cardinal::NW => vec![0, 1, 2, 9, 10, 11, 18, 19, 20],
             Cardinal::N => vec![3, 4, 5, 12, 13, 14, 21, 22, 23],

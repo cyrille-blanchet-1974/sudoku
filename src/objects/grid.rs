@@ -28,7 +28,7 @@ impl Grid {
     /**
      * create a default Sudoku Grid
      */
-    pub fn new(side: u8) -> Grid {
+    pub fn new(side: u16) -> Grid {
         let mut cells = Vec::new();
         let metrics = Metrics::new(side);
         //construct all cells
@@ -87,7 +87,7 @@ impl Grid {
     /**
      * how many cells not found for a given value
      */
-    fn get_lefts(&mut self) -> Vec<u8> {
+    fn get_lefts(&mut self) -> Vec<u16> {
         //number of cell lefts for a value
         let mut lefts = Vec::new();
         for _i in 0..self.metrics.get_max() {
@@ -111,7 +111,7 @@ impl Grid {
      * for a list of possible values in parameter
      * return the one with the more positions founds (or less positions not found)
      */
-    pub fn less_used(&mut self, possibles: Vec<u8>) -> u8 {
+    pub fn less_used(&mut self, possibles: Vec<u16>) -> u16 {
         //val/nb
         let mut res = (0, 99);
         let lefts = self.get_lefts();
@@ -150,7 +150,7 @@ impl Grid {
     /**
      * put a value in a cell -> add it in the known values of the line/column/square of the cell
      **/
-    pub fn set_val(&mut self, line: u8, column: u8, val: u8, t: CellType) {
+    pub fn set_val(&mut self, line: u16, column: u16, val: u16, t: CellType) {
         let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val, t);
@@ -170,7 +170,7 @@ impl Grid {
     /**
      * remove a possible value from a cell
      **/
-    pub fn remove_candidate(&mut self, line: u8, column: u8, val: u8) {
+    pub fn remove_candidate(&mut self, line: u16, column: u16, val: u16) {
         let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         let v: usize = val.try_into().unwrap();
@@ -374,7 +374,7 @@ impl Grid {
     /**
      * check if value is solved in a square
      */
-    pub fn check_value_in_square(&mut self, s: Cardinal, val: u8) -> bool {
+    pub fn check_value_in_square(&mut self, s: Cardinal, val: u16) -> bool {
         //check if value is resolve
         let pos: usize = (s.get_value() - 1).try_into().unwrap();
         let squ: &mut Square = &mut (self.squares[pos]);
@@ -383,7 +383,7 @@ impl Grid {
     /**
      * check if value is solved in a line
      */
-    pub fn check_value_in_line(&mut self, line: u8, val: u8) -> bool {
+    pub fn check_value_in_line(&mut self, line: u16, val: u16) -> bool {
         //check if value is resolve
         let pos: usize = (line - 1).try_into().unwrap();
         let lin: &mut Line = &mut (self.lines[pos]);
@@ -393,7 +393,7 @@ impl Grid {
     /**
      * check if value is solved in a column
      */
-    pub fn check_value_in_column(&mut self, column: u8, val: u8) -> bool {
+    pub fn check_value_in_column(&mut self, column: u16, val: u16) -> bool {
         //check if value is resolve
         let pos: usize = (column - 1).try_into().unwrap();
         let col: &mut Column = &mut (self.columns[pos]);
@@ -827,20 +827,20 @@ fn clone_grid_test() {
 
 //methods to fill grid
 impl Grid {
-    pub fn compute_line(&mut self, line_number: u8, l: &str) {
+    pub fn compute_line(&mut self, line_number: u16, l: &str) {
         for (col, part) in l.split(',').enumerate() {
-            let r: u8 = match part.parse() {
+            let r: u16 = match part.parse() {
                 Err(_) => {
                     continue;
                 }
                 Ok(v) => v,
             };
-            let c: u8 = col.try_into().unwrap();
+            let c: u16 = col.try_into().unwrap();
             self.set_val(line_number, c + 1, r, CellType::Origin);
         }
     }
 
-    pub fn compute_vecline(&mut self, line_number: u8, vl: &[u8]) {
+    pub fn compute_vecline(&mut self, line_number: u16, vl: &[u16]) {
         let mut c = 1;
         for val in vl {
             if *val != 0 {
@@ -850,7 +850,7 @@ impl Grid {
         }
     }
 
-    pub fn compute_vecvec(&mut self, vv: &[Vec<u8>]) {
+    pub fn compute_vecvec(&mut self, vv: &[Vec<u16>]) {
         let mut l = 1;
         for v in vv {
             self.compute_vecline(l, v);

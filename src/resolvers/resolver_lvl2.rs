@@ -8,7 +8,7 @@ pub struct ResolverLvl2 {
 }
 
 impl ResolverLvl2 {
-    pub fn new(side: u8) -> ResolverLvl2 {
+    pub fn new(side: u16) -> ResolverLvl2 {
         ResolverLvl2 {
             cc: CoordConverter::new(side),
         }
@@ -43,7 +43,7 @@ impl ResolverLvl2 {
      * check a value in a square
      * return true if a new cell is solved
      */
-    fn resolve_square_val(&self, g: &mut Grid, squ: Cardinal, value: u8) -> bool {
+    fn resolve_square_val(&self, g: &mut Grid, squ: Cardinal, value: u16) -> bool {
         //check if the value is already in the square
         if g.check_value_in_square(squ, value) {
             return false;

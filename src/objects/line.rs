@@ -3,11 +3,11 @@ use std::convert::TryInto;
 //the line
 pub struct Line {
     known_values: Vec<bool>, //Value already solve in the line
-    max: u8,
+    max: u16,
 }
 
 impl Line {
-    pub fn new(max: u8) -> Line {
+    pub fn new(max: u16) -> Line {
         //add all known values (False at start)
         let mut known = Vec::new();
         for _i in 0..max {
@@ -22,7 +22,7 @@ impl Line {
     /**
      * add a known value to the line
      */
-    pub fn add_a_known_value(&mut self, val: u8) {
+    pub fn add_a_known_value(&mut self, val: u16) {
         if val < 1 {
             return;
         }
@@ -36,7 +36,7 @@ impl Line {
     /**
      * is the value already solved in the line
      */
-    pub fn is_known(&self, val: u8) -> bool {
+    pub fn is_known(&self, val: u16) -> bool {
         if val < 1 {
             return false;
         }
@@ -50,7 +50,7 @@ impl Line {
     /*
      return remaining values
     */
-    pub fn _get_unknown(&self) -> Vec<u8> {
+    pub fn _get_unknown(&self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 0..self.max {
             let pos: usize = i.try_into().unwrap();

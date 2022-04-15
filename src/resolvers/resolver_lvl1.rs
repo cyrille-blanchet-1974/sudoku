@@ -8,7 +8,7 @@ pub struct ResolverLvl1 {
 }
 
 impl ResolverLvl1 {
-    pub fn new(side: u8) -> ResolverLvl1 {
+    pub fn new(side: u16) -> ResolverLvl1 {
         ResolverLvl1 {
             acc: Accessor::new(side),
         }

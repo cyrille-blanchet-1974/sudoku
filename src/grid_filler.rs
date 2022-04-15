@@ -3,7 +3,7 @@ use super::objects::grid::*;
 use super::read::*;
 use super::ui::*;
 
-fn manual(squareside: u8) -> Option<Grid> {
+fn manual(squareside: u16) -> Option<Grid> {
     let mut g = Grid::new(squareside);
     println!("resolved = {}", g.resolved());
     println!();
@@ -11,12 +11,12 @@ fn manual(squareside: u8) -> Option<Grid> {
     let max = g.get_metrics().get_max();
     loop {
         println!("[1-{}] 0 to solve", max);
-        let l = read_u8("Line?".to_string());
+        let l = read_u16("Line?".to_string());
         if l.is_none() {
             continue;
         }
         let l = l.unwrap();
-        //control >=0 useless because type is u8 unsigned 8
+        //control >=0 useless because type is u16 unsigned 8
         if l > max {
             continue;
         }
@@ -24,7 +24,7 @@ fn manual(squareside: u8) -> Option<Grid> {
             return Some(g);
         }
         println!("[1-{}] 0 to solve", max);
-        let c = read_u8("Column?".to_string());
+        let c = read_u16("Column?".to_string());
         if c.is_none() {
             continue;
         }
@@ -36,7 +36,7 @@ fn manual(squareside: u8) -> Option<Grid> {
             return Some(g);
         }
         println!("[1-{}] 0 to solve", max);
-        let v = read_u8("Value?".to_string());
+        let v = read_u16("Value?".to_string());
         if v.is_none() {
             continue;
         }
@@ -341,7 +341,7 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
         println!("14:fill manualy (4x4)");
         println!("22: sample (2x2)");
         println!("99:quit");
-        match read_u8("Your choice?".to_string()) {
+        match read_u16("Your choice?".to_string()) {
             None => {
                 continue;
             }

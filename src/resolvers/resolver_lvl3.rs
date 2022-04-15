@@ -10,7 +10,7 @@ pub struct ResolverLvl3 {
 }
 
 impl ResolverLvl3 {
-    pub fn new(side: u8) -> ResolverLvl3 {
+    pub fn new(side: u16) -> ResolverLvl3 {
         ResolverLvl3 {
             acc: Accessor::new(side),
         }
@@ -53,7 +53,7 @@ impl ResolverLvl3 {
         solve_one_at_least
     }
 
-    fn resolve_line(&self, g: &mut Grid, line: u8, val: usize) -> bool {
+    fn resolve_line(&self, g: &mut Grid, line: u16, val: usize) -> bool {
         if g.check_value_in_line(line, val.try_into().unwrap()) {
             //if val already solved in the line
             return false;
@@ -74,7 +74,7 @@ impl ResolverLvl3 {
         if unsolve != 255 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
-            let v: u8 = val.try_into().unwrap();
+            let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" l:{}/{}={}", coord.0, coord.1, val);
@@ -84,7 +84,7 @@ impl ResolverLvl3 {
         false
     }
 
-    fn resolve_column(&self, g: &mut Grid, column: u8, val: usize) -> bool {
+    fn resolve_column(&self, g: &mut Grid, column: u16, val: usize) -> bool {
         if g.check_value_in_column(column, val.try_into().unwrap()) {
             //if val already solved in the column
             return false;
@@ -105,7 +105,7 @@ impl ResolverLvl3 {
         if unsolve != 255 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
-            let v: u8 = val.try_into().unwrap();
+            let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" c:{}/{}={}", coord.0, coord.1, val);
@@ -136,7 +136,7 @@ impl ResolverLvl3 {
         if unsolve != 255 {
             //found
             let pos: usize = unsolve.try_into().unwrap();
-            let v: u8 = val.try_into().unwrap();
+            let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
             let trc = format!(" s:{}/{}={}", coord.0, coord.1, val);

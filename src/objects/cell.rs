@@ -37,16 +37,16 @@ impl PartialEq for CellType {
 //the cell
 pub struct Cell {
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
-    column: u8,           //column in the grid 1..max
-    line: u8,             //line in the grid 1..max
+    column: u16,           //column in the grid 1..max
+    line: u16,             //line in the grid 1..max
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
-    answer: u8,           //value of the cell when solved
+    answer: u16,           //value of the cell when solved
     cell_type: CellType,  //type of value
     debug: bool,
     just_resolved: bool,
     possible_removed: bool,
-    max: u8,
+    max: u16,
 }
 
 impl Cell {
@@ -63,7 +63,7 @@ impl Cell {
         self.debug = debug;
     }
     //construct a cell giving his position in the grid
-    pub fn new(pos: usize, debug: bool, squareside: u8) -> Cell {
+    pub fn new(pos: usize, debug: bool, squareside: u16) -> Cell {
         //add all possibles
         let mut possibles = Vec::new();
         let max = squareside * squareside;
@@ -101,7 +101,7 @@ impl Cell {
     /**
      * get final answer if is resolved
      */
-    pub fn get_answer(&self) -> Option<u8> {
+    pub fn get_answer(&self) -> Option<u16> {
         if self.answer == 0 {
             None
         } else {
@@ -181,13 +181,13 @@ impl Cell {
     /**
      * return the line of the cell
      */
-    pub fn get_line(&self) -> u8 {
+    pub fn get_line(&self) -> u16 {
         self.line
     }
     /**
      * return the column of the cell
      */
-    pub fn get_column(&self) -> u8 {
+    pub fn get_column(&self) -> u16 {
         self.column
     }
     /**
@@ -200,7 +200,7 @@ impl Cell {
     /**
      * return a list of possible values for the cell
      */
-    pub fn get_possibles(&mut self) -> Vec<u8> {
+    pub fn get_possibles(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 1..=self.max {
             if self.candidate(i.try_into().unwrap()) {
@@ -215,7 +215,7 @@ impl Cell {
     /*
      set the value of the cell
     */
-    pub fn set_val(&mut self, val: u8, t: CellType) {
+    pub fn set_val(&mut self, val: u16, t: CellType) {
         if !self.candidate(val.try_into().unwrap()) {
             if self.debug {
                 println!(

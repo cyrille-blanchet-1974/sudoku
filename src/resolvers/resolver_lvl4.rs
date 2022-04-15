@@ -8,7 +8,7 @@ pub struct ResolverLvl4 {
 }
 
 impl ResolverLvl4 {
-    pub fn new(side: u8) -> ResolverLvl4 {
+    pub fn new(side: u16) -> ResolverLvl4 {
         ResolverLvl4 {
             coordconverter: CoordConverter::new(side),
         }
@@ -237,7 +237,7 @@ impl ResolverLvl4 {
         trouve
     }
 
-    fn set_xwing(&self, g: &mut Grid, l1: u8, l2: u8, c1: u8, c2: u8) {
+    fn set_xwing(&self, g: &mut Grid, l1: u16, l2: u16, c1: u16, c2: u16) {
         let pos = self.coordconverter.coord_to_pos(l1, c1);
         let cell: &mut Cell = g.get_cell(pos);
         cell.set_type(CellType::Xwing);
@@ -252,7 +252,7 @@ impl ResolverLvl4 {
         cell.set_type(CellType::Xwing);
     }
 
-    fn decode(&self, d: u32, linesize: u8) -> (usize, usize) {
+    fn decode(&self, d: u32, linesize: u16) -> (usize, usize) {
         let mut p: u32 = 100_000_000;
         let mut u1 = 0;
         let mut u2 = 0;

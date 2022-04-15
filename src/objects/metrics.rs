@@ -1,14 +1,14 @@
 #[derive(Debug, Copy, Clone)]
 pub struct Metrics {
-    squareside: u8,
-    nbcolumn: u8,
-    nbline: u8,
+    squareside: u16,
+    nbcolumn: u16,
+    nbline: u16,
     gridsize: u16,
-    max: u8,
+    max: u16,
 }
 
 impl Metrics {
-    pub fn new(side: u8) -> Metrics {
+    pub fn new(side: u16) -> Metrics {
         let columnsize = side * side;
         let linesize = side * side;
         let gridsize = columnsize as u16 * linesize as u16;
@@ -21,19 +21,19 @@ impl Metrics {
             max,
         }
     }
-    pub fn get_square_side(&self) -> u8 {
+    pub fn get_square_side(&self) -> u16 {
         self.squareside
     }
-    pub fn get_nb_column(&self) -> u8 {
+    pub fn get_nb_column(&self) -> u16 {
         self.nbcolumn
     }
-    pub fn get_nb_line(&self) -> u8 {
+    pub fn get_nb_line(&self) -> u16 {
         self.nbline
     }
     pub fn get_grid_size(&self) -> u16 {
         self.gridsize
     }
-    pub fn get_max(&self) -> u8 {
+    pub fn get_max(&self) -> u16 {
         self.max
     }
 }

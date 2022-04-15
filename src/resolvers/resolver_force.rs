@@ -9,7 +9,7 @@ use std::convert::TryInto;
 */
 pub struct ResolverForce {
     debug: bool,
-    data: Vec<Vec<u8>>,
+    data: Vec<Vec<u16>>,
     metrics: Metrics,
 }
 
@@ -38,7 +38,7 @@ impl ResolverForce {
         res
     }
 
-    pub fn in_row(&mut self, row: usize, val: u8) -> bool {
+    pub fn in_row(&mut self, row: usize, val: u16) -> bool {
         for col in 0..self.metrics.get_max() {
             let c: usize = col.try_into().unwrap();
             if self.data[row][c] == val {
@@ -48,7 +48,7 @@ impl ResolverForce {
         false
     }
 
-    pub fn in_col(&mut self, col: usize, val: u8) -> bool {
+    pub fn in_col(&mut self, col: usize, val: u16) -> bool {
         for row in 0..self.metrics.get_max() {
             let r: usize = row.try_into().unwrap();
             if self.data[r][col] == val {
@@ -58,7 +58,7 @@ impl ResolverForce {
         false
     }
 
-    pub fn in_square(&mut self, row: usize, col: usize, val: u8) -> bool {
+    pub fn in_square(&mut self, row: usize, col: usize, val: u16) -> bool {
         let side: usize = self.metrics.get_square_side().try_into().unwrap();
         let lrow = row - row % side;
         let lcol = col - col % side;
@@ -72,7 +72,7 @@ impl ResolverForce {
         false
     }
 
-    pub fn valid(&mut self, row: usize, col: usize, val: u8) -> bool {
+    pub fn valid(&mut self, row: usize, col: usize, val: u16) -> bool {
         !self.in_col(col, val) && !self.in_row(row, val) && !self.in_square(row, col, val)
     }
 
@@ -101,7 +101,7 @@ impl ResolverForce {
     }
 }
 
-pub fn grid_to_vec(g: &mut Grid) -> Vec<Vec<u8>> {
+pub fn grid_to_vec(g: &mut Grid) -> Vec<Vec<u16>> {
     let max = g.get_metrics().get_max();
     let mut flat = Vec::new();
     for l in 0..max {
