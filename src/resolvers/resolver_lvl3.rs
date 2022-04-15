@@ -35,16 +35,19 @@ impl ResolverLvl3 {
         if g.resolved() {
             return false;
         }
+        let max = g.get_metrics().get_max();
+        let nb_column = g.get_metrics().get_nb_column();
+        let nb_line = g.get_metrics().get_nb_line();
         self.trace = "".to_string();
         let mut solve_one_at_least = false;
-        for v in 1..=g.get_metrics().get_max() {
+        for v in 1..=max {
             let val: usize = v.try_into().unwrap();
-            for line in 1..=g.get_metrics().get_nb_column() {
+            for line in 1..=nb_column {
                 if self.resolve_line(g, line, val) {
                     solve_one_at_least = true;
                 }
             }
-            for column in 1..=g.get_metrics().get_nb_line() {
+            for column in 1..=nb_line {
                 if self.resolve_column(g, column, val) {
                     solve_one_at_least = true;
                 }

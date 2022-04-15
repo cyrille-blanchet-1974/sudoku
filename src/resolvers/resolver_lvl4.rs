@@ -46,17 +46,20 @@ impl ResolverLvl4 {
     fn resolve_line(&mut self, g: &mut Grid) -> bool {
         let mut trouve = false;
         let acc = Accessor::new(g.get_metrics().get_square_side());
+        let max = g.get_metrics().get_max();
+        let nb_line = g.get_metrics().get_nb_line();
+        let nb_column=g.get_metrics().get_nb_column();
         //loop values
-        for v in 1..=g.get_metrics().get_max() {
+        for v in 1..=max {
             let val: usize = v.try_into().unwrap();
             let mut tab = Vec::new();
             //loop lines
-            'lines: for line in 1..=g.get_metrics().get_nb_line() {
+            'lines: for line in 1..=nb_line {
                 let mut t = (0, 0); // count   and positions
                                     //count is nb of cell with val in possibles
                                     //positions is 'binairy' positions of column with val possible
                 let mut p: u32 = 100_000_000;
-                for column in 1..=g.get_metrics().get_nb_column() {
+                for column in 1..=nb_column {
                     let pos = acc.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
@@ -88,13 +91,13 @@ impl ResolverLvl4 {
             }
             //check if we find 2 lines with only 2 count and the same position
             //loop on tab
-            for line in 1..=g.get_metrics().get_nb_line() {
+            for line in 1..=nb_line {
                 let l: usize = line.try_into().unwrap();
                 let t = tab[l - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
-                    for line2 in line + 1..=g.get_metrics().get_nb_line() {
+                    for line2 in line + 1..=nb_line {
                         let l2: usize = line2.try_into().unwrap();
                         let t2 = tab[l2 - 1];
                         //find a cell with count = 2
@@ -115,7 +118,7 @@ impl ResolverLvl4 {
                             );
                             self.trace.push_str(&trc);
                             //So we can remove value v of all other cells of this two columns
-                            for l in 1..=g.get_metrics().get_nb_line() {
+                            for l in 1..=nb_line {
                                 if l == line {
                                     continue;
                                 }
@@ -145,17 +148,20 @@ impl ResolverLvl4 {
     fn resolve_column(&mut self, g: &mut Grid) -> bool {
         let mut trouve = false;
         let acc = Accessor::new(g.get_metrics().get_square_side());
+        let max = g.get_metrics().get_max();
+        let nb_line=g.get_metrics().get_nb_line();
+        let nb_column=g.get_metrics().get_nb_column();
         //loop values
-        for v in 1..=g.get_metrics().get_max() {
+        for v in 1..=max {
             let val: usize = v.try_into().unwrap();
             let mut tab = Vec::new();
             //loop columns
-            'cols: for column in 1..=g.get_metrics().get_nb_column() {
+            'cols: for column in 1..=nb_column {
                 let mut t = (0, 0); // count   and positions
                                     //count is nb of cell with val in possibles
                                     //positions is 'binairy' positions of line with val possible
                 let mut p: u32 = 100_000_000;
-                for line in 1..=g.get_metrics().get_nb_line() {
+                for line in 1..=nb_line {
                     let pos = acc.coordconverter.coord_to_pos(line, column);
                     let cell: &mut Cell = g.get_cell(pos);
                     if cell.is_resolved() {
@@ -187,13 +193,13 @@ impl ResolverLvl4 {
             }
             //check if we find 2 cols with only 2 count and the same position
             //loop on tab
-            for column in 1..=g.get_metrics().get_nb_column() {
+            for column in 1..=nb_column {
                 let c: usize = column.try_into().unwrap();
                 let t = tab[c - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
-                    for column2 in column + 1..=g.get_metrics().get_nb_column() {
+                    for column2 in column + 1..=nb_column {
                         let c2: usize = column2.try_into().unwrap();
                         let t2 = tab[c2 - 1];
                         //find a cell with count = 2
@@ -214,7 +220,7 @@ impl ResolverLvl4 {
                             );
                             self.trace.push_str(&trc);
                             //So we can remove value v of all other cells of this two lines
-                            for c in 1..=g.get_metrics().get_nb_column() {
+                            for c in 1..=nb_column {
                                 if c == column {
                                     continue;
                                 }
