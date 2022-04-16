@@ -177,3 +177,32 @@ Obviously this is a recursive way of resolution
 
 other lvl to find...
 ....
+
+add a level 5
+In a square and in a row, if on cell id known and the two other has only two possibles
+If this two possibles are the same then we can remove the two values of all remaning cells of the line
+Same with a column in a square
+ex:
+╔═════════╦═════════╦═════════╗
+║ ?  8  ? ║ ?  2  ? ║ 5  6  ? ║
+║ ?  ?  ? ║ 1  ?  ? ║ ?  ?  7 ║
+║ ?  ?  ? ║ 5  ?  ? ║ ?  ?  ? ║
+╟═════════╬═════════╬═════════╢
+║ ?  5  ? ║ ?  9  ? ║ 4  ?  8 ║
+║ ?  ?  7 ║ 8  5  ? ║ ?  ?  3 ║
+║ ?  9  ? ║ ?  1  ? ║ ?  5  2 ║
+╟═════════╬═════════╬═════════╢
+║ 2  ?  4 ║ ?  ?  1 ║ 8  ?  5 ║
+║ ?  6  ? ║ ?  8  5 ║ ?  ?  ? ║
+║ ?  ?  ? ║ 2  ?  ? ║ 1  ?  6 ║
+╚═════════╩═════════╩═════════╝
+9/1 and 9/3 can only be 5 or 8 (because we already have a 5 and en 8 in line 8 and in column2)
+so 8/1 and 8/3 can only be 1 or 9
+So 8/9 can't be 1 or 9
+it can't also be 5/6/8 (already in line and square) nor 2/3/7
+if we remove 1/2/3/5/6/7/8/9 only 4 remains...
+
+
+add level 6
+if we have two pairs with a common number and in the same columns
+Then the numbre can only be in the third column of the third square

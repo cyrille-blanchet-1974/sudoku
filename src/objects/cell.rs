@@ -263,6 +263,38 @@ impl Cell {
         print!("  Cell:{} possibles:{:?}", self.position, poss);
         true
     }
+
+    /*
+     if the cell only has a pair of possible return it
+     else Non
+    */
+    pub fn get_pair(&self) -> Option<(u16, u16)> {
+        if self.is_resolved() {
+            return None;
+        }
+        let mut first = 0;
+        let mut second = 0;
+        let mut i = 1;
+        for r in &self.possibles {
+            if *r {
+                if first == 0 {
+                    first += i;
+                } else if second == 0 {
+                    second += i;
+                } else {
+                    //more than 3 possibles...
+                    return None;
+                }
+            }
+            i += 1;
+        }
+        if first == 0 || second == 0 {
+            //les than 2 possibles...
+            return None;
+        }
+        //we have a pair
+        Some((first, second))
+    }
 }
 
 #[test]
@@ -287,6 +319,30 @@ fn resolution_test() {
     }
     assert_eq!(true, c.is_resolved());
     assert_eq!(Some(9), c.get_answer());
+}
+
+#[test]
+fn pair_test() {
+    let mut c = Cell::new(1, false, 3);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(1);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(2);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(3);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(4);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(5);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(6);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(7);
+    assert_eq!(Some((8, 9)), c.get_pair());
+    c.remove_a_possible(8);
+    assert_eq!(None, c.get_pair());
+    c.remove_a_possible(9);
+    assert_eq!(None, c.get_pair());
 }
 
 impl Clone for Cell {

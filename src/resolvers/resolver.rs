@@ -4,6 +4,7 @@ use super::resolver_lvl1::*;
 use super::resolver_lvl2::*;
 use super::resolver_lvl3::*;
 use super::resolver_lvl4::*;
+use super::resolver_lvl5::*;
 
 pub struct Resolver {
     step: u32,
@@ -15,12 +16,15 @@ pub struct Resolver {
     nblvl3ko: u32,
     nblvl4: u32,
     nblvl4ko: u32,
+    nblvl5: u32,
+    nblvl5ko: u32,
     nblvl9guess: u32,
     nblvl9wrongguess: u32,
     resolver1: Option<ResolverLvl1>,
     resolver2: Option<ResolverLvl2>,
     resolver3: Option<ResolverLvl3>,
     resolver4: Option<ResolverLvl4>,
+    resolver5: ResolverLvl5,
     debug: bool,
     display: bool,
 }
@@ -37,12 +41,15 @@ impl Resolver {
             nblvl3ko: 0,
             nblvl4: 0,
             nblvl4ko: 0,
+            nblvl5: 0,
+            nblvl5ko: 0,
             nblvl9guess: 0,
             nblvl9wrongguess: 0,
             resolver1: None,
             resolver2: None,
             resolver3: None,
             resolver4: None,
+            resolver5: ResolverLvl5::new(),
             debug,
             display,
         }
@@ -66,7 +73,11 @@ impl Resolver {
             self.nblvl4, self.nblvl4ko
         );
         println!(
-            "Made {} guess at level 4, {} of those were wrong",
+            "Called {} times level 5 ({} times with no new result)",
+            self.nblvl5, self.nblvl5ko
+        );
+        println!(
+            "Made {} guess at level 9, {} of those were wrong",
             self.nblvl9guess, self.nblvl9wrongguess
         );
     }
@@ -213,6 +224,15 @@ impl Resolver {
         } else if self.debug {
             let trc = g.get_trace();
             println!("{}Level4 => {}", space, trc);
+        }
+        //remove values in lines or columns when 2 pairs
+        let res5 = self.resolver5.resolve(g);
+        self.nblvl5 += 1;
+        if !res5 {
+            self.nblvl5ko += 1;
+        } else if self.debug {
+            let trc = g.get_trace();
+            println!("{}Level5 => {}", space, trc);
         }
         g.something_has_some_change()
     }

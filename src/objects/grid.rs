@@ -435,6 +435,154 @@ impl Grid {
         }
         true
     }
+
+    pub fn check_pairs_line(&mut self, line: u16) -> Option<(u16, u16, Vec<u16>)> {
+        if self.debug {
+            println!("checking pairs on line {}", line);
+        }
+        let mut cells = Vec::new();
+        let list1 = self.acc.get_line(line);
+        for pos1 in list1 {
+            let c1 = self.get_cell(pos1.into());
+            let square1 = c1.get_square();
+            let p1 = c1.get_pair();
+            if p1 == None {
+                continue;
+            }
+            if self.debug {
+                println!("cell {} got a pair {:?} ", pos1, p1.unwrap());
+            }
+            let list2 = self.acc.get_line(line);
+            for pos2 in list2 {
+                if pos1 == pos2 {
+                    continue;
+                }
+                let c2 = self.get_cell(pos2.into());
+                let square2 = c2.get_square();
+                let p2 = c2.get_pair();
+                if p2 == None {
+                    continue;
+                }
+                if p1 == p2 {
+                    if self.debug {
+                        println!("cell {} has the same pair ", pos2);
+                    }
+                    let list3 = self.acc.get_line(line);
+                    let pair = p1.unwrap();
+                    let val1 = pair.0;
+                    let val2 = pair.1;
+                    for pos3 in list3 {
+                        if pos3 == pos1 || pos3 == pos2 {
+                            continue;
+                        }
+                        let c3 = self.get_cell(pos3.into());
+                        if c3.is_resolved() {
+                            continue;
+                        }
+                        if c3.candidate(val1.into()) || c3.candidate(val2.into()) {
+                            cells.push(pos3);
+                        }
+                    }
+                    if square1 == square2 {
+                        let list4 = self.acc.get_square(square1);
+                        for pos4 in list4 {
+                            if pos4 == pos1 || pos4 == pos2 || cells.contains(&pos4) {
+                                continue;
+                            }
+                            let c4 = self.get_cell(pos4.into());
+                            if c4.is_resolved() {
+                                continue;
+                            }
+                            if c4.candidate(val1.into()) || c4.candidate(val2.into()) {
+                                cells.push(pos4);
+                            }
+                        }
+                    }
+                    if self.debug {
+                        println!("cells to clean {:?} ", cells);
+                    }
+                    if !cells.is_empty() {
+                        return Some((val1, val2, cells));
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    pub fn check_pairs_column(&mut self, column: u16) -> Option<(u16, u16, Vec<u16>)> {
+        if self.debug {
+            println!("checking pairs on column {}", column);
+        }
+        let mut cells = Vec::new();
+        let list1 = self.acc.get_column(column);
+        for pos1 in list1 {
+            let c1 = self.get_cell(pos1.into());
+            let square1 = c1.get_square();
+            let p1 = c1.get_pair();
+            if p1 == None {
+                continue;
+            }
+            if self.debug {
+                println!("cell {} got a pair {:?} ", pos1, p1.unwrap());
+            }
+            let list2 = self.acc.get_column(column);
+            for pos2 in list2 {
+                if pos1 == pos2 {
+                    continue;
+                }
+                let c2 = self.get_cell(pos2.into());
+                let square2 = c2.get_square();
+                let p2 = c2.get_pair();
+                if p2 == None {
+                    continue;
+                }
+                if p1 == p2 {
+                    if self.debug {
+                        println!("cell {} has the same pair ", pos2);
+                    }
+                    let list3 = self.acc.get_column(column);
+                    let pair = p1.unwrap();
+                    let val1 = pair.0;
+                    let val2 = pair.1;
+                    for pos3 in list3 {
+                        if pos3 == pos1 || pos3 == pos2 {
+                            continue;
+                        }
+                        let c3 = self.get_cell(pos3.into());
+                        if c3.is_resolved() {
+                            continue;
+                        }
+                        if c3.candidate(val1.into()) || c3.candidate(val2.into()) {
+                            cells.push(pos3);
+                        }
+                    }
+                    if square1 == square2 {
+                        let list4 = self.acc.get_square(square1);
+                        for pos4 in list4 {
+                            if pos4 == pos1 || pos4 == pos2 || cells.contains(&pos4) {
+                                continue;
+                            }
+                            let c4 = self.get_cell(pos4.into());
+                            if c4.is_resolved() {
+                                continue;
+                            }
+                            if c4.candidate(val1.into()) || c4.candidate(val2.into()) {
+                                cells.push(pos4);
+                            }
+                        }
+                    }
+                    if self.debug {
+                        println!("cells to clean {:?} ", cells);
+                    }
+                    if !cells.is_empty() {
+                        return Some((val1, val2, cells));
+                    }
+                }
+            }
+        }
+        None
+    }
 }
 
 #[test]
