@@ -31,7 +31,7 @@ impl CoordConverter {
 
     pub fn coord_to_pos(&self, line: u16, column: u16) -> usize {
         let pos = (line - 1) * self.metrics.get_nb_line() + column - 1;
-        pos.try_into().unwrap()
+        pos.into()
     }
 
     /*

@@ -1,4 +1,3 @@
-use std::convert::TryInto;
 
 //the line
 pub struct Line {
@@ -29,7 +28,7 @@ impl Line {
         if val > self.max {
             return;
         }
-        let val: usize = (val - 1).try_into().unwrap();
+        let val: usize = (val - 1).into();
         self.known_values[val] = true;
     }
 
@@ -43,7 +42,7 @@ impl Line {
         if val > self.max {
             return false;
         }
-        let val: usize = (val - 1).try_into().unwrap();
+        let val: usize = (val - 1).into();
         self.known_values[val]
     }
 
@@ -53,7 +52,7 @@ impl Line {
     pub fn _get_unknown(&self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 0..self.max {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             if !self.known_values[pos] {
                 res.push(i + 1);
             }

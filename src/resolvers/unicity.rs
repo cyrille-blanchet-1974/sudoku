@@ -2,7 +2,6 @@ use super::super::objects::cell::CellType;
 use super::super::objects::coordconverter::*;
 use super::super::objects::grid::*;
 use super::super::resolvers::resolver::*;
-use std::convert::TryInto;
 /*
  here we use cpu power to try all possibilities
 
@@ -31,7 +30,7 @@ impl VerifyUnicity {
         let coordconverter = CoordConverter::new(first.get_metrics().get_square_side());
         //second loop on cells of type Guess
         for p in self.initial.get_unresolved() {
-            let pos: usize = p.try_into().unwrap();
+            let pos: usize = p.into();
             let answer = first.get_cell(pos).get_answer();
             if answer == None {
                 continue;

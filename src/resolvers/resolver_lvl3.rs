@@ -32,7 +32,7 @@ impl ResolverLvl3 {
         g.clear_trace();
         let mut solve_one_at_least = false;
         for v in 1..=max {
-            let val: usize = v.try_into().unwrap();
+            let val: usize = v.into();
             for line in 1..=nb_column {
                 if self.resolve_line(g, line, val) {
                     solve_one_at_least = true;
@@ -61,7 +61,7 @@ impl ResolverLvl3 {
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_line(line) {
-            let pos: usize = p.try_into().unwrap();
+            let pos: usize = p.into();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
                 if unsolve != 255 {
@@ -73,7 +73,7 @@ impl ResolverLvl3 {
         }
         if unsolve != 255 {
             //found
-            let pos: usize = unsolve.try_into().unwrap();
+            let pos: usize = unsolve.into();
             let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
@@ -92,7 +92,7 @@ impl ResolverLvl3 {
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_column(column) {
-            let pos: usize = p.try_into().unwrap();
+            let pos: usize = p.into();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
                 if unsolve != 255 {
@@ -104,7 +104,7 @@ impl ResolverLvl3 {
         }
         if unsolve != 255 {
             //found
-            let pos: usize = unsolve.try_into().unwrap();
+            let pos: usize = unsolve.into();
             let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);
@@ -123,7 +123,7 @@ impl ResolverLvl3 {
         let mut unsolve = 255;
         //iterate on all cells of the line
         for p in self.acc.get_square(square) {
-            let pos: usize = p.try_into().unwrap();
+            let pos: usize = p.into();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.candidate(val) {
                 if unsolve != 255 {
@@ -135,7 +135,7 @@ impl ResolverLvl3 {
         }
         if unsolve != 255 {
             //found
-            let pos: usize = unsolve.try_into().unwrap();
+            let pos: usize = unsolve.into();
             let v: u16 = val.try_into().unwrap();
             let coord = self.acc.coordconverter.pos_to_coord(pos);
             g.set_val(coord.0, coord.1, v, CellType::Found);

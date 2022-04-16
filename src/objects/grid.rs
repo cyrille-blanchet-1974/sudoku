@@ -33,7 +33,7 @@ impl Grid {
         let metrics = Metrics::new(side);
         //construct all cells
         for i in 0..metrics.get_grid_size() {
-            cells.push(Cell::new(i.try_into().unwrap(), false, side));
+            cells.push(Cell::new(i.into(), false, side));
         }
         let acc = Accessor::new(side);
         let mut lines = Vec::new();
@@ -94,12 +94,12 @@ impl Grid {
             lefts.push(self.metrics.get_max());
         }
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = self.get_cell(pos);
             match cell.get_answer() {
                 None => {}
                 Some(x) => {
-                    let idx: usize = (x - 1).try_into().unwrap();
+                    let idx: usize = (x - 1).into();
                     lefts[idx] -= 1;
                 }
             }
@@ -116,7 +116,7 @@ impl Grid {
         let mut res = (0, 99);
         let lefts = self.get_lefts();
         for p in possibles {
-            let idx: usize = (p - 1).try_into().unwrap();
+            let idx: usize = (p - 1).into();
             if lefts[idx] < res.1 {
                 res = (p, lefts[idx])
             }
@@ -130,7 +130,7 @@ impl Grid {
     pub fn something_has_some_change(&mut self) -> bool {
         let mut res = false;
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.something_has_some_change() {
                 res = true;
@@ -142,7 +142,7 @@ impl Grid {
     pub fn set_debug(&mut self, debug: bool) {
         self.debug = debug;
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = &mut (self.cells[pos]);
             cell.set_debug(debug);
         }
@@ -154,10 +154,10 @@ impl Grid {
         let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
         cell.set_val(val, t);
-        let c: usize = (column - 1).try_into().unwrap();
+        let c: usize = (column - 1).into();
         let col: &mut Column = &mut (self.columns[c]);
         col.add_a_known_value(val);
-        let l: usize = (line - 1).try_into().unwrap();
+        let l: usize = (line - 1).into();
         let lin: &mut Line = &mut (self.lines[l]);
         lin.add_a_known_value(val);
         let s: usize = (self.acc.coordconverter.pos_to_square(pos).get_value() - 1)
@@ -173,7 +173,7 @@ impl Grid {
     pub fn remove_candidate(&mut self, line: u16, column: u16, val: u16) {
         let pos = self.acc.coordconverter.coord_to_pos(line, column);
         let cell: &mut Cell = &mut (self.cells[pos]);
-        let v: usize = val.try_into().unwrap();
+        let v: usize = val.into();
         if self.debug {
             println!("removing value {} from cell: l:{}/c:{}", val, line, column);
         }
@@ -204,7 +204,7 @@ impl Grid {
     pub fn resolved(&mut self) -> bool {
         if !self.resolved {
             for i in 0..self.metrics.get_grid_size() {
-                let pos: usize = i.try_into().unwrap();
+                let pos: usize = i.into();
                 let cell: &mut Cell = &mut (self.cells[pos]);
                 if !cell.is_resolved() {
                     return false;
@@ -290,7 +290,7 @@ impl Grid {
     pub fn get_resolved(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.is_resolved() {
                 res.push(i);
@@ -306,7 +306,7 @@ impl Grid {
     pub fn get_unresolved(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if !cell.is_resolved() {
                 res.push(i);
@@ -336,7 +336,7 @@ impl Grid {
     pub fn get_first_xwing(&mut self) -> Option<usize> {
         //if a xwing exist return if
         for pos in 0..self.metrics.get_grid_size() {
-            let p: usize = pos.try_into().unwrap();
+            let p: usize = pos.into();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() && cell.get_type() == CellType::Xwing {
                 return Some(p);
@@ -353,7 +353,7 @@ impl Grid {
         let mut potential = (0, 999); //position/nb possibles
                                       //find a cell not resolved
         for pos in 0..self.metrics.get_grid_size() {
-            let p: usize = pos.try_into().unwrap();
+            let p: usize = pos.into();
             let cell: &mut Cell = &mut (self.cells[p]);
             if !cell.is_resolved() {
                 //and return first of its possibles
@@ -376,7 +376,7 @@ impl Grid {
      */
     pub fn check_value_in_square(&mut self, s: Cardinal, val: u16) -> bool {
         //check if value is resolve
-        let pos: usize = (s.get_value() - 1).try_into().unwrap();
+        let pos: usize = (s.get_value() - 1).into();
         let squ: &mut Square = &mut (self.squares[pos]);
         squ.is_known(val)
     }
@@ -385,7 +385,7 @@ impl Grid {
      */
     pub fn check_value_in_line(&mut self, line: u16, val: u16) -> bool {
         //check if value is resolve
-        let pos: usize = (line - 1).try_into().unwrap();
+        let pos: usize = (line - 1).into();
         let lin: &mut Line = &mut (self.lines[pos]);
         lin.is_known(val)
     }
@@ -395,7 +395,7 @@ impl Grid {
      */
     pub fn check_value_in_column(&mut self, column: u16, val: u16) -> bool {
         //check if value is resolve
-        let pos: usize = (column - 1).try_into().unwrap();
+        let pos: usize = (column - 1).into();
         let col: &mut Column = &mut (self.columns[pos]);
         col.is_known(val)
     }
@@ -409,18 +409,18 @@ impl Grid {
             count.push(0);
         }
         for v in set {
-            let pos: usize = v.try_into().unwrap();
+            let pos: usize = v.into();
             let cell: &Cell = &self.cells[pos];
             match cell.get_answer() {
                 None => {}
                 Some(a) => {
-                    let pos: usize = (a - 1).try_into().unwrap();
+                    let pos: usize = (a - 1).into();
                     count[pos] += 1;
                 }
             };
         }
         for i in 0..self.metrics.get_max() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             match count.get(pos) {
                 None => {}
                 Some(val) => {
@@ -752,7 +752,7 @@ impl Grid {
         let lefts = self.get_lefts();
         print!("Remains:");
         for i in 0..self.metrics.get_max() {
-            let idx: usize = i.try_into().unwrap();
+            let idx: usize = i.into();
             print!(" {}=>{}", i + 1, u16_to_string(lefts[idx]));
         }
         println!();
@@ -765,7 +765,7 @@ impl Grid {
         println!("-------------------------------DEBUG-------------------------------");
         let mut nb = 0;
         for i in 0..self.metrics.get_grid_size() {
-            let pos: usize = i.try_into().unwrap();
+            let pos: usize = i.into();
             let cell: &mut Cell = &mut (self.cells[pos]);
             if cell.debug() {
                 nb += 1;

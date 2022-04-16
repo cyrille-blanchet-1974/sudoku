@@ -1,6 +1,5 @@
 use super::cardinal::*;
 use super::coordconverter::*;
-use std::convert::TryInto;
 
 //type of the cell
 #[derive(Debug, Copy, Clone)]
@@ -128,7 +127,7 @@ impl Cell {
         let mut val = 1; //val
                          //check all possible
         for i in 1..=self.max {
-            let pos = i.try_into().unwrap();
+            let pos = i.into();
             if self.candidate(pos) {
                 count += 1; //one more
                 val = i;
@@ -203,7 +202,7 @@ impl Cell {
     pub fn get_possibles(&mut self) -> Vec<u16> {
         let mut res = Vec::new();
         for i in 1..=self.max {
-            if self.candidate(i.try_into().unwrap()) {
+            if self.candidate(i.into()) {
                 res.push(i);
             }
         }
@@ -216,7 +215,7 @@ impl Cell {
      set the value of the cell
     */
     pub fn set_val(&mut self, val: u16, t: CellType) {
-        if !self.candidate(val.try_into().unwrap()) {
+        if !self.candidate(val.into()) {
             if self.debug {
                 println!(
                     "ERROR! {} is not possible on cell {} (l:{}/c:{})",
@@ -229,7 +228,7 @@ impl Cell {
         //remove other possibles
         for i in 1..=self.max {
             if i != val {
-                let pos = i.try_into().unwrap();
+                let pos = i.into();
                 self.remove_a_possible(pos);
             }
         }
@@ -301,7 +300,7 @@ impl Cell {
 fn possible_test() {
     let mut c = Cell::new(1, false, 3);
     for i in 1..c.max + 1 {
-        let pos = i.try_into().unwrap();
+        let pos = i.into();
         assert_eq!(true, c.candidate(pos));
     }
     c.remove_a_possible(5);
@@ -314,7 +313,7 @@ fn resolution_test() {
     assert_eq!(false, c.is_resolved());
     assert_eq!(None, c.get_answer());
     for v in 1..c.max {
-        let val = v.try_into().unwrap();
+        let val = v.into();
         c.remove_candidate_and_verify(val);
     }
     assert_eq!(true, c.is_resolved());

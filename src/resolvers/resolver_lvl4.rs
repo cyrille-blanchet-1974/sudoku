@@ -41,7 +41,7 @@ impl ResolverLvl4 {
         let nb_column = g.get_metrics().get_nb_column();
         //loop values
         for v in 1..=max {
-            let val: usize = v.try_into().unwrap();
+            let val: usize = v.into();
             let mut tab = Vec::new();
             //loop lines
             'lines: for line in 1..=nb_line {
@@ -82,13 +82,13 @@ impl ResolverLvl4 {
             //check if we find 2 lines with only 2 count and the same position
             //loop on tab
             for line in 1..=nb_line {
-                let l: usize = line.try_into().unwrap();
+                let l: usize = line.into();
                 let t = tab[l - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
                     for line2 in line + 1..=nb_line {
-                        let l2: usize = line2.try_into().unwrap();
+                        let l2: usize = line2.into();
                         let t2 = tab[l2 - 1];
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
@@ -142,7 +142,7 @@ impl ResolverLvl4 {
         let nb_column = g.get_metrics().get_nb_column();
         //loop values
         for v in 1..=max {
-            let val: usize = v.try_into().unwrap();
+            let val: usize = v.into();
             let mut tab = Vec::new();
             //loop columns
             'cols: for column in 1..=nb_column {
@@ -183,13 +183,13 @@ impl ResolverLvl4 {
             //check if we find 2 cols with only 2 count and the same position
             //loop on tab
             for column in 1..=nb_column {
-                let c: usize = column.try_into().unwrap();
+                let c: usize = column.into();
                 let t = tab[c - 1];
                 //find a cell with count = 2
                 if t.0 == 2 {
                     //then search another one
                     for column2 in column + 1..=nb_column {
-                        let c2: usize = column2.try_into().unwrap();
+                        let c2: usize = column2.into();
                         let t2 = tab[c2 - 1];
                         //find a cell with count = 2
                         if t2.0 == 2 && t.1 == t2.1 {
@@ -261,9 +261,9 @@ impl ResolverLvl4 {
             if d32 >= p {
                 d32 -= p;
                 if u1 == 0 {
-                    u1 = line.try_into().unwrap();
+                    u1 = line.into();
                 } else {
-                    u2 = line.try_into().unwrap();
+                    u2 = line.into();
                     return (u1, u2);
                 }
             }

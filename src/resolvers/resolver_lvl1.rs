@@ -1,7 +1,6 @@
 use super::super::objects::accessor::*;
 use super::super::objects::cell::*;
 use super::super::objects::grid::*;
-use std::convert::TryInto;
 
 pub struct ResolverLvl1 {
     acc: Accessor,
@@ -42,7 +41,7 @@ impl ResolverLvl1 {
     */
     fn resolve_val(&self, g: &mut Grid, p: u16) {
         //get value of the received cell
-        let pos: usize = p.try_into().unwrap();
+        let pos: usize = p.into();
         let cell: &mut Cell = g.get_cell(pos);
         let val = match cell.get_answer() {
             None => return, //if not solve...nothing to do...but should not have been called
@@ -50,10 +49,10 @@ impl ResolverLvl1 {
         };
         //get other cells
         let clean = self.get_to_clean(g, p);
-        let val: usize = val.try_into().unwrap();
+        let val: usize = val.into();
         //remove the value to all the others
         for c in clean {
-            let cc: usize = c.try_into().unwrap();
+            let cc: usize = c.into();
             let cell: &mut Cell = g.get_cell(cc);
             if cell.is_resolved() {
                 continue;
@@ -78,7 +77,7 @@ impl ResolverLvl1 {
     */
     fn get_to_clean(&self, g: &mut Grid, p: u16) -> Vec<u16> {
         let mut res = Vec::new();
-        let pos: usize = p.try_into().unwrap();
+        let pos: usize = p.into();
         let cell: &Cell = g.get_cell(pos);
         let lin = self.acc.get_line(cell.get_line());
         for l in lin {

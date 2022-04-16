@@ -2,7 +2,6 @@ use super::super::objects::cell::*;
 use super::super::objects::grid::*;
 use super::super::objects::metrics::*;
 use super::super::read::from_vecvec;
-use std::convert::TryInto;
 
 /*
  here we use cpu power to found a solution
@@ -40,7 +39,7 @@ impl ResolverForce {
 
     pub fn in_row(&mut self, row: usize, val: u16) -> bool {
         for col in 0..self.metrics.get_max() {
-            let c: usize = col.try_into().unwrap();
+            let c: usize = col.into();
             if self.data[row][c] == val {
                 return true;
             }
@@ -50,7 +49,7 @@ impl ResolverForce {
 
     pub fn in_col(&mut self, col: usize, val: u16) -> bool {
         for row in 0..self.metrics.get_max() {
-            let r: usize = row.try_into().unwrap();
+            let r: usize = row.into();
             if self.data[r][col] == val {
                 return true;
             }
@@ -59,7 +58,7 @@ impl ResolverForce {
     }
 
     pub fn in_square(&mut self, row: usize, col: usize, val: u16) -> bool {
-        let side: usize = self.metrics.get_square_side().try_into().unwrap();
+        let side: usize = self.metrics.get_square_side().into();
         let lrow = row - row % side;
         let lcol = col - col % side;
         for r in self.data.iter().skip(lrow).take(side) {
@@ -78,9 +77,9 @@ impl ResolverForce {
 
     pub fn raw_force(&mut self) -> bool {
         for row in 0..self.metrics.get_max() {
-            let r: usize = row.try_into().unwrap();
+            let r: usize = row.into();
             for col in 0..self.metrics.get_max() {
-                let c: usize = col.try_into().unwrap();
+                let c: usize = col.into();
                 if self.data[r][c] == 0 {
                     for val in 1..=self.metrics.get_max() {
                         if self.valid(r, c, val) {
@@ -107,7 +106,7 @@ pub fn grid_to_vec(g: &mut Grid) -> Vec<Vec<u16>> {
     for l in 0..max {
         let mut line = Vec::new();
         for c in 0..max {
-            let pos: usize = (l * max + c).try_into().unwrap();
+            let pos: usize = (l * max + c).into();
             let cell: &mut Cell = g.get_cell(pos);
             if cell.is_resolved() {
                 line.push(cell.get_answer().unwrap());
