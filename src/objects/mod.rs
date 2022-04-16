@@ -1,5 +1,8 @@
 pub mod accessor;
 pub mod cardinal;
+pub mod cardinal2;
+pub mod cardinal3;
+pub mod cardinal4;
 pub mod cell;
 pub mod column;
 pub mod coordconverter;

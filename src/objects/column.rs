@@ -1,4 +1,3 @@
-
 //the column
 pub struct Column {
     known_values: Vec<bool>, //Value already solve in the line
