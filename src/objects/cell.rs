@@ -37,11 +37,11 @@ impl PartialEq for CellType {
 //the cell
 pub struct Cell {
     position: usize,      //position in the grid (in the Vec in fact) -> see Map.txt
-    column: u16,           //column in the grid 1..max
-    line: u16,             //line in the grid 1..max
+    column: u16,          //column in the grid 1..max
+    line: u16,            //line in the grid 1..max
     square: Cardinal,     //square in the grid
     possibles: Vec<bool>, //possibles values of the cell
-    answer: u16,           //value of the cell when solved
+    answer: u16,          //value of the cell when solved
     cell_type: CellType,  //type of value
     debug: bool,
     just_resolved: bool,

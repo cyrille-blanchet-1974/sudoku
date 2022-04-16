@@ -545,7 +545,7 @@ impl Grid {
                         write!(&mut stdout, " ? ").unwrap();
                     }
                     Some(x) => {
-                        self.colorwrite(cell.get_type(), x.to_string());
+                        self.colorwrite(cell.get_type(), u16_to_string(x));
                     }
                 };
                 stdout
@@ -585,7 +585,7 @@ impl Grid {
                         print!(" ? ");
                     }
                     Some(x) => {
-                        print!(" {} ", x);
+                        print!(" {} ", u16_to_string(x));
                     }
                 };
                 if column % self.metrics.get_square_side() == 0 {
@@ -605,7 +605,7 @@ impl Grid {
         print!("Remains:");
         for i in 0..self.metrics.get_max() {
             let idx: usize = i.try_into().unwrap();
-            print!(" {}=>{}", i + 1, lefts[idx]);
+            print!(" {}=>{}", i + 1, u16_to_string(lefts[idx]));
         }
         println!();
     }
@@ -829,12 +829,16 @@ fn clone_grid_test() {
 impl Grid {
     pub fn compute_line(&mut self, line_number: u16, l: &str) {
         for (col, part) in l.split(',').enumerate() {
-            let r: u16 = match part.parse() {
+            /*let r: u16 = match part.parse() {
                 Err(_) => {
                     continue;
                 }
                 Ok(v) => v,
-            };
+            };*/
+            let r = string_to_u16(part.to_string());
+            if r == 0 {
+                continue;
+            }
             let c: u16 = col.try_into().unwrap();
             self.set_val(line_number, c + 1, r, CellType::Origin);
         }
@@ -856,5 +860,53 @@ impl Grid {
             self.compute_vecline(l, v);
             l += 1;
         }
+    }
+}
+
+fn u16_to_string(input: u16) -> String {
+    let res = match input {
+        1 => "1",
+        2 => "2",
+        3 => "3",
+        4 => "4",
+        5 => "5",
+        6 => "6",
+        7 => "7",
+        8 => "8",
+        9 => "9",
+        10 => "A",
+        11 => "B",
+        12 => "C",
+        13 => "D",
+        14 => "E",
+        15 => "F",
+        16 => "G",
+        0 => "?",
+        _other => "?",
+    };
+    res.to_string()
+}
+
+fn string_to_u16(input: String) -> u16 {
+    let i = input.as_str();
+    match i {
+        "1" => 1,
+        "2" => 2,
+        "3" => 3,
+        "4" => 4,
+        "5" => 5,
+        "6" => 6,
+        "7" => 7,
+        "8" => 8,
+        "9" => 9,
+        "A" => 10,
+        "B" => 11,
+        "C" => 12,
+        "D" => 13,
+        "E" => 14,
+        "F" => 15,
+        "G" => 16,
+        "?" => 0,
+        _other => 0,
     }
 }

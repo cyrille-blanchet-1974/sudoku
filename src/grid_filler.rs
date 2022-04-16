@@ -111,6 +111,37 @@ pub fn sample22(debug: bool) -> Grid {
     */
 }
 
+pub fn sample44(debug: bool) -> Grid {
+    let v = vec![
+        "?,?,?,3,2,?,?,?,?,?,E,9,6,1,?,A".to_string(),
+        "D,?,?,?,?,8,?,?,?,5,F,6,?,?,?,?".to_string(),
+        "?,?,?,B,?,?,E,?,?,3,A,?,?,5,7,D".to_string(),
+        "4,?,6,?,?,?,1,9,7,G,?,D,3,8,B,?".to_string(),
+        "?,5,?,?,C,E,?,?,?,?,4,A,?,G,6,B".to_string(),
+        "?,G,B,?,8,5,2,?,?,F,?,?,?,?,1,?".to_string(),
+        "1,6,?,2,?,?,3,?,G,B,7,?,?,?,?,F".to_string(),
+        "?,E,?,?,6,?,G,?,C,D,?,?,?,7,?,9".to_string(),
+        "2,?,?,7,?,?,?,?,3,?,?,?,1,?,8,5".to_string(),
+        "?,?,C,8,?,F,D,?,?,6,?,?,B,?,A,?".to_string(),
+        "6,9,?,?,?,7,4,A,?,?,?,8,?,E,?,C".to_string(),
+        "?,A,?,?,3,?,6,?,5,?,C,?,?,4,?,?".to_string(),
+        "?,8,?,G,F,2,?,?,?,?,?,?,?,?,9,6".to_string(),
+        "5,2,4,?,?,1,?,7,F,9,G,?,?,?,D,?".to_string(),
+        "?,B,1,?,?,?,?,G,6,?,5,?,7,2,E,?".to_string(),
+        "C,?,3,A,4,?,?,?,2,E,?,?,?,?,G,?".to_string(),
+    ];
+    from_vec(4, v, debug)
+    /*Solved in 43 steps (26 guesses all good) // 74 steps 29 guess 1 bad
+    ---------------                       ---------------
+    | 1  ? | 2  ? |                       | 1  ? | 2  ? |
+    | ?  ? | ?  ? |                       | ?  ? | ?  ? |
+    ---------------                       ---------------
+    | 3  ? | 4  ? |                       | 3  ? | 4  ? |
+    | ?  ? | ?  ? |                       | ?  ? | ?  ? |
+    ---------------                       ---------------
+    */
+}
+
 pub fn easy(debug: bool) -> Grid {
     let v = vec![
         "1,?,7,?,?,?,?,?,?".to_string(),
@@ -340,6 +371,7 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
         println!("13:fill manualy (3x3)");
         println!("14:fill manualy (4x4)");
         println!("22: sample (2x2)");
+        println!("44: sample (4x4)");
         println!("99:quit");
         match read_u16("Your choice?".to_string()) {
             None => {
@@ -384,6 +416,9 @@ pub fn choose_grid(debug: bool) -> Option<Grid> {
             }
             Some(22) => {
                 return Some(sample22(debug));
+            }
+            Some(44) => {
+                return Some(sample44(debug));
             }
             Some(99) => {
                 println!("Sudoku resolution End!");
