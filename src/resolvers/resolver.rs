@@ -216,14 +216,17 @@ impl Resolver {
             let trc = g.get_trace();
             println!("{}Level3 => {}", space, trc);
         }
-        //x-wing
-        let res4 = self.resolver4.as_ref().unwrap().resolve(g);
-        self.nblvl4 += 1;
-        if !res4 {
-            self.nblvl4ko += 1;
-        } else if self.debug {
-            let trc = g.get_trace();
-            println!("{}Level4 => {}", space, trc);
+        //do not run xwing on grid with side <> 3!!!
+        if g.get_metrics().get_square_side() == 3 {
+            //x-wing
+            let res4 = self.resolver4.as_ref().unwrap().resolve(g);
+            self.nblvl4 += 1;
+            if !res4 {
+                self.nblvl4ko += 1;
+            } else if self.debug {
+                let trc = g.get_trace();
+                println!("{}Level4 => {}", space, trc);
+            }
         }
         //remove values in lines or columns when 2 pairs
         let res5 = self.resolver5.resolve(g);

@@ -27,7 +27,13 @@ pub fn clever_solving(g: &mut Grid, debug: bool, display: bool) -> bool {
     println!("****Final data for the grid****");
     g.display();
     g.legend();
-    println!("Grid resolved!!!!!");
+    let state = if g.resolved() {
+        "Resolved"
+    } else {
+        "NOT Resolved"
+    };
+    println!("Grid resolution finished!!!!! => {}", state);
+
     r.display_stats();
     res
 }
@@ -153,6 +159,10 @@ fn clever_solve_test() {
     assert_eq!(true, clever_solving(&mut g, false, false));
     let mut g = from_disk("test/hardest.txt".to_string(), false);
     assert_eq!(true, clever_solving(&mut g, false, false));
+    let mut g = sample22(false);
+    assert_eq!(true, clever_solving(&mut g, false, false));
+    let mut g = sample44(false);
+    assert_eq!(true, clever_solving(&mut g, false, false));
 }
 
 #[test]
@@ -191,6 +201,10 @@ fn raw_solve_test() {
     assert_eq!(true, raw_solving(&mut g, false));
     let mut g = from_disk("test/hardest.txt".to_string(), false);
     assert_eq!(true, raw_solving(&mut g, false));
+    let mut g = sample22(false);
+    assert_eq!(true, raw_solving(&mut g, false));
+    let mut g = sample44(false);
+    assert_eq!(true, raw_solving(&mut g, false));
 }
 
 #[test]
@@ -228,5 +242,9 @@ fn uniq_test() {
     let mut g = from_disk("test/m.txt".to_string(), false);
     assert_eq!(true, verify_unicity(&mut g));
     let mut g = from_disk("test/hardest.txt".to_string(), false);
+    assert_eq!(true, verify_unicity(&mut g));
+    let mut g = sample22(false);
+    assert_eq!(false, verify_unicity(&mut g));
+    let mut g = sample44(false);
     assert_eq!(true, verify_unicity(&mut g));
 }

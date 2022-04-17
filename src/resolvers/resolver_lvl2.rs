@@ -5,12 +5,14 @@ use super::super::objects::grid::*;
 
 pub struct ResolverLvl2 {
     cc: CoordConverter,
+    side: u16,
 }
 
 impl ResolverLvl2 {
     pub fn new(side: u16) -> ResolverLvl2 {
         ResolverLvl2 {
             cc: CoordConverter::new(side),
+            side,
         }
     }
 
@@ -27,9 +29,9 @@ impl ResolverLvl2 {
         g.clear_trace();
         let mut resolve_some = false;
         //iter on squares
-        let squ = Cardinal::C;
+        let squ = Cardinal::_1_1;
         let max = g.get_metrics().get_max();
-        for sq in squ.get_all() {
+        for sq in squ.get_all(self.side) {
             //iter on values
             for value in 1..=max {
                 if self.resolve_square_val(g, sq, value) {
@@ -51,7 +53,7 @@ impl ResolverLvl2 {
 
         //check if all but one line solved
         let mut unsolved_line = 255;
-        for l in squ.get_lines() {
+        for l in squ.get_lines(self.side) {
             //if unsolved in this line
             if !g.check_value_in_line(l, value) {
                 //first unsolved ?
@@ -70,7 +72,7 @@ impl ResolverLvl2 {
         //now check the columns
         //check if all but one column solved
         let mut unsolved_column = 255;
-        for c in squ.get_columns() {
+        for c in squ.get_columns(self.side) {
             //if unsolved in this column
             if !g.check_value_in_column(c, value) {
                 //first unsolved ?

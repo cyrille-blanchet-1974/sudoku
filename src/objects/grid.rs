@@ -47,9 +47,9 @@ impl Grid {
             columns.push(Column::new(metrics.get_max()));
         }
         let mut squares = Vec::new();
-        let c = Cardinal::C;
+        let c = Cardinal::_1_1;
         //construct all Squares
-        for _i in c.get_all() {
+        for _i in c.get_all(side) {
             squares.push(Square::new(metrics.get_max()));
         }
         Grid {
@@ -160,9 +160,14 @@ impl Grid {
         let l: usize = (line - 1).into();
         let lin: &mut Line = &mut (self.lines[l]);
         lin.add_a_known_value(val);
-        let s: usize = (self.acc.coordconverter.pos_to_square(pos).get_value() - 1)
-            .try_into()
-            .unwrap();
+        let s: usize = (self
+            .acc
+            .coordconverter
+            .pos_to_square(pos)
+            .get_value(self.metrics.get_square_side())
+            - 1)
+        .try_into()
+        .unwrap();
         let squ: &mut Square = &mut (self.squares[s]);
         squ.add_a_known_value(val);
     }
@@ -235,8 +240,8 @@ impl Grid {
                 return false;
             }
         }
-        let c = Cardinal::C;
-        for square in c.get_all() {
+        let c = Cardinal::_1_1;
+        for square in c.get_all(self.metrics.get_square_side()) {
             mess = format!("square {:?}", square);
             let res = self.is_valid_set(self.acc.get_square(square), mess);
             if !res {
@@ -376,7 +381,7 @@ impl Grid {
      */
     pub fn check_value_in_square(&mut self, s: Cardinal, val: u16) -> bool {
         //check if value is resolve
-        let pos: usize = (s.get_value() - 1).into();
+        let pos: usize = (s.get_value(self.metrics.get_square_side()) - 1).into();
         let squ: &mut Square = &mut (self.squares[pos]);
         squ.is_known(val)
     }
@@ -490,7 +495,13 @@ impl Grid {
                         }
                     }
                     if self.debug {
-                        println!("cells {} & {} has the same pair {:?} cells to clean {:?}", pos1,pos2, p1.unwrap(),cells);
+                        println!(
+                            "cells {} & {} has the same pair {:?} cells to clean {:?}",
+                            pos1,
+                            pos2,
+                            p1.unwrap(),
+                            cells
+                        );
                     }
                     if !cells.is_empty() {
                         return Some((val1, val2, cells));
@@ -555,7 +566,13 @@ impl Grid {
                         }
                     }
                     if self.debug {
-                        println!("cells {} & {} has the same pair {:?} cells to clean {:?}", pos1,pos2, p1.unwrap(),cells);
+                        println!(
+                            "cells {} & {} has the same pair {:?} cells to clean {:?}",
+                            pos1,
+                            pos2,
+                            p1.unwrap(),
+                            cells
+                        );
                     }
                     if !cells.is_empty() {
                         return Some((val1, val2, cells));

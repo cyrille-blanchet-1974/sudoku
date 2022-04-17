@@ -7,6 +7,7 @@ pub struct Accessor {
     columns: HashMap<u16, Vec<u16>>,
     squares: HashMap<u16, Vec<u16>>,
     pub coordconverter: CoordConverter,
+    squareside: u16,
 }
 
 impl Accessor {
@@ -16,6 +17,7 @@ impl Accessor {
             columns: gen_columns(squareside * squareside),
             squares: gen_squares(squareside),
             coordconverter: CoordConverter::new(squareside),
+            squareside,
         }
     }
 
@@ -32,7 +34,7 @@ impl Accessor {
         }
     }
     pub fn get_square(&self, s: Cardinal) -> Vec<u16> {
-        match self.squares.get(&(s.get_value())) {
+        match self.squares.get(&(s.get_value(self.squareside))) {
             None => Vec::new(),
             Some(x) => x.clone(),
         }

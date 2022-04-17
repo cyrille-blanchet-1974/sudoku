@@ -21,12 +21,10 @@ impl CoordConverter {
         let pos: u16 = pos.try_into().unwrap();
         let line = pos / self.metrics.get_nb_column();
         let column = pos % self.metrics.get_nb_column();
-        if line > self.metrics.get_nb_line() || 
-           column > self.metrics.get_nb_column()
-        {
+        if line > self.metrics.get_nb_line() || column > self.metrics.get_nb_column() {
             panic!("Position {} not supported", pos);
         }
-        (line + 1 ,column + 1)        
+        (line + 1, column + 1)
     }
     pub fn coord_to_pos(&self, line: u16, column: u16) -> usize {
         let pos = (line - 1) * self.metrics.get_nb_line() + column - 1;
@@ -37,14 +35,14 @@ impl CoordConverter {
     from a position calculate the square
     */
     pub fn pos_to_square(&self, pos: usize) -> Cardinal {
-        match self.metrics.get_square_side(){
-            2 => {self.pos_to_square2(pos)},
-            3 => {self.pos_to_square3(pos)},
-            4 => {self.pos_to_square4(pos)},
+        match self.metrics.get_square_side() {
+            2 => self.pos_to_square2(pos),
+            3 => self.pos_to_square3(pos),
+            4 => self.pos_to_square4(pos),
             _ => {
-                let tmp = Cardinal::C;
-                tmp.from(0)
-                },
+                let tmp = Cardinal::_1_1;
+                tmp.from(0, self.metrics.get_square_side())
+            }
         }
     }
 
@@ -71,8 +69,8 @@ impl CoordConverter {
             },
             _ => 0,
         };
-        let tmp = Cardinal::C;
-        tmp.from(res)
+        let tmp = Cardinal::_1_1;
+        tmp.from(res, self.metrics.get_square_side())
     }
 
     fn pos_to_square2(&self, pos: usize) -> Cardinal {
@@ -90,9 +88,8 @@ impl CoordConverter {
             },
             _ => 0,
         };
-        //Todo! 
-        let tmp = Cardinal::C;
-        tmp.from(res)
+        let tmp = Cardinal::_1_1;
+        tmp.from(res, self.metrics.get_square_side())
     }
 
     fn pos_to_square4(&self, pos: usize) -> Cardinal {
@@ -128,9 +125,8 @@ impl CoordConverter {
             },
             _ => 0,
         };
-        //Todo! 
-        let tmp = Cardinal::C;
-        tmp.from(res)
+        let tmp = Cardinal::_1_1;
+        tmp.from(res, self.metrics.get_square_side())
     }
 }
 
@@ -166,7 +162,7 @@ fn pos_to_square_test() {
     //Macro (sort of)
     fn local(i: usize) -> u16 {
         let a = CoordConverter::new(3);
-        a.pos_to_square(i).get_value()
+        a.pos_to_square(i).get_value(3)
     }
     assert_eq!(1, local(0));
     assert_eq!(1, local(1));

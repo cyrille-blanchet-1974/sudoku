@@ -7,12 +7,14 @@ use std::convert::TryInto;
 
 pub struct ResolverLvl3 {
     acc: Accessor,
+    side: u16,
 }
 
 impl ResolverLvl3 {
     pub fn new(side: u16) -> ResolverLvl3 {
         ResolverLvl3 {
             acc: Accessor::new(side),
+            side,
         }
     }
 
@@ -43,8 +45,8 @@ impl ResolverLvl3 {
                     solve_one_at_least = true;
                 }
             }
-            let c = Cardinal::C;
-            for square in c.get_all() {
+            let c = Cardinal::_1_1;
+            for square in c.get_all(self.side) {
                 if self.resolve_square(g, square, val) {
                     solve_one_at_least = true;
                 }
