@@ -37,6 +37,18 @@ impl CoordConverter {
     from a position calculate the square
     */
     pub fn pos_to_square(&self, pos: usize) -> Cardinal {
+        match self.metrics.get_square_side(){
+            2 => {self.pos_to_square2(pos)},
+            3 => {self.pos_to_square3(pos)},
+            4 => {self.pos_to_square4(pos)},
+            _ => {
+                let tmp = Cardinal::C;
+                tmp.from(0)
+                },
+        }
+    }
+
+    fn pos_to_square3(&self, pos: usize) -> Cardinal {
         let coord = self.pos_to_coord(pos);
         let res = match coord.0 {
             1..=3 => match coord.1 {
@@ -59,6 +71,64 @@ impl CoordConverter {
             },
             _ => 0,
         };
+        let tmp = Cardinal::C;
+        tmp.from(res)
+    }
+
+    fn pos_to_square2(&self, pos: usize) -> Cardinal {
+        let coord = self.pos_to_coord(pos);
+        let res = match coord.0 {
+            1..=2 => match coord.1 {
+                1..=2 => 1,
+                3..=4 => 2,
+                _ => 0,
+            },
+            3..=4 => match coord.1 {
+                1..=2 => 3,
+                3..=4 => 4,
+                _ => 0,
+            },
+            _ => 0,
+        };
+        //Todo! 
+        let tmp = Cardinal::C;
+        tmp.from(res)
+    }
+
+    fn pos_to_square4(&self, pos: usize) -> Cardinal {
+        let coord = self.pos_to_coord(pos);
+        let res = match coord.0 {
+            1..=4 => match coord.1 {
+                1..=4 => 1,
+                5..=8 => 2,
+                9..=12 => 3,
+                13..=16 => 4,
+                _ => 0,
+            },
+            5..=8 => match coord.1 {
+                1..=4 => 5,
+                5..=8 => 6,
+                9..=12 => 7,
+                13..=16 => 8,
+                _ => 0,
+            },
+            9..=12 => match coord.1 {
+                1..=4 => 9,
+                5..=8 => 10,
+                9..=12 => 11,
+                13..=16 => 12,
+                _ => 0,
+            },
+            13..=16 => match coord.1 {
+                1..=4 => 13,
+                5..=8 => 14,
+                9..=12 => 15,
+                13..=16 => 16,
+                _ => 0,
+            },
+            _ => 0,
+        };
+        //Todo! 
         let tmp = Cardinal::C;
         tmp.from(res)
     }
