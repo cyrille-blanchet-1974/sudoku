@@ -437,9 +437,6 @@ impl Grid {
     }
 
     pub fn check_pairs_line(&mut self, line: u16) -> Option<(u16, u16, Vec<u16>)> {
-        if self.debug {
-            println!("checking pairs on line {}", line);
-        }
         let mut cells = Vec::new();
         let list1 = self.acc.get_line(line);
         for pos1 in list1 {
@@ -448,9 +445,6 @@ impl Grid {
             let p1 = c1.get_pair();
             if p1 == None {
                 continue;
-            }
-            if self.debug {
-                println!("cell {} got a pair {:?} ", pos1, p1.unwrap());
             }
             let list2 = self.acc.get_line(line);
             for pos2 in list2 {
@@ -464,9 +458,6 @@ impl Grid {
                     continue;
                 }
                 if p1 == p2 {
-                    if self.debug {
-                        println!("cell {} has the same pair ", pos2);
-                    }
                     let list3 = self.acc.get_line(line);
                     let pair = p1.unwrap();
                     let val1 = pair.0;
@@ -499,7 +490,7 @@ impl Grid {
                         }
                     }
                     if self.debug {
-                        println!("cells to clean {:?} ", cells);
+                        println!("cells {} & {} has the same pair {:?} cells to clean {:?}", pos1,pos2, p1.unwrap(),cells);
                     }
                     if !cells.is_empty() {
                         return Some((val1, val2, cells));
@@ -511,9 +502,6 @@ impl Grid {
     }
 
     pub fn check_pairs_column(&mut self, column: u16) -> Option<(u16, u16, Vec<u16>)> {
-        if self.debug {
-            println!("checking pairs on column {}", column);
-        }
         let mut cells = Vec::new();
         let list1 = self.acc.get_column(column);
         for pos1 in list1 {
@@ -522,9 +510,6 @@ impl Grid {
             let p1 = c1.get_pair();
             if p1 == None {
                 continue;
-            }
-            if self.debug {
-                println!("cell {} got a pair {:?} ", pos1, p1.unwrap());
             }
             let list2 = self.acc.get_column(column);
             for pos2 in list2 {
@@ -538,9 +523,6 @@ impl Grid {
                     continue;
                 }
                 if p1 == p2 {
-                    if self.debug {
-                        println!("cell {} has the same pair ", pos2);
-                    }
                     let list3 = self.acc.get_column(column);
                     let pair = p1.unwrap();
                     let val1 = pair.0;
@@ -573,7 +555,7 @@ impl Grid {
                         }
                     }
                     if self.debug {
-                        println!("cells to clean {:?} ", cells);
+                        println!("cells {} & {} has the same pair {:?} cells to clean {:?}", pos1,pos2, p1.unwrap(),cells);
                     }
                     if !cells.is_empty() {
                         return Some((val1, val2, cells));
@@ -977,12 +959,6 @@ fn clone_grid_test() {
 impl Grid {
     pub fn compute_line(&mut self, line_number: u16, l: &str) {
         for (col, part) in l.split(',').enumerate() {
-            /*let r: u16 = match part.parse() {
-                Err(_) => {
-                    continue;
-                }
-                Ok(v) => v,
-            };*/
             let r = string_to_u16(part.to_string());
             if r == 0 {
                 continue;
