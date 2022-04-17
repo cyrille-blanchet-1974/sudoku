@@ -13,22 +13,21 @@ impl CoordConverter {
             metrics: Metrics::new(squareside),
         }
     }
+
     /*
     from a position calculate line and column
     */
     pub fn pos_to_coord(&self, pos: usize) -> (u16, u16) {
         let pos: u16 = pos.try_into().unwrap();
-        for lin in 1..=self.metrics.get_nb_line() {
-            for col in 1..=self.metrics.get_nb_column() {
-                let p = col + (lin - 1) * self.metrics.get_nb_line() - 1;
-                if p == pos {
-                    return (lin, col);
-                }
-            }
+        let line = pos / self.metrics.get_nb_column();
+        let column = pos % self.metrics.get_nb_column();
+        if line > self.metrics.get_nb_line() || 
+           column > self.metrics.get_nb_column()
+        {
+            panic!("Position {} not supported", pos);
         }
-        panic!("Position {} not supported", pos);
+        (line + 1 ,column + 1)        
     }
-
     pub fn coord_to_pos(&self, line: u16, column: u16) -> usize {
         let pos = (line - 1) * self.metrics.get_nb_line() + column - 1;
         pos.into()
